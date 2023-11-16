@@ -16,6 +16,10 @@ console.log(new Date().toISOString());
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal   : true,
+      envFilePath: `./env/.${process.env.NODE_ENV}.env`
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -31,10 +35,6 @@ console.log(new Date().toISOString());
     }),
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
-    ConfigModule.forRoot({
-      isGlobal   : true,
-      envFilePath: `./env/.${process.env.NODE_ENV}.env`
-    }),
     // API Module
     TodoModule
   ],
