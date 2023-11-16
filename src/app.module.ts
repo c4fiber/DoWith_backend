@@ -9,6 +9,7 @@ import { DoWithExceptionFilterModule } from './do-with-exception-filter/do-with-
 import { DoWithExceptionModule } from './do-with-exception/do-with-exception.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { GroupModule } from './group/group.module';
 
 // timezone check
 const now = new Date();
@@ -40,6 +41,7 @@ console.log(new Date().toISOString());
     DoWithExceptionFilterModule,
     // API Module
     TodoModule,
+    GroupModule,
     UserModule,
     AuthModule,
   ],

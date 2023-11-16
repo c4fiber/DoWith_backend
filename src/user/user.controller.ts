@@ -5,41 +5,48 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Post,
+  Patch,
   Put,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserRequestDto } from './dto/user-request.dto';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private usersService: UserService) {}
+  constructor(private readonly usersService: UserService) {}
 
-  @Get('/:id')
-  async getUser(@Param('id', ParseIntPipe) id: number) {
+  @Get('/:user_id')
+  async getUser(
+    @Param('user_id', ParseIntPipe) id: number,
+  ): Promise<UserResponseDto> {
     return this.usersService.getUser(id);
   }
 
-  @Get('/')
-  async getUsers() {
-    // TODO:
-  }
-
-  @Post('/')
-  async createUser(@Body() request: CreateUserDto): Promise<number> {
-    return this.usersService.createUser(request);
-  }
-
-  @Put('/:id')
+  @Put('/:user_id')
   async updateUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() request: CreateUserDto,
-  ) {
+    @Param('user_id', ParseIntPipe) id: number,
+    @Body() request: UserRequestDto,
+  ): Promise<boolean> {
     return this.usersService.updateUser(id, request);
   }
 
-  @Delete('/:id')
-  async deleteUser(@Param('id', ParseIntPipe) id: number) {
+  @Patch('/:user_id')
+  async updateUserHp(
+    @Param('user_id', ParseIntPipe) id: number,
+    @Query('hp', ParseIntPipe) hp: number,
+  ): Promise<boolean> {
+    return this.usersService.updateHp(id, hp);
+  }
+
+  @Delete('/:user_id')
+  async deleteUser(@Param('user_id', ParseIntPipe) id: number): Promise<void> {
     return this.usersService.deleteUser(id);
+  }
+
+  @Get('/:user_id/friends')
+  async getUserFriends() {
+    // TODO:
   }
 }
