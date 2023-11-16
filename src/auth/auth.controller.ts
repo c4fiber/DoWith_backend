@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -22,8 +23,8 @@ export class AuthController {
     return this.authService.signup(request);
   }
 
-  @Get('/login/:user_id')
-  login(@Param('user_id', ParseIntPipe) kakaoId: number): Promise<boolean> {
+  @Get('/login')
+  login(@Query('kakao_id', ParseIntPipe) kakaoId: number): Promise<boolean> {
     return this.authService.login(kakaoId);
   }
 }
