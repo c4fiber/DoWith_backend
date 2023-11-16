@@ -29,7 +29,8 @@ console.log(new Date().toISOString());
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: true,  // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
+      logging: true,
       extra: {
         timezone: 'Asia/Seoul'
       }
