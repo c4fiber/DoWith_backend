@@ -1,7 +1,9 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 
 @Injectable()
 export class DoWithMiddlewareMiddleware implements NestMiddleware {
+  private readonly logger = new Logger();
+
   use(req: any, res: any, next: () => void) {
     const logHeader    = `================== [${req.method}] ${req.url} ==================`;
     const logDate      = `date     : ${new Date()}`;
@@ -21,8 +23,7 @@ export class DoWithMiddlewareMiddleware implements NestMiddleware {
         params += `${key} = ${value}\n`;
       });
     }
-
-    console.log(`
+    this.logger.debug(`
 ${logHeader}
 ${logDate}
 ${logAgent}
