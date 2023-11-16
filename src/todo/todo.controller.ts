@@ -8,9 +8,14 @@ export class TodoController {
     private logger = new Logger('Todos');
     constructor(private todoService: TodoService) {}
 
-    @Get('/:user_id')
-    findAll(@Param('user_id', ParseIntPipe) user_id: number): Promise<Todo[]> {
-        return this.todoService.findAll(user_id);
+    @Get('/user/:user_id')
+    findAllByUser(@Param('user_id', ParseIntPipe) user_id: number): Promise<Todo[]> {
+        return this.todoService.findAllByUser(user_id);
+    }
+
+    @Get('/:todo_id')
+    findOne(@Param('todo_id', ParseIntPipe) todo_id: number): Promise<Todo> {
+        return this.todoService.findOne(todo_id);
     }
 
     @Post()
