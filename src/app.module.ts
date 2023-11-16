@@ -8,6 +8,7 @@ import { DoWithMiddlewareMiddleware } from 'src/do-with-middleware/do-with-middl
 import { DoWithExceptionFilterModule } from './do-with-exception-filter/do-with-exception-filter.module';
 import { DoWithExceptionModule } from './do-with-exception/do-with-exception.module';
 import { GroupModule } from './group/group.module';
+import { RoutineModule } from './routine/routine.module';
 
 // timezone check
 const now = new Date();
@@ -40,7 +41,8 @@ console.log(new Date().toISOString());
     DoWithExceptionFilterModule,
     // API Module
     TodoModule,
-    GroupModule
+    GroupModule,
+    RoutineModule
   ],
   controllers: [AppController],
   providers: [AppService],

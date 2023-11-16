@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Group } from './group.entity';
+import { Group } from './entities/group.entity';
 import { Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 

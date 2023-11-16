@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Logger, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { GroupService } from './group.service';
-import { Group } from './group.entity';
+import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 
 @Controller('group')

@@ -17,9 +17,6 @@ export class Group {
   @Column({ nullable: false })
   grp_cat: string;
 
-  @Column({ nullable: true })
-  grp_routs: string;
-
   @CreateDateColumn()
   createdAt: Date
 
