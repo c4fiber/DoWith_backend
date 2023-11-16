@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Todo {
@@ -11,25 +11,25 @@ export class Todo {
     @Column()
     todo_name: string;
 
-    @Column()
+    @Column({ nullable: true })
     todo_desc: string;
     
-    @Column()
+    @CreateDateColumn()
     todo_date: Date;
 
-    @Column()
+    @Column({ default: false })
     todo_done: boolean;
 
-    @Column()
+    @Column({ nullable: true })
     todo_start: Date;
 
-    @Column()
+    @Column({ nullable: true })
     todo_end: Date;
 
-    @Column()
+    @Column({ nullable: true })
     grp_id: number; // foreign key
 
-    @Column()
+    @Column({ nullable: true })
     todo_img: string;
 
     // TODO ManyToOne: user_id

@@ -8,9 +8,6 @@ export class CreateTodoDto {
     todo_name: string;
 
     todo_desc: string;
-
-    @IsNotEmpty()
-    todo_date: Date;
     
     @IsNotEmpty()
     todo_done: boolean;
