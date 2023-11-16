@@ -4,6 +4,12 @@ import { AppService } from './app.service';
 import { TodoModule } from './todo/todo.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+// timezone check
+const now = new Date();
+const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+console.log(timeZone); // 현재 타임존 출력
+console.log(new Date().toISOString());
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -15,6 +21,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'dowith-db',
       autoLoadEntities: true,
       synchronize: true,
+      extra: {
+        timezone: 'Asia/Seoul'
+      }
     }),
     TodoModule
   ],
