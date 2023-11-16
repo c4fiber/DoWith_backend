@@ -33,4 +33,9 @@ export class TodoController {
         return this.todoService.delete(todo_id);
     }
 
+    @Patch('/:todo_id')
+    editDone(@Param('todo_id', ParseIntPipe) todo_id: number, @Body() createTodoDto: CreateTodoDto): Promise<Todo> {
+        return this.todoService.editDone(todo_id, createTodoDto);
+    }
+
 }

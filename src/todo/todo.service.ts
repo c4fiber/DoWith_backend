@@ -55,4 +55,11 @@ export class TodoService {
         await await this.todoRepository.delete({ todo_id });
     }
 
+      // todo 완료상태 변경
+  async editDone(todo_id: number, createTodoDto: CreateTodoDto): Promise<Todo> {
+    const todo = await this.todoRepository.findOneBy({ todo_id });
+    todo.todo_done = createTodoDto.todo_done;
+
+    return this.todoRepository.save(todo);
+  }
 }
