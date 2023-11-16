@@ -32,7 +32,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new DoWithExceptionFilter(new Logger()));
 
-  await app.listen(port);
+  await app.listen(+port);
   Logger.log(`Application running on port ${port}`);
 }
 bootstrap();
