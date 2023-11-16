@@ -22,7 +22,6 @@ export class TodoService {
         todo.user_id = createTodoDto.user_id;
         todo.todo_name = createTodoDto.todo_name;
         todo.todo_desc = createTodoDto.todo_desc;
-        todo.todo_date = createTodoDto.todo_date;
         todo.todo_done = createTodoDto.todo_done;
         todo.todo_start = createTodoDto.todo_start;
         todo.todo_end = createTodoDto.todo_end;
@@ -38,7 +37,6 @@ export class TodoService {
         todo.user_id = createTodoDto.user_id;
         todo.todo_name = createTodoDto.todo_name;
         todo.todo_desc = createTodoDto.todo_desc;
-        todo.todo_date = createTodoDto.todo_date;
         todo.todo_done = createTodoDto.todo_done;
         todo.todo_start = createTodoDto.todo_start;
         todo.todo_end = createTodoDto.todo_end;
