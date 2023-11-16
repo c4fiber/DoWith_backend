@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { DoWithMiddlewareMiddleware } from 'src/do-with-middleware/do-with-middleware.middleware';
 import { DoWithExceptionFilterModule } from './do-with-exception-filter/do-with-exception-filter.module';
 import { DoWithExceptionModule } from './do-with-exception/do-with-exception.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 // timezone check
 const now = new Date();
@@ -17,8 +19,8 @@ console.log(new Date().toISOString());
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal   : true,
-      envFilePath: `./env/.${process.env.NODE_ENV}.env`
+      isGlobal: true,
+      envFilePath: `./env/.${process.env.NODE_ENV}.env`,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -30,20 +32,21 @@ console.log(new Date().toISOString());
       autoLoadEntities: true,
       synchronize: true,
       extra: {
-        timezone: 'Asia/Seoul'
-      }
+        timezone: 'Asia/Seoul',
+      },
     }),
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
     // API Module
-    TodoModule
+    TodoModule,
+    UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-      consumer.apply(DoWithMiddlewareMiddleware)
-              .forRoutes('');
+    consumer.apply(DoWithMiddlewareMiddleware).forRoutes('');
   }
 }
