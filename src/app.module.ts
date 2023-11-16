@@ -27,13 +27,16 @@ console.log(new Date().toISOString());
       synchronize: true,
       extra: {
         timezone: 'Asia/Seoul'
+      }
     }),
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
     ConfigModule.forRoot({
       isGlobal   : true,
       envFilePath: `./env/.${process.env.NODE_ENV}.env`
-    })
+    }),
+    // API Module
+    TodoModule
   ],
   controllers: [AppController],
   providers: [AppService],
