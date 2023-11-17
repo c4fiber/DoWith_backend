@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
-import { Repository } from 'typeorm';
+import { Any, In, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
+import { User } from 'src/user/user.entities';
 
 @Injectable()
 export class GroupService {
@@ -25,11 +26,20 @@ export class GroupService {
     return await this.groupRepository.findOneBy({group_id});
   }
 
-  async getAllMemberInGroup(group_id: number){
-    return {"success": true};
+  async getAllMemberInGroup(group_id: number): Promise<Promise<Group[]>>{
+    const result = await this.groupRepository.createQueryBuilder('group')
+                                             .leftJoinAndSelect('group.users', 'user')
+                                             .where('group.group_id = :group_id', {group_id})
+                                             .getMany();
+    this.logger.debug(result);
+    return result;
   }
 
   async getMemberTodoInGroup(group_id: number, user_id: number){
     return {"success": true};
+  }
+
+  async deleteGroup(group_id: number){
+    return await this.groupRepository.softDelete({group_id});
   }
 }

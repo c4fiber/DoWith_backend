@@ -11,7 +11,21 @@ export class RoutineService {
     private readonly logger: Logger
   ) {}
 
-  async create(createRoutineDto: CreateRoutineDto) {
+  async createRoutine(createRoutineDto: CreateRoutineDto) {
     return await this.routineRepository.save(createRoutineDto);
+  }
+
+  async getAllRoutines(group_id: number){
+    // const result = await this.routineRepository.find({
+    //   relations: ['group'],
+    //   where: { group: { group_id }},
+    // });
+
+    const result = await this.routineRepository.createQueryBuilder('routine')
+                                               .innerJoinAndSelect('routine.group_id', 'group')
+                                               .where('group_id = :group_id', {group_id})
+                                               .getMany();
+    this.logger.debug(result);
+    return;
   }
 }
