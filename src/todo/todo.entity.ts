@@ -1,39 +1,43 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Todo {
-    @PrimaryGeneratedColumn()
-    todo_id: number;
-    
-    @Column()
-    user_id: number; // foreign key
+  @PrimaryGeneratedColumn()
+  todo_id: number;
 
-    @Column()
-    todo_name: string;
+  @Column()
+  user_id: number; // foreign key
 
-    @Column({ nullable: true })
-    todo_desc: string;
-    
-    @CreateDateColumn()
-    todo_date: Date;
+  @Column()
+  todo_name: string;
 
-    @Column({ default: false })
-    todo_done: boolean;
+  @Column({ nullable: true })
+  todo_desc: string;
 
-    @Column({ nullable: true })
-    todo_start: Date;
+  @CreateDateColumn()
+  todo_date: Date;
 
-    @Column({ nullable: true })
-    todo_end: Date;
+  @Column({ default: false })
+  todo_done: boolean;
 
-    @Column({ nullable: true })
-    grp_id: number; // foreign key
+  @Column({ nullable: true })
+  todo_start: Date;
 
-    @Column({ nullable: true })
-    todo_img: string;
+  @Column({ nullable: true })
+  todo_end: Date;
 
-    // TODO ManyToOne: user_id
-    // TODO ManyToOne: grp_id
-    // TODO todo_image: path of image
+  @Column({ nullable: true })
+  grp_id: number; // foreign key
 
+  @Column({ nullable: true })
+  todo_img: string;
+
+  // TODO ManyToOne: user_id
+  // TODO ManyToOne: grp_id
+  // TODO todo_image: path of image
 }
