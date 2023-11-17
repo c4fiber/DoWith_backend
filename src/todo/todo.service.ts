@@ -12,8 +12,12 @@ export class TodoService {
     ) {}
 
     // READ
-    async findAll(user_id: number): Promise <Todo[]> {
+    async findAllByUser(user_id: number): Promise <Todo[]> {
         return await this.todoRepository.findBy({ user_id });
+    }
+
+    async findOne(todo_id: number): Promise <Todo> {
+        return await this.todoRepository.findOneBy({ todo_id });
     }
 
     // CREATE
