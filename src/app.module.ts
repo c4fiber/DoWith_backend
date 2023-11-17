@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { DoWithMiddlewareMiddleware } from 'src/do-with-middleware/do-with-middleware.middleware';
 import { DoWithExceptionFilterModule } from './do-with-exception-filter/do-with-exception-filter.module';
 import { DoWithExceptionModule } from './do-with-exception/do-with-exception.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './group/group.module';
 import { RoutineModule } from './routine/routine.module';
 
@@ -19,8 +21,8 @@ console.log(new Date().toISOString());
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal   : true,
-      envFilePath: `./env/.${process.env.NODE_ENV}.env`
+      isGlobal: true,
+      envFilePath: `./env/.${process.env.NODE_ENV}.env`,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -33,8 +35,8 @@ console.log(new Date().toISOString());
       synchronize: true,  // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
       logging: true,
       extra: {
-        timezone: 'Asia/Seoul'
-      }
+        timezone: 'Asia/Seoul',
+      },
     }),
     // Common Module
     DoWithExceptionModule,
@@ -43,13 +45,14 @@ console.log(new Date().toISOString());
     TodoModule,
     GroupModule,
     RoutineModule
+    UserModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-      consumer.apply(DoWithMiddlewareMiddleware)
-              .forRoutes('');
+    consumer.apply(DoWithMiddlewareMiddleware).forRoutes('');
   }
 }

@@ -1,23 +1,23 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateTodoDto {
-    @IsNotEmpty()
-    user_id: number; // foreign key
+  @IsNotEmpty()
+  user_id: number; // foreign key
 
-    @IsNotEmpty()
-    todo_name: string;
+  @IsNotEmpty()
+  todo_name: string;
 
-    todo_desc: string;
-    
-    @IsNotEmpty()
-    todo_done: boolean;
+  todo_desc: string;
 
-    todo_start: Date;
+  @IsNotEmpty()
+  todo_done: boolean;
 
-    todo_end: Date;
+  todo_start: Date;
 
-    grp_id: number; // foreign key
+  todo_end: Date;
 
-    // path of image, nessary if grp_id is not null
-    todo_img: string;
+  grp_id: number; // foreign key
+
+  // path of image, nessary if grp_id is not null
+  todo_img: string;
 }
