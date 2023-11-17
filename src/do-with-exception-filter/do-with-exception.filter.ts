@@ -1,31 +1,31 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, Logger } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, Logger, Injectable } from '@nestjs/common';
+import { Request, Response, response } from 'express';
 
 @Catch()
 export class DoWithExceptionFilter implements ExceptionFilter {
-   constructor(
-     private readonly logger: Logger
-   ) {}
+  private readonly logger = new Logger();
 
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
-    // let status = exception.getStatus();
+    const res = ctx.getResponse<Response>();
+    const req = ctx.getRequest<Request>();
+    let comRes = {
+      timestamp: new Date().toISOString(),
+      name     : exception.name,
+      message  : exception.message,
+      path     : req.url
+    }
+
+    this.logger.debug(req.method);
+    this.logger.debug(req.url);
+    this.logger.debug(req.headers['user-agent']);
+    this.logger.error(exception.stack);
 
     // 요구 사항에 따라서 밑에 코드 변경 예정
-    if(exception.name === 'DoWithException'){
-      this.logger.debug("DoWithException");
-    } else {
-      this.logger.debug("HTTPException");
-    }
-    this.logger.error("여기 에러 났습니다 동네 사람들!!!", exception);
+    if(exception.name === 'DoWithException' || exception.name === 'HTTPException'){
+      res.status(exception.getStatus());
+    } 
 
-    // response.status(status)
-    response.json({
-              //statusCode: status,
-              timestamp : new Date().toISOString(),
-              path      : request.url
-            });
-    }
+    res.json(comRes);
+  }
 }

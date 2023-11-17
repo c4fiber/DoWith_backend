@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TodoModule } from './todo/todo.module';
@@ -10,6 +10,9 @@ import { DoWithExceptionModule } from './do-with-exception/do-with-exception.mod
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './group/group.module';
+import { RoutineModule } from './routine/routine.module';
+import { APP_FILTER } from '@nestjs/core';
+import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 
 // timezone check
 const now = new Date();
@@ -31,22 +34,31 @@ console.log(new Date().toISOString());
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: true,  // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
+      logging: true,
       extra: {
         timezone: 'Asia/Seoul',
       },
     }),
-    // Common Module
-    DoWithExceptionModule,
-    DoWithExceptionFilterModule,
     // API Module
     TodoModule,
     GroupModule,
+    RoutineModule,
     UserModule,
     AuthModule,
+    // Common Module
+    DoWithExceptionModule,
+    DoWithExceptionFilterModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    Logger,
+    {
+      provide: APP_FILTER,
+      useClass: DoWithExceptionFilter
+    }
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
