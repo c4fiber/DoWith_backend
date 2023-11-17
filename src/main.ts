@@ -6,7 +6,6 @@ import {
   WinstonModule
 } from 'nest-winston';
 import { Logger } from '@nestjs/common';
-import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 
 async function bootstrap() {
   const port = process.env.PORT;
@@ -29,8 +28,6 @@ async function bootstrap() {
       })
     }
   );
-
-  app.useGlobalFilters(new DoWithExceptionFilter(new Logger()));
 
   await app.listen(+port);
   Logger.log(`Application running on port ${port}`);

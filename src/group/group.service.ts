@@ -26,10 +26,10 @@ export class GroupService {
   }
 
   async getAllMemberInGroup(group_id: number){
-    return;
+    return {"success": true};
   }
 
   async getMemberTodoInGroup(group_id: number, user_id: number){
-    return;
+    return {"success": true};
   }
 }

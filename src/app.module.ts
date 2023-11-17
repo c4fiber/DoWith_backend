@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TodoModule } from './todo/todo.module';
@@ -9,6 +9,8 @@ import { DoWithExceptionFilterModule } from './do-with-exception-filter/do-with-
 import { DoWithExceptionModule } from './do-with-exception/do-with-exception.module';
 import { GroupModule } from './group/group.module';
 import { RoutineModule } from './routine/routine.module';
+import { APP_FILTER } from '@nestjs/core';
+import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 
 // timezone check
 const now = new Date();
@@ -36,16 +38,23 @@ console.log(new Date().toISOString());
         timezone: 'Asia/Seoul'
       }
     }),
-    // Common Module
-    DoWithExceptionModule,
-    DoWithExceptionFilterModule,
     // API Module
     TodoModule,
     GroupModule,
-    RoutineModule
+    RoutineModule,
+    // Common Module
+    DoWithExceptionModule,
+    DoWithExceptionFilterModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    Logger,
+    {
+      provide: APP_FILTER,
+      useClass: DoWithExceptionFilter
+    }
+  ],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer): any {
