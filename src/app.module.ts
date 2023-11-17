@@ -7,6 +7,9 @@ import { ConfigModule } from '@nestjs/config';
 import { DoWithMiddlewareMiddleware } from 'src/do-with-middleware/do-with-middleware.middleware';
 import { DoWithExceptionFilterModule } from './do-with-exception-filter/do-with-exception-filter.module';
 import { DoWithExceptionModule } from './do-with-exception/do-with-exception.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { GroupModule } from './group/group.module';
 
 // timezone check
 const now = new Date();
@@ -17,33 +20,36 @@ console.log(new Date().toISOString());
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal   : true,
-      envFilePath: `./env/.${process.env.NODE_ENV}.env`
+      isGlobal: true,
+      envFilePath: `./env/.${process.env.NODE_ENV}.env`,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT) || 5432,
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: 'dowith-db',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
       autoLoadEntities: true,
       synchronize: true,
       extra: {
-        timezone: 'Asia/Seoul'
-      }
+        timezone: 'Asia/Seoul',
+      },
     }),
+    // Common Module
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
     // API Module
-    TodoModule
+    TodoModule,
+    GroupModule,
+    UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-      consumer.apply(DoWithMiddlewareMiddleware)
-              .forRoutes('');
+    consumer.apply(DoWithMiddlewareMiddleware).forRoutes('');
   }
 }
