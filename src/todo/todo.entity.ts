@@ -2,8 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { User } from '../user/user.entities';
 
 @Entity()
 export class Todo {
@@ -37,7 +39,9 @@ export class Todo {
   @Column({ nullable: true })
   todo_img: string;
 
-  // TODO ManyToOne: user_id
+  @ManyToOne(type => User, user => user.todos)
+  user: User;
+  // NOTE todo데이터 보존을 위해 CASCADE 미설정
   // TODO ManyToOne: grp_id
   // TODO todo_image: path of image
 }
