@@ -6,12 +6,16 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Put,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserRequestDto } from './dto/user-request.dto';
 import { UserResponseDto } from './dto/user-response.dto';
+import { FriendRequestDto } from './dto/friend-request.dto';
 
 @Controller('user')
 export class UserController {
@@ -25,6 +29,7 @@ export class UserController {
   }
 
   @Put('/:user_id')
+  @UsePipes(new ValidationPipe())
   async updateUser(
     @Param('user_id', ParseIntPipe) id: number,
     @Body() request: UserRequestDto,
@@ -45,8 +50,17 @@ export class UserController {
     return this.usersService.deleteUser(id);
   }
 
-  @Get('/:user_id/friends')
+  @Get('/:user_id/friend')
   async getUserFriends() {
-    // TODO:
+    return '친구조회';
+  }
+
+  @Post('user/:user_id/friend/:friend_id')
+  @UsePipes(new ValidationPipe())
+  async addUserFriend(
+    @Param('user_id', ParseIntPipe) id: number,
+    @Body() request: FriendRequestDto,
+  ) {
+    return `유저: ${id} 친구 ${request.friend_id}`;
   }
 }
