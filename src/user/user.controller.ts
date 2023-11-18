@@ -55,7 +55,7 @@ export class UserController {
     return '친구조회';
   }
 
-  @Post('user/:user_id/friend/:friend_id')
+  @Post(':user_id/friend/:friend_id')
   @UsePipes(new ValidationPipe())
   async addUserFriend(
     @Param('user_id', ParseIntPipe) id: number,
