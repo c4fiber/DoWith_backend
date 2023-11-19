@@ -61,6 +61,7 @@ export class TodoService {
   async delete(todo_id: number): Promise<void> {
     const todo = await this.todoRepository.findOneBy({ todo_id });
     todo.todo_deleted = true;
+    await this.todoRepository.save(todo);
   }
 
   // todo 완료상태 변경
