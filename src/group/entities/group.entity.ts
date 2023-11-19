@@ -1,11 +1,12 @@
+import { Category } from 'src/category/entities/category.entity';
 import { Routine } from 'src/routine/entities/routine.entity';
 import { User } from 'src/user/user.entities';
-import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity()
 export class Group {
   @PrimaryGeneratedColumn()
-  group_id: number;
+  grp_id: number;
     
   @Column({ nullable: false })
   grp_name: string;
@@ -14,10 +15,7 @@ export class Group {
   grp_decs: string;
 
   @Column({ nullable: false })
-  grp_owner: string;
-
-  @Column({ nullable: false })
-  grp_cat: string;
+  grp_owner: number;
 
   @CreateDateColumn()
   createdAt: Date
@@ -28,19 +26,20 @@ export class Group {
   @DeleteDateColumn()
   deletedAt: Date
 
-  @OneToMany(type => Routine, routine => routine.group)
-  grp_rout: Routine[]
+  @OneToOne(() => Category, {createForeignKeyConstraints: false})
+  @JoinColumn({ name: 'cat_id'})
+  category: Category;
 
   @ManyToMany(() => User)
   @JoinTable({ 
     name : 'user_group',
     joinColumn: {
-      name: 'group_id',
-      referencedColumnName: 'group_id',
+      name: 'grp_id',
+      referencedColumnName: 'grp_id'
     },
     inverseJoinColumn: {
       name: 'user_id',
-      referencedColumnName: 'user_id',
+      referencedColumnName: 'user_id'
     },
   })
   users: User[];
