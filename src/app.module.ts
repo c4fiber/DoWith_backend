@@ -13,6 +13,7 @@ import { GroupModule } from './group/group.module';
 import { RoutineModule } from './routine/routine.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
+import { CategoryModule } from './category/category.module';
 
 // timezone check
 const now = new Date();
@@ -48,7 +49,8 @@ console.log(new Date().toISOString());
     AuthModule,
     // Common Module
     DoWithExceptionModule,
-    DoWithExceptionFilterModule
+    DoWithExceptionFilterModule,
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [

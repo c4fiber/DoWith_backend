@@ -1,13 +1,14 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Group } from "src/group/entities/group.entity";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Routine {
   @PrimaryGeneratedColumn()
   rout_id: number;
-
-  @Column()
-  group_id: number;
   
+  @Column()
+  grp_id: number;
+
   @Column()
   rout_name: string;
 
@@ -22,6 +23,10 @@ export class Routine {
 
   @CreateDateColumn()
   rout_end: Date;
+
+  // @ManyToOne(() => Group)
+  // @JoinTable({name: 'grp_id'})
+  // grp_id: Group;
 
   // 시간 포맷팅 해서 가지고 있을 수 있을듯 (정해져야 확실히 할텐데)
   // @BeforeInsert()

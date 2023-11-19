@@ -2,7 +2,7 @@ import { IsNotEmpty } from "class-validator";
 
 export class CreateGroupDto {
   @IsNotEmpty()
-  group_id: number;
+  grp_id: number;
 
   @IsNotEmpty()
   grp_name: string;
@@ -10,7 +10,7 @@ export class CreateGroupDto {
   grp_decs: string;
 
   @IsNotEmpty()
-  grp_owner: string;
+  grp_owner: number;
 
   @IsNotEmpty()
   grp_cat: string;
