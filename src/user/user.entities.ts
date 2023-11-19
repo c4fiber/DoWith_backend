@@ -12,7 +12,7 @@ export class User {
   user_tel: string;
 
   @Column()
-  user_kakaoId: number;
+  user_kakao_id: number;
 
   @Column()
   user_hp: number;
@@ -22,11 +22,11 @@ export class User {
   //   room_id: number;
 
   @Column()
-  regAt: Date;
+  reg_at: Date;
 
   @Column()
-  uptAt: Date;
+  upt_at: Date;
 
   @Column()
-  lastLogin: Date;
+  last_login: Date;
 }

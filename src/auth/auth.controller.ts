@@ -24,7 +24,7 @@ export class AuthController {
   }
 
   @Get('/login')
-  login(@Query('kakao_id', ParseIntPipe) kakaoId: number): Promise<boolean> {
-    return this.authService.login(kakaoId);
+  login(@Query('kakao_id', ParseIntPipe) kakao_id: number): Promise<boolean> {
+    return this.authService.login(kakao_id);
   }
 }

@@ -22,10 +22,10 @@ export class UserService {
 
   // 새로운 유저 생성
   async createUser(request: UserRequestDto): Promise<UserResponseDto> {
-    const { name, tel, kakaoId } = request;
+    const { name, tel, kakao_id } = request;
 
     // 만약 이미 가입된 유저인 경우 예외처리
-    if ((await this.getUserByKakaoId(kakaoId)) != null) {
+    if ((await this.getUserByKakaoId(kakao_id)) != null) {
       throw this.doWithException.UserAlreadyExists;
     }
 
@@ -35,11 +35,11 @@ export class UserService {
 
     user.user_name = name;
     user.user_tel = tel;
-    user.user_kakaoId = kakaoId;
-    user.regAt = now;
-    user.lastLogin = now;
+    user.user_kakao_id = kakao_id;
+    user.reg_at = now;
+    user.last_login = now;
     user.user_hp = 0;
-    user.uptAt = now;
+    user.upt_at = now;
 
     await this.userRepository.save(user);
     return new UserResponseDto(user);
@@ -60,7 +60,7 @@ export class UserService {
       .set({
         user_name: name,
         user_tel: tel,
-        uptAt: new Date(),
+        upt_at: new Date(),
       })
       .where('user_id = :id', { id })
       .execute();
@@ -97,12 +97,12 @@ export class UserService {
   }
 
   // 유저 로그인 시각 업데이트
-  async updateLastLoginByKakaoId(kakaoId: number): Promise<boolean> {
+  async updateLastLoginByKakaoId(kakao_id: number): Promise<boolean> {
     const updateResult = await this.userRepository
       .createQueryBuilder()
       .update(User)
-      .set({ lastLogin: new Date() })
-      .where('user_kakaoId = :kakaoId', { kakaoId })
+      .set({ last_login: new Date() })
+      .where('user_kakao_id = :kakao_id', { kakao_id })
       .execute();
 
     if (updateResult.affected === 0) {
@@ -118,7 +118,7 @@ export class UserService {
   }
 
   // 카카오 아이디로 조회
-  async getUserByKakaoId(kakaoId: number): Promise<User> {
-    return await this.userRepository.findOneBy({ user_kakaoId: kakaoId });
+  async getUserByKakaoId(kakao_id: number): Promise<User> {
+    return await this.userRepository.findOneBy({ user_kakao_id: kakao_id });
   }
 }
