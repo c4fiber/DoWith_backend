@@ -14,12 +14,6 @@ import { RoutineModule } from './routine/routine.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 
-// timezone check
-const now = new Date();
-const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-console.log(timeZone); // 현재 타임존 출력
-console.log(new Date().toISOString());
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -65,3 +59,15 @@ export class AppModule implements NestModule {
     consumer.apply(DoWithMiddlewareMiddleware).forRoutes('');
   }
 }
+
+// timezone check
+const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+console.log(timeZone); // 현재 타임존 출력
+
+function getNow() {
+  const event = new Date();
+  event.setTime(event.getTime() - event.getTimezoneOffset() * 60 * 1000);
+  return event.toISOString();
+}
+
+console.log( getNow()); // 현재 타임존의 시간 출력
