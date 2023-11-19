@@ -21,6 +21,9 @@ export class Todo {
   @Column({ nullable: true })
   todo_desc: string;
 
+  @Column({ nullable: false, default: 0 })
+  todo_label: number;
+
   @CreateDateColumn()
   todo_date: Date;
 
@@ -41,9 +44,6 @@ export class Todo {
 
   @Column({ nullable: false, default: false })
   todo_deleted: boolean;
-
-  @Column({ nullable: false, default: 0 })
-  todo_label: number;
 
   @ManyToOne(type => User, user => user.todos)
   user: User;
