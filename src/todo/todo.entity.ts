@@ -24,7 +24,7 @@ export class Todo {
   @Column({ nullable: false, default: 0 })
   todo_label: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn() // default: now()
   todo_date: Date;
 
   @Column({ default: false })
