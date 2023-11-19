@@ -22,10 +22,10 @@ export class UserService {
 
   // 새로운 유저 생성
   async createUser(request: UserRequestDto): Promise<UserResponseDto> {
-    const { name, tel, kakao_id } = request;
+    const { user_name, user_tel, user_kakao_id } = request;
 
     // 만약 이미 가입된 유저인 경우 예외처리
-    if ((await this.getUserByKakaoId(kakao_id)) != null) {
+    if ((await this.getUserByKakaoId(user_kakao_id)) != null) {
       throw this.doWithException.UserAlreadyExists;
     }
 
@@ -33,9 +33,9 @@ export class UserService {
     const now = new Date();
     const user = new User();
 
-    user.user_name = name;
-    user.user_tel = tel;
-    user.user_kakao_id = kakao_id;
+    user.user_name = user_name;
+    user.user_tel = user_tel;
+    user.user_kakao_id = user_kakao_id;
     user.reg_at = now;
     user.last_login = now;
     user.user_hp = 0;
@@ -48,8 +48,8 @@ export class UserService {
   // 유저 수정
   async updateUser(id: number, request: UserRequestDto): Promise<boolean> {
     // 만약 중복된 이름일 경우 예외 반환
-    const { name, tel } = request;
-    const user = await this.userRepository.findOneBy({ user_name: name });
+    const { user_name, user_tel } = request;
+    const user = await this.userRepository.findOneBy({ user_name: user_name });
     if (user !== null) {
       throw this.doWithException.UserNameNotUnique;
     }
@@ -58,8 +58,8 @@ export class UserService {
       .createQueryBuilder()
       .update(User)
       .set({
-        user_name: name,
-        user_tel: tel,
+        user_name: user_name,
+        user_tel: user_tel,
         upt_at: new Date(),
       })
       .where('user_id = :id', { id })
