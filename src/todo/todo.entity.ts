@@ -42,6 +42,9 @@ export class Todo {
   @Column({ nullable: false, default: false })
   todo_deleted: boolean;
 
+  @Column({ nullable: false, default: 0 })
+  todo_label: number;
+
   @ManyToOne(type => User, user => user.todos)
   user: User;
   // NOTE todo데이터 보존을 위해 CASCADE 미설정
