@@ -14,6 +14,7 @@ import { RoutineModule } from './routine/routine.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 import { CategoryModule } from './category/category.module';
+import { UserGroupModule } from './user_group/user_group.module';
 
 @Module({
   imports: [
@@ -44,7 +45,8 @@ import { CategoryModule } from './category/category.module';
     // Common Module
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
-    CategoryModule
+    CategoryModule,
+    UserGroupModule
   ],
   controllers: [AppController],
   providers: [

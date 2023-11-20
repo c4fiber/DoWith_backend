@@ -15,11 +15,14 @@ export class GroupController {
     return this.groupService.getGroupAll();
   }
 
-  @Post('/')
-  createGroupOne(@Body() createGroupDto: CreateGroupDto): Promise<any>{
+  @Post('/:user_id')
+  createGroupOne(
+    @Param('user_id') user_id: number,
+    @Body() createGroupDto: CreateGroupDto
+  ): Promise<any>{
     this.logger.debug("createGroupDto", JSON.stringify(createGroupDto));
 
-    return this.groupService.createGroupOne(createGroupDto);
+    return this.groupService.createGroupOne(user_id, createGroupDto);
   }
 
   @Get('/:grp_id')
