@@ -62,6 +62,7 @@ export class UserController {
     @Body() body: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UserResponseDto> {
+    console.log(body);
     return await this.usersService.createUser(body);
   }
 
