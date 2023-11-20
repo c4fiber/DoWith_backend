@@ -31,7 +31,7 @@ export class RoutineService {
     return result;
   }
 
-  async createRoutine(grp_id: number, createRoutineDto: CreateRoutineDto) {
+  async createRoutine(grp_id: number, createRoutineDto: CreateRoutineDto): Promise<any> {
     const routList = await this.routineRepository.createQueryBuilder('r')
                                                  .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
                                                  .where('g.grp_id = :grp_id', {grp_id})
@@ -47,5 +47,9 @@ export class RoutineService {
     createRoutineDto['grp_id'] = grp_id;
 
     return await this.routineRepository.save(createRoutineDto);
+  }
+
+  async deleteRoutine(rout_id: number): Promise<any> {
+    return await this.routineRepository.softDelete({ rout_id });
   }
 }

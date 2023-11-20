@@ -18,9 +18,14 @@ export class RoutineController {
   createRoutine(
     @Param('grp_id')grp_id: number,
     @Body() createRoutineDto: CreateRoutineDto
-  ) {
+  ): Promise<any> {
     this.logger.debug(JSON.stringify(createRoutineDto));
 
     return this.routineService.createRoutine(grp_id, createRoutineDto);
+  }
+
+  @Delete('/:rout_id')
+  deleteRoutine(@Param('rout_id')rout_id: number): Promise<any> {
+    return this.routineService.deleteRoutine(rout_id);  
   }
 }

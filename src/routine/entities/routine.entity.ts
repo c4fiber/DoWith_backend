@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Routine {
@@ -22,4 +22,7 @@ export class Routine {
 
   @CreateDateColumn()
   rout_end: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date
 }
