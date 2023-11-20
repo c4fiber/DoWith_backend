@@ -46,8 +46,6 @@ export class UserService {
     user.user_hp = 0;
     user.upt_at = now;
 
-    console.log(`${user_name} ${user_kakao_id}`);
-
     await this.userRepository.save(user);
     return new UserResponseDto(user);
   }

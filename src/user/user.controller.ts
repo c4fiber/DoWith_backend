@@ -24,7 +24,6 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { FriendRequestDto } from './dto/friend-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import path from 'path';
 
 @Controller('user')
 export class UserController {
@@ -51,13 +50,11 @@ export class UserController {
       storage: diskStorage({
         destination: './public/image',
         filename: (_, file, callback) => {
-          if (!file) {
-            console.log('파일이 없음');
-            return;
+          if (file) {
+            // 파일이 있을 떄만 저장
+            console.log(`filename: ${file.originalname}`);
+            callback(null, file.originalname);
           }
-
-          console.log(`filename: ${file.originalname}`);
-          callback(null, file.originalname);
         },
       }),
     }),
@@ -66,7 +63,6 @@ export class UserController {
     @Body() body: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UserResponseDto> {
-    console.log(body);
     return await this.usersService.createUser(body);
   }
 
