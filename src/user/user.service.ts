@@ -124,7 +124,6 @@ export class UserService {
   ): Promise<UserResponseDto[]> {
     const { contacts } = body;
 
-    console.log(contacts);
     if (contacts.length == 0) {
       return [];
     }
@@ -138,12 +137,12 @@ export class UserService {
   }
 
   // 닉네임으로 조회
-  async getUserByName(name: string): Promise<User> {
+  private async getUserByName(name: string): Promise<User> {
     return await this.userRepository.findOneBy({ user_name: name });
   }
 
   // 카카오 아이디로 조회
-  async getUserByKakaoId(kakao_id: string): Promise<User> {
+  private async getUserByKakaoId(kakao_id: string): Promise<User> {
     return await this.userRepository.findOneBy({ user_kakao_id: kakao_id });
   }
 }

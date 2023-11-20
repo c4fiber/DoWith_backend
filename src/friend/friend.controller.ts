@@ -28,7 +28,6 @@ export class FriendController {
   @Post('/')
   @UsePipes(ValidationPipe)
   async createFriend(@Body() body: FreindRequestDto): Promise<boolean> {
-    console.log(`🔥 ${JSON.stringify(body)}`);
     return await this.friendService.createFriend(body);
   }
 
