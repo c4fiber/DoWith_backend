@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './todo.entity';
 
 @Controller('todo')
@@ -39,9 +40,9 @@ export class TodoController {
   @Put('/:todo_id')
   update(
     @Param('todo_id', ParseIntPipe) todo_id: number,
-    @Body() createTodoDto: CreateTodoDto,
+    @Body() updateTodoDto: UpdateTodoDto,
   ): Promise<Todo> {
-    return this.todoService.update(todo_id, createTodoDto);
+    return this.todoService.update(todo_id, updateTodoDto);
   }
 
   @Delete('/:todo_id')
@@ -52,8 +53,8 @@ export class TodoController {
   @Patch('/:todo_id')
   editDone(
     @Param('todo_id', ParseIntPipe) todo_id: number,
-    @Body() createTodoDto: CreateTodoDto,
+    @Body() updateTodoDto: UpdateTodoDto,
   ): Promise<Todo> {
-    return this.todoService.editDone(todo_id, createTodoDto);
+    return this.todoService.editDone(todo_id, updateTodoDto);
   }
 }
