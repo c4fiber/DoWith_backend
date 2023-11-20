@@ -56,9 +56,8 @@ export class UserController {
             return;
           }
 
-          const newFilename = path.extname(file.originalname);
-          console.log(`filename: ${newFilename}`);
-          callback(null, newFilename);
+          console.log(`filename: ${file.originalname}`);
+          callback(null, file.originalname);
         },
       }),
     }),
