@@ -123,17 +123,19 @@ export class UserService {
     body: GetUsersByContactsDto,
   ): Promise<UserResponseDto[]> {
     const { contacts } = body;
-    console.log(contacts);
 
-    const result: UserResponseDto[] = [];
-    await this.userRepository
+    console.log(contacts);
+    if (contacts.length == 0) {
+      console.log('🔥 빈 contacts 배열!!');
+      return [];
+    }
+
+    const users = await this.userRepository
       .createQueryBuilder('user')
       .where('user_tel IN (:...tels)', { tels: contacts })
-      .getMany()
-      .then((users) =>
-        users.forEach((user) => result.push(new UserResponseDto(user))),
-      );
-    return result;
+      .getMany();
+
+    return users.map((user) => new UserResponseDto(user));
   }
 
   // 닉네임으로 조회

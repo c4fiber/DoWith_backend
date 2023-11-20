@@ -94,6 +94,7 @@ export class UserController {
   async getUsersByContacts(
     @Body() body: GetUsersByContactsDto,
   ): Promise<UserResponseDto[]> {
+    console.log(`🔥 ${body}`);
     return await this.usersService.getUsersByContacts(body);
   }
 
