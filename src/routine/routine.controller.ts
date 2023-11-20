@@ -14,10 +14,13 @@ export class RoutineController {
     return this.routineService.getAllRoutines(grp_id);
   }
 
-  @Post()
-  createRoutine(@Body() createRoutineDto: CreateRoutineDto) {
+  @Post('/:grp_id')
+  createRoutine(
+    @Param('grp_id')grp_id: number,
+    @Body() createRoutineDto: CreateRoutineDto
+  ) {
     this.logger.debug(JSON.stringify(createRoutineDto));
 
-    return this.routineService.createRoutine(createRoutineDto);
+    return this.routineService.createRoutine(grp_id, createRoutineDto);
   }
 }
