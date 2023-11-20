@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Logger, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -30,10 +30,10 @@ export class GroupController {
   }
 
   @Get('/:user_id/groups')
-  getAllMyGroup(@Param('user_id') user_id: number){
+  getAllMyGroups(@Param('user_id') user_id: number){
     this.logger.debug("user_id", user_id);
 
-    return this.groupService.getAllMyGroup(user_id);
+    return this.groupService.getAllMyGroups(user_id);
   }
 
   @Get('/:grp_id/user/:user_id')
@@ -59,6 +59,9 @@ export class GroupController {
 
     return this.groupService.getGroupsBySearching(user_id, cat_id, keyword);
   }
+
+  // @Patch()
+  // updateImg()
 
   // 그룹 인원수가 0이되면 삭제
   @Delete('/:grp_id')
