@@ -21,9 +21,10 @@ import {
 import { UserService } from './user.service';
 import { UserRequestDto as CreateUserDto } from './dto/user-request.dto';
 import { UserResponseDto } from './dto/user-response.dto';
-import { FriendRequestDto } from './dto/friend-request.dto';
+import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { User } from './user.entities';
 
 @Controller('user')
 export class UserController {
@@ -88,20 +89,25 @@ export class UserController {
     return await this.usersService.deleteUser(id);
   }
 
-  //   @Post("/:user/profile")
-  //   async createUserProfile(@Param('user_id'))
-
-  @Get('/:user_id/friend')
-  async getUserFriends() {
-    return '친구조회';
+  @Post('/contacts')
+  @UsePipes(ValidationPipe)
+  async getUsersByContacts(
+    @Body() body: GetUsersByContactsDto,
+  ): Promise<UserResponseDto[]> {
+    return await this.usersService.getUsersByContacts(body);
   }
 
-  @Post(':user_id/friend/:friend_id')
-  @UsePipes(new ValidationPipe())
-  async addUserFriend(
-    @Param('user_id', ParseIntPipe) id: number,
-    @Body() request: FriendRequestDto,
-  ) {
-    return `유저: ${id} 친구 ${request.friend_id}`;
-  }
+  //   @Get('/:user_id/friend')
+  //   async getUserFriends() {
+  //     return '친구조회';
+  //   }
+
+  //   @Post(':user_id/friend/:friend_id')
+  //   @UsePipes(new ValidationPipe())
+  //   async addUserFriend(
+  //     @Param('user_id', ParseIntPipe) id: number,
+  //     @Body() request: GetUsersByContactsDto,
+  //   ) {
+  //     return `유저: ${id} 친구 ${request.friend_id}`;
+  //   }
 }

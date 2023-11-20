@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UserResponseDto } from './dto/user-response.dto';
+import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 
 @Injectable()
 export class UserService {
@@ -115,6 +116,22 @@ export class UserService {
     }
 
     return true;
+  }
+
+  // 연락처 리스트로 조회
+  async getUsersByContacts(
+    body: GetUsersByContactsDto,
+  ): Promise<UserResponseDto[]> {
+    const { contacts } = body;
+    const result: UserResponseDto[] = [];
+    await this.userRepository
+      .createQueryBuilder('user')
+      .where('user_tel IN (:...tels)', { tels: contacts })
+      .getMany()
+      .then((users) =>
+        users.forEach((user) => result.push(new UserResponseDto(user))),
+      );
+    return result;
   }
 
   // 닉네임으로 조회

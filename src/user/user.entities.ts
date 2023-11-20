@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -17,9 +24,13 @@ export class User {
   @Column()
   user_hp: number;
 
-  //   @OneToOne(() => Room)
-  //   @JoinColumn()
-  //   room_id: number;
+  // @OneToOne(() => Room)
+  // @JoinColumn()
+  // room_id: number;
+
+  @ManyToMany(() => User)
+  @JoinTable()
+  friends: User[];
 
   @Column()
   reg_at: Date;
