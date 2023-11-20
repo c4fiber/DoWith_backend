@@ -9,9 +9,9 @@ export class RoutineController {
     private readonly logger: Logger
   ) {}
 
-  @Get('/:group_id')
-  getAllRoutines(@Param('group_id') group_id: number){
-    return this.routineService.getAllRoutines(group_id);
+  @Get('/:grp_id')
+  getAllRoutines(@Param('grp_id') grp_id: number): Promise<any>{
+    return this.routineService.getAllRoutines(grp_id);
   }
 
   @Post()

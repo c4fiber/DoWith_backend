@@ -15,17 +15,21 @@ export class RoutineService {
     return await this.routineRepository.save(createRoutineDto);
   }
 
-  async getAllRoutines(group_id: number){
-    // const result = await this.routineRepository.find({
-    //   relations: ['group'],
-    //   where: { group: { group_id }},
-    // });
-
-    const result = await this.routineRepository.createQueryBuilder('routine')
-                                               .innerJoinAndSelect('routine.group_id', 'group')
-                                               .where('group_id = :group_id', {group_id})
-                                               .getMany();
+  async getAllRoutines(grp_id: number): Promise<any>{
+    const result = await this.routineRepository.createQueryBuilder('r')
+                                               .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
+                                               .where('g.grp_id = :grp_id', {grp_id})
+                                               .select([
+                                                  'r.grp_id      AS grp_id'
+                                                , 'r.rout_name   AS rout_name'
+                                                , 'r.rout_desc   AS rout_desc'
+                                                , 'r.rout_repeat AS rout_repeat'
+                                                , 'r.rout_srt    AS rout_srt'
+                                                , 'r.rout_end    AS rout_end'
+                                               ])
+                                               .getRawMany();
     this.logger.debug(result);
-    return;
+
+    return result;
   }
 }
