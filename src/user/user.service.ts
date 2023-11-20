@@ -123,6 +123,8 @@ export class UserService {
     body: GetUsersByContactsDto,
   ): Promise<UserResponseDto[]> {
     const { contacts } = body;
+    console.log(contacts);
+
     const result: UserResponseDto[] = [];
     await this.userRepository
       .createQueryBuilder('user')
