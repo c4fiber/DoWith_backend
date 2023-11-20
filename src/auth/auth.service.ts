@@ -11,22 +11,9 @@ export class AuthService {
     private doWithExceptions: DoWithExceptions,
   ) {}
 
-  // 새로운 유저를 생성
-  async signup(request: UserRequestDto): Promise<UserResponseDto> {
-    const { user_name } = request;
-    await this.usersService.getUserByName(user_name).then((user) => {
-      if (user !== null) {
-        // 중복 닉네임 처리
-        throw this.doWithExceptions.UserNameNotUnique;
-      }
-    });
-
-    return await this.usersService.createUser(request);
-  }
-
   // 카카오 아이디로 DB를 검색하여
   // lastLogin 필드를 업데이트
-  async login(kakao_id: number): Promise<boolean> {
+  async login(kakao_id: string): Promise<boolean> {
     return await this.usersService.updateLastLoginByKakaoId(kakao_id);
   }
 }

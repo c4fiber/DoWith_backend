@@ -13,6 +13,8 @@ import { GroupModule } from './group/group.module';
 import { RoutineModule } from './routine/routine.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 // timezone check
 const now = new Date();
@@ -34,11 +36,14 @@ console.log(new Date().toISOString());
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
-      synchronize: true,  // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
+      synchronize: true, // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
       logging: true,
       extra: {
         timezone: 'Asia/Seoul',
       },
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
     }),
     // API Module
     TodoModule,
@@ -48,7 +53,7 @@ console.log(new Date().toISOString());
     AuthModule,
     // Common Module
     DoWithExceptionModule,
-    DoWithExceptionFilterModule
+    DoWithExceptionFilterModule,
   ],
   controllers: [AppController],
   providers: [
@@ -56,8 +61,8 @@ console.log(new Date().toISOString());
     Logger,
     {
       provide: APP_FILTER,
-      useClass: DoWithExceptionFilter
-    }
+      useClass: DoWithExceptionFilter,
+    },
   ],
 })
 export class AppModule implements NestModule {

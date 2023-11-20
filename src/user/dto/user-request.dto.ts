@@ -8,5 +8,5 @@ export class UserRequestDto {
   user_tel: string;
 
   @IsNotEmpty()
-  user_kakao_id: number;
+  user_kakao_id: string;
 }

@@ -29,6 +29,11 @@ export class UserService {
       throw this.doWithException.UserAlreadyExists;
     }
 
+    // 중복 닉네임 예외처리
+    if ((await this.getUserByName(user_name)) != null) {
+      throw this.doWithException.UserNameNotUnique;
+    }
+
     // 유저 엔티티 생성
     const now = new Date();
     const user = new User();
@@ -97,7 +102,7 @@ export class UserService {
   }
 
   // 유저 로그인 시각 업데이트
-  async updateLastLoginByKakaoId(kakao_id: number): Promise<boolean> {
+  async updateLastLoginByKakaoId(kakao_id: string): Promise<boolean> {
     const updateResult = await this.userRepository
       .createQueryBuilder()
       .update(User)
@@ -118,7 +123,7 @@ export class UserService {
   }
 
   // 카카오 아이디로 조회
-  async getUserByKakaoId(kakao_id: number): Promise<User> {
+  async getUserByKakaoId(kakao_id: string): Promise<User> {
     return await this.userRepository.findOneBy({ user_kakao_id: kakao_id });
   }
 }

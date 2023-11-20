@@ -12,10 +12,13 @@ export class User {
   user_tel: string;
 
   @Column()
-  user_kakao_id: number;
+  user_kakao_id: string;
 
   @Column()
   user_hp: number;
+
+  @Column()
+  user_profile: string;
 
   //   @OneToOne(() => Room)
   //   @JoinColumn()
