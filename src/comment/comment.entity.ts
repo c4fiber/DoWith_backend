@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from '../user/user.entities';
 
 @Entity()
 export class Comment {
@@ -22,4 +23,8 @@ export class Comment {
 
 	@Column({ default: false })
 	is_del: boolean;
+
+	@ManyToOne(() => User, user => user.user_id)
+    @JoinColumn({ name: 'author_id' })
+    author: User;
 }

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Comment } from './comment.entity';
 import { User } from '../user/user.entities';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update_comment.dto';
 
 @Injectable()
 export class CommentService {
@@ -18,7 +19,8 @@ export class CommentService {
             where: {
                 owner_id: owner_id,
                 is_del: false
-            }
+            },
+            relations: ['author'],
         });
     }
 
@@ -27,8 +29,13 @@ export class CommentService {
         const comment = new Comment();
         const now = new Date();
 
-        comment.owner_id = createCommentDto.owner_id;
-        comment.author_id = createCommentDto.author_id;
+        comment.owner_id = parseInt(createCommentDto.owner_id);
+        comment.author_id = parseInt(createCommentDto.author_id);
+
+        if (isNaN(comment.owner_id) || isNaN(comment.author_id)) {
+            throw new Error("Invalid owner_id or author_id");
+        }
+    
         comment.content = createCommentDto.content;
         comment.reg_at = now;
         comment.is_mod = false;
@@ -38,20 +45,23 @@ export class CommentService {
     }
 
     // UPDATE
-    async updateComment(com_id: number, createCommentDto: CreateCommentDto): Promise<Comment> {
-        const comment = await this.commentRepository.findOneBy({ com_id });
-
-        comment.content = createCommentDto.content;
-        comment.is_mod = true;
-
-        return await this.commentRepository.save(comment);
+    async updateComment(com_id: number, updateCommentDto: UpdateCommentDto): Promise<Comment> {
+        const comment = await this.commentRepository.findOne({ where: { com_id } });
+        if (comment) {
+            comment.content = updateCommentDto.content;
+            comment.is_mod = true;
+            await this.commentRepository.save(comment);
+            return comment;
+        }
     }
 
     // DELETE
-    async deleteComment(com_id: number, createCommentDto: CreateCommentDto): Promise<Comment> {
-        const comment = await this.commentRepository.findOneBy({ com_id });
-        comment.is_del = true;
-
-        return await this.commentRepository.save(comment);
+    async deleteComment(com_id: number): Promise<Comment> {
+        const comment = await this.commentRepository.findOne({ where: { com_id } });
+        if (comment) {
+            comment.is_del = true;
+            await this.commentRepository.save(comment);
+            return comment
+        }
     }
 }
