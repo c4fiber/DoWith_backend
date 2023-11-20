@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TodoModule } from './todo/todo.module';
@@ -10,12 +10,11 @@ import { DoWithExceptionModule } from './do-with-exception/do-with-exception.mod
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './group/group.module';
-
-// timezone check
-const now = new Date();
-const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-console.log(timeZone); // 현재 타임존 출력
-console.log(new Date().toISOString());
+import { RoutineModule } from './routine/routine.module';
+import { APP_FILTER } from '@nestjs/core';
+import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
+import { CategoryModule } from './category/category.module';
+import { UserGroupModule } from './user_group/user_group.module';
 
 @Module({
   imports: [
@@ -31,25 +30,48 @@ console.log(new Date().toISOString());
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: true,  // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
+      logging: true,
       extra: {
         timezone: 'Asia/Seoul',
       },
     }),
-    // Common Module
-    DoWithExceptionModule,
-    DoWithExceptionFilterModule,
     // API Module
     TodoModule,
     GroupModule,
+    RoutineModule,
     UserModule,
     AuthModule,
+    // Common Module
+    DoWithExceptionModule,
+    DoWithExceptionFilterModule,
+    CategoryModule,
+    UserGroupModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    Logger,
+    {
+      provide: APP_FILTER,
+      useClass: DoWithExceptionFilter
+    }
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
     consumer.apply(DoWithMiddlewareMiddleware).forRoutes('');
   }
 }
+
+// timezone check
+const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+console.log(timeZone); // 현재 타임존 출력
+
+function getNow() {
+  const event = new Date();
+  event.setTime(event.getTime() - event.getTimezoneOffset() * 60 * 1000);
+  return event.toISOString();
+}
+
+console.log( getNow()); // 현재 타임존의 시간 출력
