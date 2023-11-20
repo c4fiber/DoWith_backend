@@ -22,6 +22,7 @@ enum DoWithErrorCode {
   UserAlreadyExists = '0011',
   UserNotFound = '0012',
   UserNameNotUnique = '0013',
+  SelfFriendship = '0014',
 }
 
 enum DoWithErrorMsg {
@@ -29,6 +30,7 @@ enum DoWithErrorMsg {
   UserAlreadyExists = 'User is already registerd',
   UserNotFound = 'User not found',
   UserNameNotUnique = 'User name is not unique',
+  SelfFriendship = 'A user cannot befriend themselves',
 }
 
 @Injectable()
@@ -51,6 +53,11 @@ export class DoWithExceptions {
   UserNameNotUnique = new DoWithException(
     DoWithErrorMsg.UserNameNotUnique,
     DoWithErrorCode.UserNameNotUnique,
+    HttpStatus.BAD_REQUEST,
+  );
+  SelfFriendship = new DoWithException(
+    DoWithErrorMsg.SelfFriendship,
+    DoWithErrorMsg.SelfFriendship,
     HttpStatus.BAD_REQUEST,
   );
 }

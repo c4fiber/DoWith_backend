@@ -19,12 +19,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserRequestDto as CreateUserDto } from './dto/user-request.dto';
+import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { User } from './user.entities';
 
 @Controller('user')
 export class UserController {
@@ -61,7 +60,7 @@ export class UserController {
     }),
   )
   async createUser(
-    @Body() body: CreateUserDto,
+    @Body() body: UserRequestDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UserResponseDto> {
     return await this.usersService.createUser(body);
@@ -71,7 +70,7 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   async updateUser(
     @Param('user_id', ParseIntPipe) id: number,
-    @Body() request: CreateUserDto,
+    @Body() request: UserRequestDto,
   ): Promise<boolean> {
     return await this.usersService.updateUser(id, request);
   }
@@ -94,21 +93,6 @@ export class UserController {
   async getUsersByContacts(
     @Body() body: GetUsersByContactsDto,
   ): Promise<UserResponseDto[]> {
-    console.log(`🔥 ${body}`);
     return await this.usersService.getUsersByContacts(body);
   }
-
-  //   @Get('/:user_id/friend')
-  //   async getUserFriends() {
-  //     return '친구조회';
-  //   }
-
-  //   @Post(':user_id/friend/:friend_id')
-  //   @UsePipes(new ValidationPipe())
-  //   async addUserFriend(
-  //     @Param('user_id', ParseIntPipe) id: number,
-  //     @Body() request: GetUsersByContactsDto,
-  //   ) {
-  //     return `유저: ${id} 친구 ${request.friend_id}`;
-  //   }
 }

@@ -61,7 +61,7 @@ export class UserService {
     }
 
     const updateResult = await this.userRepository
-      .createQueryBuilder()
+      .createQueryBuilder('user')
       .update(User)
       .set({
         user_name: user_name,
@@ -90,7 +90,7 @@ export class UserService {
   // 유저 HP 업데이트
   async updateHp(id: number, hp: number): Promise<boolean> {
     const updateResult = await this.userRepository
-      .createQueryBuilder()
+      .createQueryBuilder('user')
       .update(User)
       .set({ user_hp: hp })
       .where('user_id = :id', { id })
@@ -105,7 +105,7 @@ export class UserService {
   // 유저 로그인 시각 업데이트
   async updateLastLoginByKakaoId(kakao_id: string): Promise<boolean> {
     const updateResult = await this.userRepository
-      .createQueryBuilder()
+      .createQueryBuilder('user')
       .update(User)
       .set({ last_login: new Date() })
       .where('user_kakao_id = :kakao_id', { kakao_id })
@@ -126,7 +126,6 @@ export class UserService {
 
     console.log(contacts);
     if (contacts.length == 0) {
-      console.log('🔥 빈 contacts 배열!!');
       return [];
     }
 

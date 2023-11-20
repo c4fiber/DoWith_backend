@@ -15,6 +15,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { FriendModule } from './friend/friend.module';
 
 // timezone check
 const now = new Date();
@@ -54,6 +55,7 @@ console.log(new Date().toISOString());
     // Common Module
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
+    FriendModule,
   ],
   controllers: [AppController],
   providers: [
