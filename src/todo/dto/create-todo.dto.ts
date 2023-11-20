@@ -13,8 +13,8 @@ export class CreateTodoDto {
   todo_done: boolean;
 
   // optional
-  todo_start: Date;
-  todo_end: Date;
+  todo_start: string;
+  todo_end: string;
   grp_id: number; // foreign key
   // path of image, nessary if grp_id is not null
   todo_img: string;

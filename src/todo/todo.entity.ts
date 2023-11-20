@@ -30,11 +30,11 @@ export class Todo {
   @Column({ default: false })
   todo_done: boolean;
 
-  @Column({ nullable: true })
-  todo_start: Date;
+  @Column({ nullable: true, default: "00:00" })
+  todo_start: string;
 
-  @Column({ nullable: true })
-  todo_end: Date;
+  @Column({ nullable: true, default: "00:00" })
+  todo_end: string;
 
   @Column({ nullable: true })
   grp_id: number; // foreign key
