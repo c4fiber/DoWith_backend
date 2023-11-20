@@ -42,7 +42,7 @@ export class UserController {
     FileInterceptor('file', {
       limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (_, file, callback) => {
-        if (file.originalname.match(/\.jpg$/)) {
+        if (!file.originalname.match(/\.jpg$/)) {
           return callback(new Error('Only images are allowed.'), false);
         }
       },
