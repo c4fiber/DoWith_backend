@@ -9,10 +9,15 @@ export class RoutineController {
     private readonly logger: Logger
   ) {}
 
-  @Post()
-  create(@Body() createRoutineDto: CreateRoutineDto) {
-    this.logger.log(JSON.stringify(createRoutineDto));
+  @Get('/:group_id')
+  getAllRoutines(@Param('group_id') group_id: number){
+    return this.routineService.getAllRoutines(group_id);
+  }
 
-    return this.routineService.create(createRoutineDto);
+  @Post()
+  createRoutine(@Body() createRoutineDto: CreateRoutineDto) {
+    this.logger.debug(JSON.stringify(createRoutineDto));
+
+    return this.routineService.createRoutine(createRoutineDto);
   }
 }

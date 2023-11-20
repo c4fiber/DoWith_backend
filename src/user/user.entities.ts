@@ -6,6 +6,8 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Column, Entity, ManyToMany, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Todo } from '../todo/todo.entity';
 
 @Entity()
 export class User {
@@ -40,4 +42,7 @@ export class User {
 
   @Column()
   last_login: Date;
+
+  @OneToMany(() => Todo, (todo) => todo.user)
+  todos: Todo[];
 }

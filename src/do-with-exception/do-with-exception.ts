@@ -18,7 +18,6 @@ export class DoWithException extends Error {
 }
 
 enum DoWithErrorCode {
-  TestError = '0010',
   UserAlreadyExists = '0011',
   UserNotFound = '0012',
   UserNameNotUnique = '0013',
@@ -26,7 +25,6 @@ enum DoWithErrorCode {
 }
 
 enum DoWithErrorMsg {
-  TestError = 'This is not permmited',
   UserAlreadyExists = 'User is already registerd',
   UserNotFound = 'User not found',
   UserNameNotUnique = 'User name is not unique',
@@ -35,11 +33,6 @@ enum DoWithErrorMsg {
 
 @Injectable()
 export class DoWithExceptions {
-  NotPermitted = new DoWithException(
-    DoWithErrorMsg.TestError,
-    DoWithErrorCode.TestError,
-    HttpStatus.BAD_REQUEST,
-  );
   UserAlreadyExists = new DoWithException(
     DoWithErrorMsg.UserAlreadyExists,
     DoWithErrorCode.UserAlreadyExists,

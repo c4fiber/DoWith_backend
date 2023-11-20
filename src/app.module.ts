@@ -16,12 +16,8 @@ import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-except
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FriendModule } from './friend/friend.module';
-
-// timezone check
-const now = new Date();
-const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-console.log(timeZone); // 현재 타임존 출력
-console.log(new Date().toISOString());
+import { CategoryModule } from './category/category.module';
+import { UserGroupModule } from './user_group/user_group.module';
 
 @Module({
   imports: [
@@ -56,6 +52,8 @@ console.log(new Date().toISOString());
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
     FriendModule,
+    CategoryModule,
+    UserGroupModule
   ],
   controllers: [AppController],
   providers: [
@@ -72,3 +70,15 @@ export class AppModule implements NestModule {
     consumer.apply(DoWithMiddlewareMiddleware).forRoutes('');
   }
 }
+
+// timezone check
+const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+console.log(timeZone); // 현재 타임존 출력
+
+function getNow() {
+  const event = new Date();
+  event.setTime(event.getTime() - event.getTimezoneOffset() * 60 * 1000);
+  return event.toISOString();
+}
+
+console.log( getNow()); // 현재 타임존의 시간 출력

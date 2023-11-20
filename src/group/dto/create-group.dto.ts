@@ -1,17 +1,18 @@
 import { IsNotEmpty } from "class-validator";
+import { Category } from "src/category/entities/category.entity";
 
 export class CreateGroupDto {
-  @IsNotEmpty()
-  group_id: number;
-
   @IsNotEmpty()
   grp_name: string;
 
   grp_decs: string;
 
   @IsNotEmpty()
-  grp_owner: string;
+  grp_owner: number;
 
   @IsNotEmpty()
-  grp_cat: string;
+  cat_id: number;
+
+  @IsNotEmpty()
+  category: Category;
 }
