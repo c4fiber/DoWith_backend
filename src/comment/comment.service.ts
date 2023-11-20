@@ -19,8 +19,7 @@ export class CommentService {
             where: {
                 owner_id: owner_id,
                 is_del: false
-            },
-            relations: ['author'],
+            }
         });
     }
 
