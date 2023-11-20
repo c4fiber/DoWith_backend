@@ -17,9 +17,6 @@ export class User {
   @Column()
   user_hp: number;
 
-  @Column()
-  user_profile: string;
-
   //   @OneToOne(() => Room)
   //   @JoinColumn()
   //   room_id: number;
