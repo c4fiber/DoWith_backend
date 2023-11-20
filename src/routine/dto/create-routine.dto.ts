@@ -5,9 +5,6 @@ export class CreateRoutineDto {
   rout_id: number;
 
   @IsNotEmpty()
-  group_id: number;
-
-  @IsNotEmpty()
   rout_name: string;
 
   rout_desc: string;

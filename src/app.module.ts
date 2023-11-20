@@ -13,6 +13,7 @@ import { GroupModule } from './group/group.module';
 import { RoutineModule } from './routine/routine.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-except
     AuthModule,
     // Common Module
     DoWithExceptionModule,
-    DoWithExceptionFilterModule
+    DoWithExceptionFilterModule,
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [

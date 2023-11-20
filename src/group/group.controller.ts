@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -16,34 +16,58 @@ export class GroupController {
   }
 
   @Post('/')
-  createGroupOne(@Body() createGroupDto: CreateGroupDto): Promise<Group>{
-    this.logger.log("createGroupDto", JSON.stringify(createGroupDto));
+  createGroupOne(@Body() createGroupDto: CreateGroupDto): Promise<any>{
+    this.logger.debug("createGroupDto", JSON.stringify(createGroupDto));
 
     return this.groupService.createGroupOne(createGroupDto);
   }
 
-  @Get('/:group_id')
-  getGroupOne(@Param('group_id') group_id: number){
-    this.logger.log("group_id", group_id);
+  @Get('/:grp_id')
+  getGroupOne(@Param('grp_id') grp_id: number){
+    this.logger.debug("grp_id", grp_id);
 
-    return this.groupService.getGroupOne(group_id);
+    return this.groupService.getGroupOne(grp_id);
   }
 
-  @Get('/:group_id/user')
-  getAllMemberInGroup(@Param('group_id') group_id: number){
-    this.logger.log("group_id", group_id);
+  @Get('/:user_id/groups')
+  getAllMyGroups(@Param('user_id') user_id: number){
+    this.logger.debug("user_id", user_id);
 
-    return this.groupService.getAllMemberInGroup(group_id);
+    return this.groupService.getAllMyGroups(user_id);
   }
 
-  @Get('/:group_id/user/:user_id')
-  getMemberTodoInGroup(
-    @Param('group_id') group_id: number,
+  @Get('/:grp_id/user/:user_id')
+  getMemberTodoInGroup (
+    @Param('grp_id') grp_id: number,
     @Param('user_id') user_id: number
-  ){
-    this.logger.log("group_id", group_id);
-    this.logger.log("user_id", user_id);
+  ): Promise<any[]>{
+    this.logger.debug("grp_id", grp_id);
+    this.logger.debug("user_id", user_id);
 
-    return this.groupService.getMemberTodoInGroup(group_id, user_id);
+    return this.groupService.getMemberTodoInGroup(grp_id, user_id);
+  }
+
+  @Get('/search/:user_id/:category/:keyword?')
+  getGroupsBySearching(
+    @Param('user_id') user_id: number,
+    @Param('category') cat_id: number,
+    @Param('keyword') keyword: string
+  ): Promise<any[]>{
+    this.logger.debug("user_id = ", user_id);
+    this.logger.debug("category = ", cat_id);
+    this.logger.debug("keyword = ", keyword);
+
+    return this.groupService.getGroupsBySearching(user_id, cat_id, keyword);
+  }
+
+  // @Patch()
+  // updateImg()
+
+  // 그룹 인원수가 0이되면 삭제
+  @Delete('/:grp_id')
+  deleteGroup(@Param('grp_id')grp_id : number){
+    this.logger.debug("grp_id", grp_id);
+
+    return this.groupService.deleteGroup(grp_id);
   }
 }
