@@ -119,6 +119,10 @@ export class GroupService {
     return await this.userGroupRepository.save(userGrpInsert);
   }
 
+  async leftGroup(grp_id: number, user_id: number): Promise<any>{
+    return await this.userGroupRepository.delete({ grp_id, user_id });
+  }
+
   async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any[]>{
     const result = await this.groupRepository.createQueryBuilder('g')
                                              .select(['t.todo_img AS todo_img'])

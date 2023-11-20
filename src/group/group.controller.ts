@@ -55,6 +55,18 @@ export class GroupController {
     return this.groupService.createJoinGroup(grp_id, user_id);
   }
 
+  // 그룹 나가기
+  @Delete('/:grp_id/left/:user_id')
+  leftGroup(
+    @Param('grp_id')grp_id: number,
+    @Param('user_id')user_id: number
+  ): Promise<any>{
+    this.logger.debug("grp_id", grp_id);
+    this.logger.debug("user_id", user_id);
+
+    return this.groupService.leftGroup(grp_id, user_id);
+  }
+
   // 그룹원들의 인증 사진 조회
   @Get('/:grp_id/user/:user_id/image')
   getMemberTodoInGroup (
