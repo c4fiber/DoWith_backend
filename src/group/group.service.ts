@@ -40,8 +40,8 @@ export class GroupService {
     createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
     const grpInsert = await this.groupRepository.save(createGroupDto);
-
     const userGrpInsert = new UserGroup();
+
     userGrpInsert.user_id = +user_id;
     userGrpInsert.grp_id = +grpInsert['grp_id'];
 
@@ -108,6 +108,15 @@ export class GroupService {
                                              .getRawMany();
     this.logger.debug(result);
     return result;
+  }
+
+  async createJoinGroup(grp_id: number, user_id: number): Promise<any>{
+    const userGrpInsert = new UserGroup();
+
+    userGrpInsert.user_id = user_id;
+    userGrpInsert.grp_id = grp_id;
+
+    return await this.userGroupRepository.save(userGrpInsert);
   }
 
   async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any[]>{
