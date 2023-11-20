@@ -46,6 +46,7 @@ export class UserController {
         if (!file.originalname.match(/\.jpg$/)) {
           return callback(new Error('Only images are allowed.'), false);
         }
+        callback(null, true);
       },
       storage: diskStorage({
         destination: './public/image',
