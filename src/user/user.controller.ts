@@ -25,6 +25,7 @@ import { FriendRequestDto } from './dto/friend-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { log } from 'console';
+import path from 'path';
 
 @Controller('user')
 export class UserController {
@@ -51,10 +52,12 @@ export class UserController {
       storage: diskStorage({
         destination: './public/image',
         filename: (_, file, callback) => {
-          // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          // const filename = `${uniqueSuffix}-${file.filename}`;
-          console.log(`filename: ${file.filename}`);
-          callback(null, file.filename);
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const fileExtension = path.extname(file.originalname); // Requires `path` module
+          const newFilename = `${uniqueSuffix}${fileExtension}`;
+          console.log(`filename: ${newFilename}`);
+          callback(null, newFilename);
         },
       }),
     }),
