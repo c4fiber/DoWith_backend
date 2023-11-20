@@ -14,16 +14,17 @@ export class GroupService {
 
   async getGroupAll(): Promise<Group[]>{
     const result = await this.groupRepository.createQueryBuilder('g')
+                                             .select([
+                                               'g.grp_id          AS grp_id'
+                                             , 'g.grp_name        AS grp_name'
+                                             , 'MAX(u2.user_name) AS owner'
+                                             , 'COUNT(u1.user_id) AS mem_cnt'
+                                             ])
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                              .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
                                              .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
+                                             .orderBy('COUNT(u1.user_id)', 'DESC')
                                              .groupBy('g.grp_id')
-                                             .select([
-                                                        'g.grp_id          AS grp_id'
-                                                      , 'g.grp_name        AS grp_name'
-                                                      , 'MAX(u2.user_name) AS owner'
-                                                      , 'COUNT(u1.user_id) AS mem_cnt'
-                                                    ])
                                              .getRawMany();
 
     this.logger.debug(result);
@@ -32,27 +33,34 @@ export class GroupService {
   }
 
   async createGroupOne(createGroupDto: CreateGroupDto): Promise<Group>{
-    // 빈칸으로 삽입되는거 막아지지가 않네? Entity, Dto 다 시도해 봤는데?
+    // 두 개의 테이블에 insert 해야 하는데...
+    // 한개의 테이블이 user_group(ManyToMany 테이블임...어떻게 삽입하지? 내가 해야하나????)
+    // [ To-Do ] - 2023.11.20 LIB
+    createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
+
     return await this.groupRepository.save(createGroupDto);
   }
 
   async getGroupOne(grp_id: number): Promise<any>{
     const rout_detail = await this.groupRepository.createQueryBuilder('g')
+                                                  .select([
+                                                    'r.rout_id   AS rout_id'
+                                                  , 'r.rout_name AS rout_name'
+                                                  , 'r.rout_desc AS rout_desc'
+                                                  ])
                                                   .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
                                                   .where('g.grp_id = :grp_id', { grp_id })
-                                                  .select([
-                                                    'r.rout_name AS rout_name'
-                                                  , 'r.rout_desc AS rout_desc'
-                                                ])
                                                   .getRawMany();
     
     const grp_mems = await this.groupRepository.createQueryBuilder('g')
+                                               .select([
+                                                 'u.user_id    AS user_id'
+                                               , 'u.user_name  AS user_name'
+                                               , 'u.lastLogin AS last_login'
+                                               ])
                                                .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                                .leftJoin('user'      , 'u' , 'u.user_id = ug.user_id')
                                                .where('g.grp_id = :grp_id', { grp_id })
-                                               .select([
-                                                'u.*' 
-                                              ])
                                                .getRawMany();
 
     this.logger.debug(rout_detail);
@@ -61,19 +69,33 @@ export class GroupService {
     return {rout_detail, grp_mems};
   }
 
-  async getAllMyGroup(user_id: number): Promise<Promise<Group[]>>{
+  async getAllMyGroups(user_id: number): Promise<Promise<Group[]>>{
+    const Count = await this.groupRepository.createQueryBuilder('g')
+                                      .select([ 'g.grp_id AS grp_id'
+                                              , 'count(*) AS mem_cnt'])
+                                      .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                      .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
+                                      .groupBy('g.grp_id')
+                                      .getQuery();
+
     const result = await this.groupRepository.createQueryBuilder('g')
+                                             .select([
+                                                'g.grp_id          AS grp_id'
+                                              , 'g.grp_name        AS grp_name'
+                                              , 'g.grp_decs        AS grp_decs'
+                                              , 'MAX(u2.user_name) AS owner'
+                                              , 'g.cat_id          AS cat_id'
+                                              , 'MAX(c.cat_name)   AS cat_name'
+                                              , 'MAX(g2.mem_cnt)   AS mem_cnt'
+                                             ])
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                              .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
                                              .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
-                                             .where('ug.user_id = :user_id', { user_id })
+                                             .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
+                                             .leftJoin(`(${Count})`, 'g2', 'g.grp_id = g2.grp_id')
+                                             .where('u1.user_id = :user_id', { user_id })
                                              .groupBy('g.grp_id')
-                                             .select([
-                                                        'g.grp_id          AS grp_id'
-                                                      , 'g.grp_name        AS grp_name'
-                                                      , 'MAX(u2.user_name) AS owner'
-                                                      , 'COUNT(u1.user_id) AS mem_cnt'
-                                                    ])
+                                             .orderBy('MAX(g2.mem_cnt)', 'DESC')
                                              .getRawMany();
     this.logger.debug(result);
     return result;
@@ -81,14 +103,13 @@ export class GroupService {
 
   async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any[]>{
     const result = await this.groupRepository.createQueryBuilder('g')
+                                             .select(['t.todo_img AS todo_img'])
                                              .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
                                              .leftJoin('routine', 'r', 't.grp_id = r.grp_id')
                                              .where('t.todo_img IS NOT NULL')
                                              .andWhere('g.grp_id = :grp_id', {grp_id})
                                              .groupBy('t.todo_id')
                                              .orderBy('t.todo_id')
-                                             //.select(['t.*'])
-                                             .select(['t.todo_img AS todo_img'])
                                              .getRawMany();
     this.logger.debug(result);                                  
 
@@ -97,20 +118,20 @@ export class GroupService {
 
   async getGroupsBySearching(user_id: number, cat_id: number, keyword: string): Promise<any[]>{
     const result = await this.groupRepository.createQueryBuilder('g')
+                                             .select([
+                                               'g.grp_id          AS grp_id'
+                                             , 'g.grp_name        AS grp_name' 
+                                             , 'g.grp_decs        AS grp_decs' 
+                                             , 'g.grp_owner       AS grp_owner'
+                                             , 'max(c.cat_name)   AS cat_name'
+                                             , 'max(u2.user_name) AS owner'
+                                             , 'count(u1.user_id) AS mem_cnt'
+                                             ])
                                              .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                              .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
                                              .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
-                                             .groupBy('g.grp_id')
-                                             .select([
-                                                'g.grp_id          AS grp_id'
-                                              , 'g.grp_name        AS grp_name' 
-                                              , 'g.grp_decs        AS grp_decs' 
-                                              , 'g.grp_owner       AS grp_owner'
-                                              , 'max(c.cat_name)   AS cat_name'
-                                              , 'max(u2.user_name) AS owner'
-                                              , 'count(u1.user_id) AS mem_cnt'
-                                             ]);
+                                             .groupBy('g.grp_id');
 
     if(cat_id != 1){  // 1: 전체
       result.andWhere('c.cat_id = :cat_id', {cat_id});
