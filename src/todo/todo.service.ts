@@ -44,15 +44,12 @@ export class TodoService {
   // UPDATE
   async update(todo_id: number, dto: UpdateTodoDto): Promise<Todo> {
     const todo = await this.todoRepository.findOneBy({ todo_id });
-    todo.todo_name = dto.todo_name;
-    todo.todo_desc = dto.todo_desc;
-    todo.todo_date = dto.todo_date;
-    todo.todo_done = dto.todo_done;
 
-    todo.todo_start = dto.todo_start;
-    todo.todo_end = dto.todo_end;
-    todo.todo_img = dto.todo_img;
-    todo.todo_label = dto.todo_label;
+    Object.keys(dto).forEach(key => {
+      if (dto[key] !== null && dto[key] !== undefined) {
+        todo[key] = dto[key];
+      }
+    });
 
     return await this.todoRepository.save(todo);
   }
