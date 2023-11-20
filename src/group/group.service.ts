@@ -1,14 +1,17 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
 import { Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
+import { UserGroup } from 'src/user_group/entities/user_group.entity';
 
 @Injectable()
 export class GroupService {
   constructor(
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
+    @InjectRepository(UserGroup)
+    private readonly userGroupRepository: Repository<UserGroup>,
     private readonly logger: Logger
   ){}
 
@@ -32,13 +35,19 @@ export class GroupService {
     return result;
   }
 
-  async createGroupOne(createGroupDto: CreateGroupDto): Promise<Group>{
-    // 두 개의 테이블에 insert 해야 하는데...
-    // 한개의 테이블이 user_group(ManyToMany 테이블임...어떻게 삽입하지? 내가 해야하나????)
-    // [ To-Do ] - 2023.11.20 LIB
+  async createGroupOne(user_id: number, createGroupDto: CreateGroupDto): Promise<Group>{
+    // [ To-Do] 두 insert가 하나의 트랜잭션으로 묶여야 할 거 같은데...
     createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
-    return await this.groupRepository.save(createGroupDto);
+    const grpInsert = await this.groupRepository.save(createGroupDto);
+
+    const userGrpInsert = new UserGroup();
+    userGrpInsert.user_id = +user_id;
+    userGrpInsert.grp_id = +grpInsert['grp_id'];
+
+    await this.userGroupRepository.save(userGrpInsert);
+
+    return grpInsert;
   }
 
   async getGroupOne(grp_id: number): Promise<any>{
@@ -71,12 +80,12 @@ export class GroupService {
 
   async getAllMyGroups(user_id: number): Promise<Promise<Group[]>>{
     const Count = await this.groupRepository.createQueryBuilder('g')
-                                      .select([ 'g.grp_id AS grp_id'
-                                              , 'count(*) AS mem_cnt'])
-                                      .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-                                      .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
-                                      .groupBy('g.grp_id')
-                                      .getQuery();
+                                            .select([ 'g.grp_id AS grp_id'
+                                                    , 'count(*) AS mem_cnt'])
+                                            .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                            .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
+                                            .groupBy('g.grp_id')
+                                            .getQuery();
 
     const result = await this.groupRepository.createQueryBuilder('g')
                                              .select([
