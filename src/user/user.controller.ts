@@ -62,26 +62,6 @@ export class UserController {
     return await this.usersService.createUser(body);
   }
 
-  // @UseInterceptors(
-  //   FileInterceptor('profile', {
-  //     limits: { fileSize: 5 * 1024 * 1024 },
-  //     fileFilter: (_, file, callback) => {
-  //       if (!file.originalname.match(/\.jpg$/)) {
-  //         return callback(new Error('Only images are allowed.'), false);
-  //       }
-  //       callback(null, true);
-  //     },
-  //     storage: diskStorage({
-  //       destination: './public/image',
-  //       filename: (_, file, callback) => {
-  //         if (file) {
-  //           // 파일이 있을 떄만 저장
-  //           callback(null, file.originalname);
-  //         }
-  //       },
-  //     }),
-  //   }),
-  // )
   @UseInterceptors(FileInterceptor('profile'))
   @Post('/:user_id/profile')
   async createUserProfile(

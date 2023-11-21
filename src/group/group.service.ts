@@ -14,6 +14,8 @@ export class GroupService {
     private readonly groupRepository: Repository<Group>,
     @InjectRepository(UserGroup)
     private readonly userGroupRepository: Repository<UserGroup>,
+    @InjectRepository(Todo)
+    private readonly todoRepository: Repository<Todo>,
     private readonly doWithException: DoWithExceptions,
     private dataSource: DataSource,
     private readonly logger: Logger
@@ -220,12 +222,18 @@ export class GroupService {
                  .getRawMany();
   }
 
-  async updateImage(grp_id: number, user_id: number, file: Express.Multer.File){
+  async updateImage(todo_id: number, user_id: number, file: Express.Multer.File){
     if(!file){
-      throw new Error();
+      throw this.doWithException.ThereIsNoFile;
     }
+    
+    const todoIns = await this.todoRepository.createQueryBuilder('t')
+                                             .update({todo_img: file.filename})
+                                             .where({ todo_id })
+                                             .andWhere({ user_id })
+                                             .execute();
 
-    return file.path;
+    return todoIns;
   }
 
   async deleteGroup(grp_id: number){

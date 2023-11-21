@@ -30,6 +30,10 @@ enum DoWithErrorCode {
 
   // Routine
   ExceedMaxRoutines = '0200',
+
+  // Utils
+  NotAllowedExtension = '1000',
+  ThereIsNoFile = '1001'
 }
 
 enum DoWithErrorMsg {
@@ -45,6 +49,10 @@ enum DoWithErrorMsg {
 
   // Routine
   ExceedMaxRoutines = '등록할 수 있는 최대 루틴을 초과하셨습니다.',
+
+  // Utils
+  NotAllowedExtension = '지원하지 않는 파일 확장자입니다.',
+  ThereIsNoFile = '파일을 업로드 하지 않았습니다.'
 }
 
 @Injectable()
@@ -88,6 +96,19 @@ export class DoWithExceptions {
   ExceedMaxRoutines = new DoWithException(
     DoWithErrorMsg.ExceedMaxRoutines,
     DoWithErrorCode.ExceedMaxRoutines,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  // =============== [ Utils ] ===============
+  NotAllowedExtension = new DoWithException(
+    DoWithErrorMsg.NotAllowedExtension,
+    DoWithErrorCode.NotAllowedExtension,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  ThereIsNoFile = new DoWithException(
+    DoWithErrorMsg.ThereIsNoFile,
+    DoWithErrorCode.ThereIsNoFile,
     HttpStatus.BAD_REQUEST,
   );
 }

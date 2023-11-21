@@ -98,17 +98,17 @@ export class GroupController {
   }
   
   @UseInterceptors(FileInterceptor('file'))
-  @Patch('/:grp_id/user/:user_id/image')
+  @Patch('/:todo_id/user/:user_id/image')
   updateImage(
-    @Param('grp_id') grp_id: number,
+    @Param('todo_id') todo_id: number,
     @Param('user_id') user_id: number,
     @UploadedFile() file: Express.Multer.File
   ){
-    this.logger.debug("grp_id", grp_id);
+    this.logger.debug("todo_id", todo_id);
     this.logger.debug("user_id", user_id);
     this.logger.debug(file);
     
-    return this.groupService.updateImage(grp_id, user_id, file);
+    return this.groupService.updateImage(todo_id, user_id, file);
   }
 
   // 그룹 삭제 (인원수가 0이되면 삭제)

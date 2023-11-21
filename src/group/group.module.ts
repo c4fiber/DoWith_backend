@@ -7,10 +7,11 @@ import { UserGroup } from 'src/user_group/entities/user_group.entity';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UtilsModule } from 'src/utils/utils.module';
 import { MulterConfigService } from 'src/utils/fileUpload/MulterConfigService';
+import { Todo } from 'src/todo/todo.entity';
 
 @Module({
   imports: [
-      TypeOrmModule.forFeature([Group, UserGroup]),
+      TypeOrmModule.forFeature([Group, UserGroup, Todo]),
       UtilsModule
   ],
   controllers: [GroupController],
