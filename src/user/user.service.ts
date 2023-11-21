@@ -52,10 +52,8 @@ export class UserService {
     user.user_name = user_name;
     user.user_tel = user_tel;
     user.user_kakao_id = user_kakao_id;
-    user.reg_at = now;
     user.last_login = now;
     user.user_hp = 0;
-    user.upt_at = now;
 
     await this.userRepository.save(user);
     return new UserResponseDto(user);
@@ -76,7 +74,6 @@ export class UserService {
       .set({
         user_name: user_name,
         user_tel: user_tel,
-        upt_at: new Date(),
       })
       .where('user_id = :id', { id })
       .execute();
