@@ -220,6 +220,14 @@ export class GroupService {
                  .getRawMany();
   }
 
+  async updateImage(grp_id: number, user_id: number, file: Express.Multer.File){
+    if(!file){
+      throw new Error();
+    }
+
+    return file.path;
+  }
+
   async deleteGroup(grp_id: number){
     return await this.groupRepository.softDelete({grp_id});
   }

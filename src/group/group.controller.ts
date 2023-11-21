@@ -1,14 +1,19 @@
-import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { MulterConfigService } from 'src/utils/fileUpload/MulterConfigService';
 
 @Controller('group')
 export class GroupController {
   constructor(
     private readonly logger: Logger,
-    private readonly groupService: GroupService
-  ){}
+    private readonly groupService: GroupService,
+    private readonly multerConifg: MulterConfigService
+  ){
+    this.multerConifg.changePath(process.env.IMAGE_PATH);
+  }
   
   // 모든 그룹 조회
   @Get('/')
@@ -92,8 +97,19 @@ export class GroupController {
     return this.groupService.getGroupsBySearching(user_id, cat_id, keyword);
   }
   
-  // @Patch()
-  // updateImg()
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('/:grp_id/user/:user_id/image')
+  updateImage(
+    @Param('grp_id') grp_id: number,
+    @Param('user_id') user_id: number,
+    @UploadedFile() file: Express.Multer.File
+  ){
+    this.logger.debug("grp_id", grp_id);
+    this.logger.debug("user_id", user_id);
+    this.logger.debug(file);
+    
+    return this.groupService.updateImage(grp_id, user_id, file);
+  }
 
   // 그룹 삭제 (인원수가 0이되면 삭제)
   @Delete('/:grp_id')

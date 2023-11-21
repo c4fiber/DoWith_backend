@@ -10,7 +10,7 @@ export class Group {
   @Column({ nullable: false })
   grp_name: string;
 
-  @Column({ nullable: false })
+  @Column()
   grp_decs: string;
 
   @Column({ nullable: false })

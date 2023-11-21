@@ -19,6 +19,7 @@ import { join } from 'path';
 import { FriendModule } from './friend/friend.module';
 import { CategoryModule } from './category/category.module';
 import { UserGroupModule } from './user_group/user_group.module';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -43,15 +44,16 @@ import { UserGroupModule } from './user_group/user_group.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
+    // Common Module
+    DoWithExceptionModule,
+    DoWithExceptionFilterModule,
+    UtilsModule,
     // API Module
     TodoModule,
     GroupModule,
     RoutineModule,
     UserModule,
     AuthModule,
-    // Common Module
-    DoWithExceptionModule,
-    DoWithExceptionFilterModule,
     FriendModule,
     CategoryModule,
     UserGroupModule,
