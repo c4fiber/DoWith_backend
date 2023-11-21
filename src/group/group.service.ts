@@ -39,19 +39,30 @@ export class GroupService {
     return result;
   }
 
-  async createGroupOne(user_id: number, createGroupDto: CreateGroupDto): Promise<Group>{
-    // [ To-Do] 두 insert가 하나의 트랜잭션으로 묶여야 할 거 같은데...
-    createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
+  async createGroupOne(user_id: number, createGroupDto: CreateGroupDto): Promise<any>{
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    const grpInsert = await this.groupRepository.save(createGroupDto);
-    const userGrpInsert = new UserGroup();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    userGrpInsert.user_id = +user_id;
-    userGrpInsert.grp_id = +grpInsert['grp_id'];
+    try{
+      createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
-    await this.userGroupRepository.save(userGrpInsert);
+      const grpIns = await queryRunner.manager.save(Group, createGroupDto);
+      const ug = new UserGroup();
 
-    return grpInsert;
+      ug.user_id = +user_id;
+      ug.grp_id = +grpIns['grp_id'];
+      
+      const ugIns = await queryRunner.manager.save(UserGroup ,ug);
+      await queryRunner.commitTransaction();
+
+      return { grpIns, ugIns };
+
+    } catch(err){
+      await queryRunner.rollbackTransaction();
+      throw this.doWithException.FailedToMakeGroup;
+    }
   }
 
   async getGroupOne(grp_id: number): Promise<any>{
@@ -130,17 +141,18 @@ export class GroupService {
     await queryRunner.startTransaction();
 
     try{
-      await queryRunner.manager.delete(UserGroup, { grp_id, user_id });
-      await queryRunner.manager.update(
+      const ugDel = await queryRunner.manager.delete(UserGroup, { grp_id, user_id });
+      const todoUpt = await queryRunner.manager.update(
           Todo
         , { user_id, grp_id, todo_date: Raw(todo_date => `to_char(${todo_date}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`),}
         , { todo_deleted: true }
       )
-      throw new Error();
+
       await queryRunner.commitTransaction();
-      return;
+
+      return { ugDel, todoUpt };
+
     } catch(err) {
-      this.logger.error(err);
       await queryRunner.rollbackTransaction();
       throw this.doWithException.FailedToleftGroup;
     } 
