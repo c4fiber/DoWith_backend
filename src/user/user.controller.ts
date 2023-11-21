@@ -36,6 +36,20 @@ export class UserController {
     return await this.usersService.getUser(id);
   }
 
+  @Get('/')
+  async getUserByKakakoId(
+    @Query('user_kakao_id') kakaoId: string,
+  ): Promise<UserResponseDto> {
+    return await this.usersService.getUserByKakaoId(kakaoId);
+  }
+
+  @Get('/')
+  async getUserByName(
+    @Query('user_name') name: string,
+  ): Promise<UserResponseDto> {
+    return await this.usersService.getUserByName(name);
+  }
+
   @Post('/')
   @UsePipes(ValidationPipe)
   async createUser(@Body() body: UserRequestDto): Promise<UserResponseDto> {

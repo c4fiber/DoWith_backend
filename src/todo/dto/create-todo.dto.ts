@@ -4,20 +4,19 @@ export class CreateTodoDto {
   @IsNotEmpty()
   user_id: number; // foreign key
 
+  // essential
   @IsNotEmpty()
   todo_name: string;
-
   todo_desc: string;
-
-  @IsNotEmpty()
+  todo_label: string;
+  todo_date: Date;
   todo_done: boolean;
 
-  todo_start: Date;
-
-  todo_end: Date;
-
+  // optional
+  todo_start: string;
+  todo_end: string;
   grp_id: number; // foreign key
-
   // path of image, nessary if grp_id is not null
   todo_img: string;
+
 }
