@@ -1,12 +1,11 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Column, Entity, ManyToMany, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Todo } from '../todo/todo.entity';
 
 @Entity()
