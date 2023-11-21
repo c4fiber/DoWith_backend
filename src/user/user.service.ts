@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UserResponseDto } from './dto/user-response.dto';
+import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 
 @Injectable()
 export class UserService {
@@ -22,24 +23,29 @@ export class UserService {
 
   // 새로운 유저 생성
   async createUser(request: UserRequestDto): Promise<UserResponseDto> {
-    const { name, tel, kakaoId } = request;
+    const { user_name, user_tel, user_kakao_id } = request;
 
     // 만약 이미 가입된 유저인 경우 예외처리
-    if ((await this.getUserByKakaoId(kakaoId)) != null) {
+    if ((await this.getUserByKakaoId(user_kakao_id)) != null) {
       throw this.doWithException.UserAlreadyExists;
+    }
+
+    // 중복 닉네임 예외처리
+    if ((await this.getUserByName(user_name)) != null) {
+      throw this.doWithException.UserNameNotUnique;
     }
 
     // 유저 엔티티 생성
     const now = new Date();
     const user = new User();
 
-    user.user_name = name;
-    user.user_tel = tel;
-    user.user_kakaoId = kakaoId;
-    user.regAt = now;
-    user.lastLogin = now;
+    user.user_name = user_name;
+    user.user_tel = user_tel;
+    user.user_kakao_id = user_kakao_id;
+    user.reg_at = now;
+    user.last_login = now;
     user.user_hp = 0;
-    user.uptAt = now;
+    user.upt_at = now;
 
     await this.userRepository.save(user);
     return new UserResponseDto(user);
@@ -48,19 +54,19 @@ export class UserService {
   // 유저 수정
   async updateUser(id: number, request: UserRequestDto): Promise<boolean> {
     // 만약 중복된 이름일 경우 예외 반환
-    const { name, tel } = request;
-    const user = await this.userRepository.findOneBy({ user_name: name });
+    const { user_name, user_tel } = request;
+    const user = await this.userRepository.findOneBy({ user_name: user_name });
     if (user !== null) {
       throw this.doWithException.UserNameNotUnique;
     }
 
     const updateResult = await this.userRepository
-      .createQueryBuilder()
+      .createQueryBuilder('user')
       .update(User)
       .set({
-        user_name: name,
-        user_tel: tel,
-        uptAt: new Date(),
+        user_name: user_name,
+        user_tel: user_tel,
+        upt_at: new Date(),
       })
       .where('user_id = :id', { id })
       .execute();
@@ -84,7 +90,7 @@ export class UserService {
   // 유저 HP 업데이트
   async updateHp(id: number, hp: number): Promise<boolean> {
     const updateResult = await this.userRepository
-      .createQueryBuilder()
+      .createQueryBuilder('user')
       .update(User)
       .set({ user_hp: hp })
       .where('user_id = :id', { id })
@@ -97,12 +103,12 @@ export class UserService {
   }
 
   // 유저 로그인 시각 업데이트
-  async updateLastLoginByKakaoId(kakaoId: number): Promise<boolean> {
+  async updateLastLoginByKakaoId(kakao_id: string): Promise<boolean> {
     const updateResult = await this.userRepository
-      .createQueryBuilder()
+      .createQueryBuilder('user')
       .update(User)
-      .set({ lastLogin: new Date() })
-      .where('user_kakaoId = :kakaoId', { kakaoId })
+      .set({ last_login: new Date() })
+      .where('user_kakao_id = :kakao_id', { kakao_id })
       .execute();
 
     if (updateResult.affected === 0) {
@@ -112,13 +118,32 @@ export class UserService {
     return true;
   }
 
+  // 연락처 리스트로 조회
+  async getUsersByContacts(
+    body: GetUsersByContactsDto,
+  ): Promise<UserResponseDto[]> {
+    const { contacts } = body;
+
+    console.log(contacts);
+    if (contacts.length == 0) {
+      return [];
+    }
+
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user_tel IN (:...tels)', { tels: contacts })
+      .getMany();
+
+    return users.map((user) => new UserResponseDto(user));
+  }
+
   // 닉네임으로 조회
   async getUserByName(name: string): Promise<User> {
     return await this.userRepository.findOneBy({ user_name: name });
   }
 
   // 카카오 아이디로 조회
-  async getUserByKakaoId(kakaoId: number): Promise<User> {
-    return await this.userRepository.findOneBy({ user_kakaoId: kakaoId });
+  async getUserByKakaoId(kakao_id: string): Promise<User> {
+    return await this.userRepository.findOneBy({ user_kakao_id: kakao_id });
   }
 }

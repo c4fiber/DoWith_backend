@@ -2,11 +2,11 @@ import { IsNotEmpty } from 'class-validator';
 
 export class UserRequestDto {
   @IsNotEmpty()
-  name: string;
+  user_name: string;
 
   @IsNotEmpty()
-  tel: string;
+  user_tel: string;
 
   @IsNotEmpty()
-  kakaoId: number;
+  user_kakao_id: string;
 }
