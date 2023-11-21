@@ -6,7 +6,6 @@ import { DataSource, Repository } from 'typeorm';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Group } from 'src/group/entities/group.entity';
 import { Todo } from 'src/todo/todo.entity';
-import { async } from 'rxjs';
 
 @Injectable()
 export class RoutineService {
@@ -65,16 +64,17 @@ export class RoutineService {
                                                .getRawMany();
       this.logger.debug(routIns);
       memList.forEach(async (data) => { 
-        // const todo = new Todo();
+        const todo = new Todo();
+        // local inmemory에서 해결할 루틴으로 To-Do 만들기임
+        todo['user_id'] = data.user_id;
+        todo.grp_id = grp_id;
+        todo.todo_name = routIns.rout_name;
+        todo.todo_desc = routIns.rout_desc;
+        todo.todo_start = routIns.rout_srt;
+        todo.todo_end = routIns.rout_end;
+        todo.todo_label = '2020-11-11 11:11:11';
 
-        // todo['user_id'] = data.user_id;
-        // todo.grp_id = grp_id;
-        // todo.todo_name = routIns.rout_name;
-        // todo.todo_desc = routIns.rout_desc;
-        // todo.todo_start = routIns.rout_srt;
-        // todo.todo_end = routIns.rout_end;
-
-        // await queryRunner.manager.save(Todo, todo);
+        await queryRunner.manager.save(Todo, todo);
       });
 
       //return;
