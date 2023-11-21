@@ -1,6 +1,7 @@
 import { Category } from 'src/category/entities/category.entity';
+import { Routine } from 'src/routine/entities/routine.entity';
 import { User } from 'src/user/user.entities';
-import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable, JoinColumn, OneToOne } from 'typeorm';
+import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable, JoinColumn, OneToOne, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Group {
@@ -29,6 +30,10 @@ export class Group {
   @JoinColumn({ name: 'cat_id'})
   category: Category;
 
+  // @ManyToOne(() => Routine, {createForeignKeyConstraints: false})
+  // @JoinColumn({ name: 'rout_id' })
+  // grp_routs: Routine;
+
   @ManyToMany(() => User)
   @JoinTable({ 
     name : 'user_group',
@@ -42,8 +47,4 @@ export class Group {
     },
   })
   users: User[];
-  
-  // 한 유저가 여러 그룹 가입 UserGroup @OneToMany: user_id (이건 OneToOne 인듯 Group 테이블 입장에서)
-  // 한 그룹당 여러개의 루틴 Routine @OneToMany: rout_id
-  // 한 유저가 여러 그룹 소유 User @ManyToOne: user_id
 }

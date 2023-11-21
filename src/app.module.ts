@@ -11,6 +11,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './group/group.module';
 import { RoutineModule } from './routine/routine.module';
+import { CommentModule } from './comment/comment.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -53,7 +54,8 @@ import { UserGroupModule } from './user_group/user_group.module';
     DoWithExceptionFilterModule,
     FriendModule,
     CategoryModule,
-    UserGroupModule
+    UserGroupModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [
