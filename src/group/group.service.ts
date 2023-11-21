@@ -39,20 +39,21 @@ export class GroupService {
     return result;
   }
 
-  async createGroupOne(user_id: number, createGroupDto: CreateGroupDto): Promise<any>{
+  async createGroupOne(createGroupDto: CreateGroupDto): Promise<any>{
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try{
+      createGroupDto.grp_owner =  createGroupDto.user_id;
       createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
       const grpIns = await queryRunner.manager.save(Group, createGroupDto);
       const ug = new UserGroup();
 
-      ug.user_id = +user_id;
-      ug.grp_id = +grpIns['grp_id'];
+      ug.user_id = +createGroupDto.user_id;
+      ug.grp_id = +grpIns.grp_id
       
       const ugIns = await queryRunner.manager.save(UserGroup ,ug);
       await queryRunner.commitTransaction();

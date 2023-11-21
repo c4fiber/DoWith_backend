@@ -17,14 +17,13 @@ export class GroupController {
   }
 
   // 그룹 생성
-  @Post('/:user_id')
+  @Post('')
   createGroupOne(
-    @Param('user_id') user_id: number,
     @Body() createGroupDto: CreateGroupDto
   ): Promise<any>{
     this.logger.debug("createGroupDto", JSON.stringify(createGroupDto));
 
-    return this.groupService.createGroupOne(user_id, createGroupDto);
+    return this.groupService.createGroupOne(createGroupDto);
   }
 
   // 그룹 상세조회

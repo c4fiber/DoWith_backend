@@ -29,10 +29,6 @@ export class Group {
   @JoinColumn({ name: 'cat_id'})
   category: Category;
 
-  // @ManyToOne(() => Routine, {createForeignKeyConstraints: false})
-  // @JoinColumn({ name: 'rout_id' })
-  // grp_routs: Routine;
-
   @ManyToMany(() => User)
   @JoinTable({ 
     name : 'user_group',
