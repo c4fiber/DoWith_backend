@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
-import { DataSource, Raw, Repository, getManager } from 'typeorm';
+import { DataSource, Raw, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/user_group/entities/user_group.entity';
 import { Todo } from 'src/todo/todo.entity';
@@ -14,8 +14,6 @@ export class GroupService {
     private readonly groupRepository: Repository<Group>,
     @InjectRepository(UserGroup)
     private readonly userGroupRepository: Repository<UserGroup>,
-    @InjectRepository(Todo)
-    private readonly todoRepository: Repository<Todo>,
     private readonly doWithException: DoWithExceptions,
     private dataSource: DataSource,
     private readonly logger: Logger
@@ -135,10 +133,10 @@ export class GroupService {
       await queryRunner.manager.delete(UserGroup, { grp_id, user_id });
       await queryRunner.manager.update(
           Todo
-        , { user_id, grp_id, todo_date: Raw(alias => `to_char(${alias}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`),}
+        , { user_id, grp_id, todo_date: Raw(todo_date => `to_char(${todo_date}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`),}
         , { todo_deleted: true }
       )
-
+      throw new Error();
       await queryRunner.commitTransaction();
       return;
     } catch(err) {
