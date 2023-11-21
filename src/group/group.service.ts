@@ -66,6 +66,21 @@ export class GroupService {
   }
 
   async getGroupOne(grp_id: number): Promise<any>{
+    const grp_detail = await this.groupRepository.createQueryBuilder('g')
+                                                 .select([
+                                                     'g.grp_id    AS grp_id'
+                                                   , 'g.grp_name  AS grp_name'
+                                                   , 'g.grp_decs  AS grp_desc'
+                                                   , `to_char(g.reg_at, 'yyyy-MM-dd HH:MI:SS') AS reg_at`
+                                                   , 'u.user_name AS user_name'
+                                                   , 'c.cat_name  AS cat_name'
+                                                 ])
+                                                 .leftJoin('user_group', 'ug', 'g.grp_owner = ug.grp_id')
+                                                 .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
+                                                 .leftJoin('category'  , 'c' , 'c.cat_id = g.cat_id')
+                                                 .where('g.grp_id = :grp_id', { grp_id })
+                                                 .getRawOne();
+
     const rout_detail = await this.groupRepository.createQueryBuilder('g')
                                                   .select([
                                                     'r.rout_id   AS rout_id'
@@ -87,10 +102,11 @@ export class GroupService {
                                                .where('g.grp_id = :grp_id', { grp_id })
                                                .getRawMany();
 
+    this.logger.debug(grp_detail);
     this.logger.debug(rout_detail);
     this.logger.debug(grp_mems);
     
-    return {rout_detail, grp_mems};
+    return {grp_detail, rout_detail, grp_mems};
   }
 
   async getAllMyGroups(user_id: number): Promise<Promise<Group[]>>{
