@@ -21,6 +21,16 @@ export class UserService {
     return new UserResponseDto(user);
   }
 
+  // 닉네임으로 조회
+  async getUserByName(name: string): Promise<User> {
+    return await this.userRepository.findOneBy({ user_name: name });
+  }
+
+  // 카카오 아이디로 조회
+  async getUserByKakaoId(kakao_id: string): Promise<User> {
+    return await this.userRepository.findOneBy({ user_kakao_id: kakao_id });
+  }
+
   // 새로운 유저 생성
   async createUser(request: UserRequestDto): Promise<UserResponseDto> {
     const { user_name, user_tel, user_kakao_id } = request;
@@ -134,15 +144,5 @@ export class UserService {
       .getMany();
 
     return users.map((user) => new UserResponseDto(user));
-  }
-
-  // 닉네임으로 조회
-  private async getUserByName(name: string): Promise<User> {
-    return await this.userRepository.findOneBy({ user_name: name });
-  }
-
-  // 카카오 아이디로 조회
-  private async getUserByKakaoId(kakao_id: string): Promise<User> {
-    return await this.userRepository.findOneBy({ user_kakao_id: kakao_id });
   }
 }
