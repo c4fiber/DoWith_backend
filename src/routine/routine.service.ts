@@ -2,14 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateRoutineDto } from './dto/create-routine.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Routine } from './entities/routine.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
+import { Group } from 'src/group/entities/group.entity';
+import { Todo } from 'src/todo/todo.entity';
 
 @Injectable()
 export class RoutineService {
   constructor(
     @InjectRepository(Routine) private readonly routineRepository: Repository<Routine>,
     private readonly dowithException: DoWithExceptions,
+    private dataSource: DataSource,
     private readonly logger: Logger
   ) {}
 
@@ -44,9 +47,44 @@ export class RoutineService {
       throw this.dowithException.ExceedMaxRoutines;
     }
 
-    createRoutineDto['grp_id'] = grp_id;
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    return await this.routineRepository.save(createRoutineDto);
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try{
+      createRoutineDto['grp_id'] = grp_id;
+
+      const routIns = await queryRunner.manager.save(Routine, createRoutineDto);
+      const memList = await queryRunner.manager.createQueryBuilder()
+                                               .select('ug.user_id AS user_id')
+                                               .from(Group, 'g')
+                                               .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                               .where('g.grp_id = :grp_id', { grp_id })
+                                               .getRawMany();
+      this.logger.debug(routIns);
+      memList.forEach(async (data) => { 
+        const todo = new Todo();
+        // local inmemory에서 해결할 루틴으로 To-Do 만들기임
+        todo['user_id'] = data.user_id;
+        todo.grp_id = grp_id;
+        todo.todo_name = routIns.rout_name;
+        todo.todo_desc = routIns.rout_desc;
+        todo.todo_start = routIns.rout_srt;
+        todo.todo_end = routIns.rout_end;
+        todo.todo_label = '2020-11-11 11:11:11';
+
+        await queryRunner.manager.save(Todo, todo);
+      });
+
+      //return;
+      await queryRunner.commitTransaction();
+      return;
+
+    } catch(err){
+      this.logger.error(err);
+      await queryRunner.rollbackTransaction();
+    }
   }
 
   async deleteRoutine(rout_id: number): Promise<any> {
