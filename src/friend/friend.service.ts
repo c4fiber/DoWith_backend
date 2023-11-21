@@ -27,8 +27,6 @@ export class FriendService {
       throw this.doWithExceptions.UserNotFound;
     }
 
-    console.log(user.friends);
-
     // 친구가 없는 경우
     if (user.friends.length == 0) return [];
 

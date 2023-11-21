@@ -36,10 +36,29 @@ export class UserController {
     return await this.usersService.getUser(id);
   }
 
+  @Get('/')
+  async getUserByKakakoId(
+    @Query('user_kakao_id') kakaoId: string,
+  ): Promise<UserResponseDto> {
+    return await this.usersService.getUserByKakaoId(kakaoId);
+  }
+
+  @Get('/')
+  async getUserByName(
+    @Query('user_name') name: string,
+  ): Promise<UserResponseDto> {
+    return await this.usersService.getUserByName(name);
+  }
+
   @Post('/')
   @UsePipes(ValidationPipe)
+  async createUser(@Body() body: UserRequestDto): Promise<UserResponseDto> {
+    return await this.usersService.createUser(body);
+  }
+
+  @Post('/:user_id/profile')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FileInterceptor('profile', {
       limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (_, file, callback) => {
         if (!file.originalname.match(/\.jpg$/)) {
@@ -52,18 +71,18 @@ export class UserController {
         filename: (_, file, callback) => {
           if (file) {
             // 파일이 있을 떄만 저장
-            console.log(`filename: ${file.originalname}`);
             callback(null, file.originalname);
           }
         },
       }),
     }),
   )
-  async createUser(
-    @Body() body: UserRequestDto,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<UserResponseDto> {
-    return await this.usersService.createUser(body);
+  async createUserProfile(
+    @Param('user_id', ParseIntPipe) id: number,
+    @UploadedFile() profile: Express.Multer.File,
+  ): Promise<boolean> {
+    // TODO: type, size, .. 검증 로직, 디스크 공간 체크
+    return true;
   }
 
   @Put('/:user_id')
