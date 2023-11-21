@@ -21,7 +21,7 @@ export class Todo {
   @Column({ nullable: true })
   todo_desc: string;
 
-  @Column({ nullable: false, default: "etc" })
+  @Column({ nullable: false, type: 'date' })
   todo_label: string;
 
   @CreateDateColumn() // default: now()
@@ -30,10 +30,10 @@ export class Todo {
   @Column({ default: false })
   todo_done: boolean;
 
-  @Column({ nullable: true, default: "00:00" })
+  @Column({ nullable: true, type: 'time' })
   todo_start: string;
 
-  @Column({ nullable: true, default: "00:00" })
+  @Column({ nullable: true, type: 'time' })
   todo_end: string;
 
   @Column({ nullable: true })
