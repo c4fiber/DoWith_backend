@@ -87,14 +87,24 @@ export class UserService {
     return true;
   }
 
-  // 유저 삭제
+  // 아이디를 기준으로 유저 삭제
   async deleteUser(id: number): Promise<void> {
     const user = await this.getUser(id);
     if (user == null) {
       throw this.doWithException.UserNotFound;
     }
 
-    this.userRepository.delete(id);
+    this.userRepository.softDelete(id);
+  }
+
+  // 카카오 아이디를 기준으로 유저 삭제
+  async deleteUserByKakaoId(kakao_id: string): Promise<void> {
+    const user = await this.getUserByKakaoId(kakao_id);
+    if (user == null) {
+      throw this.doWithException.UserNotFound;
+    }
+
+    this.userRepository.softDelete(user.user_id);
   }
 
   // 유저 HP 업데이트
