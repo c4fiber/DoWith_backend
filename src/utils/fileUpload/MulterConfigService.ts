@@ -38,9 +38,9 @@ export class MulterConfigService implements MulterOptionsFactory{
           const name = path.basename(file.originalname, ext);
 
           done(null, `${name}_${Date.now()}${ext}`);
-        },
+        }
       }),
-      limits: { fileSize: 10 * 1024 * 1024 },
+      limits: { fileSize: 5 * 1024 * 1024 } // 5 MB
     };
 
     return option;
