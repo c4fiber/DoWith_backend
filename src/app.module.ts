@@ -14,6 +14,9 @@ import { RoutineModule } from './routine/routine.module';
 import { CommentModule } from './comment/comment.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { FriendModule } from './friend/friend.module';
 import { CategoryModule } from './category/category.module';
 import { UserGroupModule } from './user_group/user_group.module';
 
@@ -31,11 +34,14 @@ import { UserGroupModule } from './user_group/user_group.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
-      synchronize: true,  // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
+      synchronize: true, // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
       logging: true,
       extra: {
         timezone: 'Asia/Seoul',
       },
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
     }),
     // API Module
     TodoModule,
@@ -46,6 +52,7 @@ import { UserGroupModule } from './user_group/user_group.module';
     // Common Module
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
+    FriendModule,
     CategoryModule,
     UserGroupModule,
     CommentModule,
@@ -56,8 +63,8 @@ import { UserGroupModule } from './user_group/user_group.module';
     Logger,
     {
       provide: APP_FILTER,
-      useClass: DoWithExceptionFilter
-    }
+      useClass: DoWithExceptionFilter,
+    },
   ],
 })
 export class AppModule implements NestModule {

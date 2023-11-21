@@ -1,7 +1,13 @@
-
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Column, Entity, ManyToMany, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Todo } from '../todo/todo.entity';
-import { Group } from 'src/group/entities/group.entity';
 
 @Entity()
 export class User {
@@ -15,23 +21,27 @@ export class User {
   user_tel: string;
 
   @Column()
-  user_kakaoId: number;
+  user_kakao_id: string;
 
   @Column()
   user_hp: number;
 
-  //   @OneToOne(() => Room)
-  //   @JoinColumn()
-  //   room_id: number;
+  // @OneToOne(() => Room)
+  // @JoinColumn()
+  // room_id: number;
+
+  @ManyToMany(() => User)
+  @JoinTable()
+  friends: User[];
 
   @Column()
-  regAt: Date;
+  reg_at: Date;
 
   @Column()
-  uptAt: Date;
+  upt_at: Date;
 
   @Column()
-  lastLogin: Date;
+  last_login: Date;
 
   @OneToMany(() => Todo, (todo) => todo.user)
   todos: Todo[];

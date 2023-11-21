@@ -17,14 +17,8 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('/signup')
-  @UsePipes(ValidationPipe)
-  signup(@Body() request: UserRequestDto): Promise<UserResponseDto> {
-    return this.authService.signup(request);
-  }
-
   @Get('/login')
-  login(@Query('kakao_id', ParseIntPipe) kakaoId: number): Promise<boolean> {
-    return this.authService.login(kakaoId);
+  login(@Query('kakao_id') kakao_id: string): Promise<boolean> {
+    return this.authService.login(kakao_id);
   }
 }

@@ -2,16 +2,28 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
+  FileValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   ParseIntPipe,
   Patch,
+  Post,
   Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserRequestDto } from './dto/user-request.dto';
+import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { UserResponseDto } from './dto/user-response.dto';
+import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Controller('user')
 export class UserController {
@@ -21,15 +33,46 @@ export class UserController {
   async getUser(
     @Param('user_id', ParseIntPipe) id: number,
   ): Promise<UserResponseDto> {
-    return this.usersService.getUser(id);
+    return await this.usersService.getUser(id);
+  }
+
+  @Post('/')
+  @UsePipes(ValidationPipe)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (_, file, callback) => {
+        if (!file.originalname.match(/\.jpg$/)) {
+          return callback(new Error('Only images are allowed.'), false);
+        }
+        callback(null, true);
+      },
+      storage: diskStorage({
+        destination: './public/image',
+        filename: (_, file, callback) => {
+          if (file) {
+            // 파일이 있을 떄만 저장
+            console.log(`filename: ${file.originalname}`);
+            callback(null, file.originalname);
+          }
+        },
+      }),
+    }),
+  )
+  async createUser(
+    @Body() body: UserRequestDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<UserResponseDto> {
+    return await this.usersService.createUser(body);
   }
 
   @Put('/:user_id')
+  @UsePipes(new ValidationPipe())
   async updateUser(
     @Param('user_id', ParseIntPipe) id: number,
     @Body() request: UserRequestDto,
   ): Promise<boolean> {
-    return this.usersService.updateUser(id, request);
+    return await this.usersService.updateUser(id, request);
   }
 
   @Patch('/:user_id')
@@ -37,16 +80,19 @@ export class UserController {
     @Param('user_id', ParseIntPipe) id: number,
     @Query('hp', ParseIntPipe) hp: number,
   ): Promise<boolean> {
-    return this.usersService.updateHp(id, hp);
+    return await this.usersService.updateHp(id, hp);
   }
 
   @Delete('/:user_id')
   async deleteUser(@Param('user_id', ParseIntPipe) id: number): Promise<void> {
-    return this.usersService.deleteUser(id);
+    return await this.usersService.deleteUser(id);
   }
 
-  @Get('/:user_id/friends')
-  async getUserFriends() {
-    // TODO:
+  @Post('/contacts')
+  @UsePipes(ValidationPipe)
+  async getUsersByContacts(
+    @Body() body: GetUsersByContactsDto,
+  ): Promise<UserResponseDto[]> {
+    return await this.usersService.getUsersByContacts(body);
   }
 }
