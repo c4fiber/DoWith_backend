@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Raw, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/user_group/entities/user_group.entity';
+import { Todo } from 'src/todo/todo.entity';
+import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 
 @Injectable()
 export class GroupService {
@@ -12,6 +14,8 @@ export class GroupService {
     private readonly groupRepository: Repository<Group>,
     @InjectRepository(UserGroup)
     private readonly userGroupRepository: Repository<UserGroup>,
+    private readonly doWithException: DoWithExceptions,
+    private dataSource: DataSource,
     private readonly logger: Logger
   ){}
 
@@ -35,19 +39,30 @@ export class GroupService {
     return result;
   }
 
-  async createGroupOne(user_id: number, createGroupDto: CreateGroupDto): Promise<Group>{
-    // [ To-Do] 두 insert가 하나의 트랜잭션으로 묶여야 할 거 같은데...
-    createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
+  async createGroupOne(user_id: number, createGroupDto: CreateGroupDto): Promise<any>{
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    const grpInsert = await this.groupRepository.save(createGroupDto);
-    const userGrpInsert = new UserGroup();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    userGrpInsert.user_id = +user_id;
-    userGrpInsert.grp_id = +grpInsert['grp_id'];
+    try{
+      createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
-    await this.userGroupRepository.save(userGrpInsert);
+      const grpIns = await queryRunner.manager.save(Group, createGroupDto);
+      const ug = new UserGroup();
 
-    return grpInsert;
+      ug.user_id = +user_id;
+      ug.grp_id = +grpIns['grp_id'];
+      
+      const ugIns = await queryRunner.manager.save(UserGroup ,ug);
+      await queryRunner.commitTransaction();
+
+      return { grpIns, ugIns };
+
+    } catch(err){
+      await queryRunner.rollbackTransaction();
+      throw this.doWithException.FailedToMakeGroup;
+    }
   }
 
   async getGroupOne(grp_id: number): Promise<any>{
@@ -65,7 +80,7 @@ export class GroupService {
                                                .select([
                                                  'u.user_id    AS user_id'
                                                , 'u.user_name  AS user_name'
-                                               , 'u.lastLogin AS last_login'
+                                               , 'u.last_login AS last_login'
                                                ])
                                                .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                                .leftJoin('user'      , 'u' , 'u.user_id = ug.user_id')
@@ -118,9 +133,29 @@ export class GroupService {
 
     return await this.userGroupRepository.save(userGrpInsert);
   }
-
+  
   async leftGroup(grp_id: number, user_id: number): Promise<any>{
-    return await this.userGroupRepository.delete({ grp_id, user_id });
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try{
+      const ugDel = await queryRunner.manager.delete(UserGroup, { grp_id, user_id });
+      const todoUpt = await queryRunner.manager.update(
+          Todo
+        , { user_id, grp_id, todo_date: Raw(todo_date => `to_char(${todo_date}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`),}
+        , { todo_deleted: true }
+      )
+
+      await queryRunner.commitTransaction();
+
+      return { ugDel, todoUpt };
+
+    } catch(err) {
+      await queryRunner.rollbackTransaction();
+      throw this.doWithException.FailedToleftGroup;
+    } 
   }
 
   async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any[]>{

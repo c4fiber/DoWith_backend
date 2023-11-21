@@ -24,5 +24,5 @@ export class Routine {
   rout_end: Date;
 
   @DeleteDateColumn()
-  deletedAt: Date
+  del_at: Date
 }

@@ -18,13 +18,13 @@ export class Group {
   grp_owner: number;
 
   @CreateDateColumn()
-  createdAt: Date
+  reg_at: Date
 
   @UpdateDateColumn()
-  updatedAt: Date
+  upt_at: Date
 
   @DeleteDateColumn()
-  deletedAt: Date
+  del_at: Date
 
   @OneToOne(() => Category, {createForeignKeyConstraints: false})
   @JoinColumn({ name: 'cat_id'})
