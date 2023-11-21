@@ -25,7 +25,7 @@ enum DoWithErrorCode {
   SelfFriendship = '0014',
 
   // Routine
-  ExceedMaxRoutines = '0200'
+  ExceedMaxRoutines = '0200',
 }
 
 enum DoWithErrorMsg {
@@ -61,6 +61,8 @@ export class DoWithExceptions {
   SelfFriendship = new DoWithException(
     DoWithErrorMsg.SelfFriendship,
     DoWithErrorMsg.SelfFriendship,
+    HttpStatus.BAD_REQUEST,
+  );
 
   // =============== [ Routine ] ===============
   ExceedMaxRoutines = new DoWithException(
