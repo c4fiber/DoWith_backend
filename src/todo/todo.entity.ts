@@ -21,10 +21,10 @@ export class Todo {
   @Column({ nullable: true })
   todo_desc: string;
 
-  @Column({ nullable: false, type: 'date' })
+  @Column({ default: 'etc' })
   todo_label: string;
 
-  @CreateDateColumn() // default: now()
+  @CreateDateColumn({ type: 'date' }) // default: now()
   todo_date: Date;
 
   @Column({ default: false })
@@ -42,7 +42,7 @@ export class Todo {
   @Column({ nullable: true })
   todo_img: string;
 
-  @Column({ nullable: false, default: false })
+  @Column({ default: false })
   todo_deleted: boolean;
 
   @ManyToOne(type => User, user => user.todos)

@@ -56,8 +56,8 @@ export class GroupService {
       ug.grp_id = +grpIns.grp_id
       
       const ugIns = await queryRunner.manager.save(UserGroup ,ug);
-      await queryRunner.commitTransaction();
 
+      await queryRunner.commitTransaction();
       return { grpIns, ugIns };
 
     } catch(err){
