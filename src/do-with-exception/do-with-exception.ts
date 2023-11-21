@@ -21,12 +21,18 @@ enum DoWithErrorCode {
   UserAlreadyExists = '0011',
   UserNotFound = '0012',
   UserNameNotUnique = '0013',
+
+  // Group
+  FailedToleftGroup = '0100'
 }
 
 enum DoWithErrorMsg {
   UserAlreadyExists = 'User is already registerd',
   UserNotFound = 'User not found',
   UserNameNotUnique = 'User name is not unique',
+
+  // Group
+  FailedToleftGroup = '그룹을 나가는데 실패하였습니다.'
 }
 
 @Injectable()
@@ -44,6 +50,13 @@ export class DoWithExceptions {
   UserNameNotUnique = new DoWithException(
     DoWithErrorMsg.UserNameNotUnique,
     DoWithErrorCode.UserNameNotUnique,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  // =============== [ Group ] ===============
+  FailedToleftGroup = new DoWithException(
+    DoWithErrorMsg.FailedToleftGroup,
+    DoWithErrorCode.FailedToleftGroup,
     HttpStatus.BAD_REQUEST,
   );
 }

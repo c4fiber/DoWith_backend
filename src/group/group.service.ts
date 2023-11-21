@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Raw, Repository, getManager } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/user_group/entities/user_group.entity';
+import { Todo } from 'src/todo/todo.entity';
+import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 
 @Injectable()
 export class GroupService {
@@ -12,6 +14,10 @@ export class GroupService {
     private readonly groupRepository: Repository<Group>,
     @InjectRepository(UserGroup)
     private readonly userGroupRepository: Repository<UserGroup>,
+    @InjectRepository(Todo)
+    private readonly todoRepository: Repository<Todo>,
+    private readonly doWithException: DoWithExceptions,
+    private dataSource: DataSource,
     private readonly logger: Logger
   ){}
 
@@ -65,7 +71,7 @@ export class GroupService {
                                                .select([
                                                  'u.user_id    AS user_id'
                                                , 'u.user_name  AS user_name'
-                                               , 'u.lastLogin AS last_login'
+                                               , 'u.last_login AS last_login'
                                                ])
                                                .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                                .leftJoin('user'      , 'u' , 'u.user_id = ug.user_id')
@@ -118,9 +124,28 @@ export class GroupService {
 
     return await this.userGroupRepository.save(userGrpInsert);
   }
-
+  
   async leftGroup(grp_id: number, user_id: number): Promise<any>{
-    return await this.userGroupRepository.delete({ grp_id, user_id });
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try{
+      await queryRunner.manager.delete(UserGroup, { grp_id, user_id });
+      await queryRunner.manager.update(
+          Todo
+        , { user_id, grp_id, todo_date: Raw(alias => `to_char(${alias}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`),}
+        , { todo_deleted: true }
+      )
+
+      await queryRunner.commitTransaction();
+      return;
+    } catch(err) {
+      this.logger.error(err);
+      await queryRunner.rollbackTransaction();
+      throw this.doWithException.FailedToleftGroup;
+    } 
   }
 
   async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any[]>{
