@@ -14,7 +14,14 @@ export class TodoService {
 
   // READ
   async findAllByUser(user_id: number): Promise<Todo[]> {
-    return await this.todoRepository.findBy({ user_id, todo_deleted: false });
+    return await this.todoRepository
+      .createQueryBuilder('todo')
+      .where('todo.user_id = :user_id', { user_id })
+      .andWhere('todo.todo_deleted = :todo_deleted', { todo_deleted: false })
+      .orderBy('todo.todo_date', 'ASC')
+      .orderBy('todo.todo_id', 'ASC')
+      .getMany();
+    // return await this.todoRepository.findBy({ user_id, todo_deleted: false });
   }
 
   async findOne(todo_id: number): Promise<Todo> {
@@ -27,7 +34,7 @@ export class TodoService {
   // CREATE
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
     const todo = new Todo();
-    Object.keys(createTodoDto).forEach(key => {
+    Object.keys(createTodoDto).forEach((key) => {
       if (createTodoDto[key] !== undefined && createTodoDto[key] !== null) {
         todo[key] = createTodoDto[key];
       }
