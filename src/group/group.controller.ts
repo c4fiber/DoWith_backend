@@ -24,11 +24,13 @@ export class GroupController {
   // 그룹 생성
   @Post('')
   createGroupOne(
-    @Body() createGroupDto: CreateGroupDto
+    @Body('grpInfo') createGroupDto: CreateGroupDto,
+    @Body('routInfo') routs: Array<any>
   ): Promise<any>{
     this.logger.debug("createGroupDto", JSON.stringify(createGroupDto));
+    this.logger.debug(routs);
 
-    return this.groupService.createGroupOne(createGroupDto);
+    return this.groupService.createGroupOne(createGroupDto, routs);
   }
 
   // 그룹 상세조회
