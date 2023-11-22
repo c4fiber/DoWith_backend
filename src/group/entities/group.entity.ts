@@ -10,7 +10,7 @@ export class Group {
   @Column({ nullable: false })
   grp_name: string;
 
-  @Column({ nullable: false })
+  @Column()
   grp_decs: string;
 
   @Column({ nullable: false })
@@ -28,10 +28,6 @@ export class Group {
   @OneToOne(() => Category, {createForeignKeyConstraints: false})
   @JoinColumn({ name: 'cat_id'})
   category: Category;
-
-  // @ManyToOne(() => Routine, {createForeignKeyConstraints: false})
-  // @JoinColumn({ name: 'rout_id' })
-  // grp_routs: Routine;
 
   @ManyToMany(() => User)
   @JoinTable({ 

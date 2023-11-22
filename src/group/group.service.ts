@@ -6,6 +6,7 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/user_group/entities/user_group.entity';
 import { Todo } from 'src/todo/todo.entity';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
+import { Routine } from 'src/routine/entities/routine.entity';
 
 @Injectable()
 export class GroupService {
@@ -14,6 +15,8 @@ export class GroupService {
     private readonly groupRepository: Repository<Group>,
     @InjectRepository(UserGroup)
     private readonly userGroupRepository: Repository<UserGroup>,
+    @InjectRepository(Todo)
+    private readonly todoRepository: Repository<Todo>,
     private readonly doWithException: DoWithExceptions,
     private dataSource: DataSource,
     private readonly logger: Logger
@@ -39,27 +42,55 @@ export class GroupService {
     return result;
   }
 
-  async createGroupOne(user_id: number, createGroupDto: CreateGroupDto): Promise<any>{
+  async createGroupOne(createGroupDto: CreateGroupDto, routs: Array<any>): Promise<any>{
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try{
+      createGroupDto.grp_owner =  createGroupDto.user_id;
       createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
+      // Group Insert
       const grpIns = await queryRunner.manager.save(Group, createGroupDto);
       const ug = new UserGroup();
 
-      ug.user_id = +user_id;
-      ug.grp_id = +grpIns['grp_id'];
+      ug.user_id = +createGroupDto.user_id;
+      ug.grp_id = +grpIns.grp_id
       
+      // UserGroup Insert
       const ugIns = await queryRunner.manager.save(UserGroup ,ug);
+      
+      // Routine Insert
+      routs.forEach(async (data) => {
+        const rout = new Routine();
+
+        rout.grp_id = ug.grp_id;
+        rout.rout_name = data.rout_name;
+        rout.rout_desc = data.rout_desc;
+        rout.rout_repeat = data.rout_repeat;
+        rout.rout_srt = data.rout_srt;
+        rout.rout_end = data.rout_end;
+
+        const routRes = await queryRunner.manager.save(Routine, rout);
+        const todo = new Todo();
+
+        todo.grp_id = ug.grp_id;
+        todo.user_id = ug.user_id;
+        todo.todo_name = data.rout_name;
+        todo.todo_desc = data.rout_desc;
+        todo.todo_start = data.rout_srt;
+        todo.todo_end = data.rout_end;
+
+        const todoRes = await queryRunner.manager.save(Todo, todo);
+      });
 
       await queryRunner.commitTransaction();
-      return { grpIns, ugIns };
+      return { grpIns };
 
     } catch(err){
+      this.logger.error(err);
       await queryRunner.rollbackTransaction();
       throw this.doWithException.FailedToMakeGroup;
     }
@@ -217,6 +248,20 @@ export class GroupService {
     return result.andWhere('u2.user_id != :user_id', { user_id })
                  .orderBy('count(u1.user_id)', 'DESC')
                  .getRawMany();
+  }
+
+  async updateImage(todo_id: number, user_id: number, file: Express.Multer.File){
+    if(!file){
+      throw this.doWithException.ThereIsNoFile;
+    }
+    
+    const todoIns = await this.todoRepository.createQueryBuilder('t')
+                                             .update({todo_img: file.filename})
+                                             .where({ todo_id })
+                                             .andWhere({ user_id })
+                                             .execute();
+
+    return todoIns;
   }
 
   async deleteGroup(grp_id: number){

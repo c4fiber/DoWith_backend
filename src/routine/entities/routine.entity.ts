@@ -15,8 +15,8 @@ export class Routine {
   @Column({nullable: true})
   rout_desc: string;
 
-  @Column()
-  rout_repeat: number;
+  @Column({ type: 'bit varying', width: 7 })
+  rout_repeat: string;
 
   @Column({nullable: true, type: 'time'})
   rout_srt: string;

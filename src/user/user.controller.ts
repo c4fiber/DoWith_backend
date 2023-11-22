@@ -24,10 +24,16 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { MulterConfigService } from 'src/utils/fileUpload/MulterConfigService';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly usersService: UserService) {}
+  constructor(
+      private readonly usersService: UserService
+    , private readonly multerConifg: MulterConfigService
+  ) {
+    this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
+  }
 
   @Get('/:user_id')
   async getUser(
@@ -56,27 +62,8 @@ export class UserController {
     return await this.usersService.createUser(body);
   }
 
+  @UseInterceptors(FileInterceptor('profile'))
   @Post('/:user_id/profile')
-  @UseInterceptors(
-    FileInterceptor('profile', {
-      limits: { fileSize: 5 * 1024 * 1024 },
-      fileFilter: (_, file, callback) => {
-        if (!file.originalname.match(/\.jpg$/)) {
-          return callback(new Error('Only images are allowed.'), false);
-        }
-        callback(null, true);
-      },
-      storage: diskStorage({
-        destination: './public/image',
-        filename: (_, file, callback) => {
-          if (file) {
-            // 파일이 있을 떄만 저장
-            callback(null, file.originalname);
-          }
-        },
-      }),
-    }),
-  )
   async createUserProfile(
     @Param('user_id', ParseIntPipe) id: number,
     @UploadedFile() profile: Express.Multer.File,
