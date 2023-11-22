@@ -205,19 +205,19 @@ export class GroupService {
     } 
   }
 
-  async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any[]>{
+  async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any>{
     const result = await this.groupRepository.createQueryBuilder('g')
                                              .select(['t.todo_img AS todo_img'])
                                              .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
                                              .leftJoin('routine', 'r', 't.grp_id = r.grp_id')
-                                             .where('t.todo_img IS NOT NULL')
+                                             .where('t.user_id = :user_id', {user_id})
                                              .andWhere('g.grp_id = :grp_id', {grp_id})
                                              .groupBy('t.todo_id')
                                              .orderBy('t.todo_id')
                                              .getRawMany();
     this.logger.debug(result);                                  
 
-    return result;
+    return { 'path': process.env.IMAGE_PATH, result} ;
   }
 
   async getGroupsBySearching(user_id: number, cat_id: number, keyword: string): Promise<any[]>{

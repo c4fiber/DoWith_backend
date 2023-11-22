@@ -78,7 +78,7 @@ export class GroupController {
   getMemberTodoInGroup (
     @Param('grp_id') grp_id: number,
     @Param('user_id') user_id: number
-  ): Promise<any[]>{
+  ): Promise<any>{
     this.logger.debug("grp_id", grp_id);
     this.logger.debug("user_id", user_id);
 
