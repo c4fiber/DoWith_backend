@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import { DoWithException } from "src/do-with-exception/do-with-exception";
 
 @Injectable()
-export class MulterConfigService implements MulterOptionsFactory{
+export class MulterConfig implements MulterOptionsFactory{
   dir_path: string;
 
   constructor(){
@@ -46,7 +46,7 @@ export class MulterConfigService implements MulterOptionsFactory{
           done(null, `${name}_${Date.now()}${ext}`);
         }
       }),
-      limits: { fileSize: 5 * 1024 * 1024 } // 5 MB
+      limits: { fileSize: 1 * 1024 * 1024 } // 1 MB
     };
 
     return option;

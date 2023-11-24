@@ -23,14 +23,13 @@ import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { MulterConfigService } from 'src/utils/fileUpload/MulterConfigService';
+import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
 
 @Controller('user')
 export class UserController {
   constructor(
       private readonly usersService: UserService
-    , private readonly multerConifg: MulterConfigService
+    , private readonly multerConifg: MulterConfig
   ) {
     this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
   }

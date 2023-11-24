@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
-import { MulterConfigService } from './fileUpload/MulterConfigService';
+import { MulterConfig } from './fileUpload/MulterConfigService';
 
 @Module({
   imports: [
     MulterModule.registerAsync({
-      useClass: MulterConfigService
+      useClass: MulterConfig
     })
   ],
   exports: [ MulterModule ]

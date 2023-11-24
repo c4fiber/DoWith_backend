@@ -7,6 +7,8 @@ import { UserGroup } from 'src/user_group/entities/user_group.entity';
 import { Todo } from 'src/todo/todo.entity';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Routine } from 'src/routine/entities/routine.entity';
+import * as sharp from 'sharp'
+import * as fs from 'fs/promises'
 
 @Injectable()
 export class GroupService {
@@ -99,12 +101,12 @@ export class GroupService {
   async getGroupOne(grp_id: number): Promise<any>{
     const grp_detail = await this.groupRepository.createQueryBuilder('g')
                                                  .select([
-                                                     'g.grp_id    AS grp_id'
-                                                   , 'g.grp_name  AS grp_name'
-                                                   , 'g.grp_decs  AS grp_desc'
-                                                   , `to_char(g.reg_at, 'yyyy-MM-dd HH:MI:SS') AS reg_at`
-                                                   , 'u.user_name AS user_name'
-                                                   , 'c.cat_name  AS cat_name'
+                                                   'g.grp_id    AS grp_id'
+                                                 , 'g.grp_name  AS grp_name'
+                                                 , 'g.grp_decs  AS grp_desc'
+                                                 , `to_char(g.reg_at, 'yyyy-MM-dd HH:MI:SS') AS reg_at`
+                                                 , 'u.user_name AS user_name'
+                                                 , 'c.cat_name  AS cat_name'
                                                  ])
                                                  .leftJoin('user_group', 'ug', 'g.grp_owner = ug.grp_id')
                                                  .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
@@ -151,13 +153,13 @@ export class GroupService {
 
     const result = await this.groupRepository.createQueryBuilder('g')
                                              .select([
-                                                'g.grp_id          AS grp_id'
-                                              , 'g.grp_name        AS grp_name'
-                                              , 'g.grp_decs        AS grp_decs'
-                                              , 'MAX(u2.user_name) AS owner'
-                                              , 'g.cat_id          AS cat_id'
-                                              , 'MAX(c.cat_name)   AS cat_name'
-                                              , 'MAX(g2.mem_cnt)   AS mem_cnt'
+                                               'g.grp_id          AS grp_id'
+                                             , 'g.grp_name        AS grp_name'
+                                             , 'g.grp_decs        AS grp_decs'
+                                             , 'MAX(u2.user_name) AS owner'
+                                             , 'g.cat_id          AS cat_id'
+                                             , 'MAX(c.cat_name)   AS cat_name'
+                                             , 'MAX(g2.mem_cnt)   AS mem_cnt'
                                              ])
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                              .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
@@ -207,11 +209,14 @@ export class GroupService {
 
   async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any>{
     const result = await this.groupRepository.createQueryBuilder('g')
-                                             .select(['t.todo_img AS todo_img'])
+                                             .select([
+                                               't.todo_id  AS todo_id'
+                                             , 't.todo_img AS todo_img'
+                                             ])
                                              .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
                                              .leftJoin('routine', 'r', 't.grp_id = r.grp_id')
-                                             .where('t.user_id = :user_id', {user_id})
-                                             .andWhere('g.grp_id = :grp_id', {grp_id})
+                                             .where('t.user_id = :user_id', { user_id })
+                                             .andWhere('g.grp_id = :grp_id', { grp_id })
                                              .groupBy('t.todo_id')
                                              .orderBy('t.todo_id')
                                              .getRawMany();
@@ -224,7 +229,7 @@ export class GroupService {
     const myGrps = await this.groupRepository.createQueryBuilder('g')
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                              .select(['g.grp_id AS grp_id'])
-                                             .where('ug.user_id = :user_id', {user_id})
+                                             .where('ug.user_id = :user_id', { user_id })
                                              .getRawMany();
 
     const myGrpsIds = myGrps.map(data => data.grp_id);
@@ -247,11 +252,11 @@ export class GroupService {
                                              .groupBy('g.grp_id');
 
     if(myGrpsIds.length > 0){
-      result.where('g.grp_id NOT IN (:...myGrpsIds)', { myGrpsIds });
+      result.andWhere('g.grp_id NOT IN (:...myGrpsIds)', { myGrpsIds });
     }
 
     if(cat_id != 1){  // 1: 전체
-      result.andWhere('c.cat_id = :cat_id', {cat_id});
+      result.andWhere('c.cat_id = :cat_id', { cat_id });
     }
 
     if(keyword){
@@ -262,21 +267,36 @@ export class GroupService {
                  .getRawMany();
   }
 
-  async updateImage(todo_id: number, user_id: number, file: Express.Multer.File){
+  async updateImage(todo_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
     if(!file){
       throw this.doWithException.ThereIsNoFile;
     }
-    
+
     const todoIns = await this.todoRepository.createQueryBuilder('t')
-                                             .update({todo_img: file.filename})
+                                             .update({ todo_img: file.filename })
                                              .where({ todo_id })
                                              .andWhere({ user_id })
                                              .execute();
 
+    try {
+      const filePath = file.path;
+
+      await sharp(filePath).resize({ width: 700, height: 700, fit: 'contain' }) // 원하는 크기로 조정
+                           .toFile(filePath, async(err, info) => {
+                             try{
+                               await fs.unlink(filePath);
+                             } catch(err){
+                               throw this.doWithException.FailedToDeletedOirginal;
+                             }
+                           });
+    } catch(err) {
+      throw this.doWithException.FailedToResizeImage;
+    }
+
     return todoIns;
   }
 
-  async deleteGroup(grp_id: number){
+  async deleteGroup(grp_id: number): Promise<any>{
     return await this.groupRepository.softDelete({grp_id});
   }
 }
