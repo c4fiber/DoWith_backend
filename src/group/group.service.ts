@@ -272,7 +272,7 @@ export class GroupService {
       throw this.doWithException.ThereIsNoFile;
     }
 
-    const todoIns = await this.todoRepository.createQueryBuilder('t')
+    const todoUpt = await this.todoRepository.createQueryBuilder('t')
                                              .update({ todo_img: file.filename })
                                              .where({ todo_id })
                                              .andWhere({ user_id })
@@ -293,7 +293,16 @@ export class GroupService {
       throw this.doWithException.FailedToResizeImage;
     }
 
-    return todoIns;
+    return todoUpt;
+  }
+
+  async updateTodoDone(todo_id: number): Promise<any>{
+    const todoUpt = await this.todoRepository.createQueryBuilder('t')
+                                             .update({ todo_done: true })
+                                             .where({ todo_id })
+                                             .execute();
+     
+    return todoUpt;
   }
 
   async deleteGroup(grp_id: number): Promise<any>{

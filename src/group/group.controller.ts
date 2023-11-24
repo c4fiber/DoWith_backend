@@ -114,12 +114,11 @@ export class GroupController {
   }
 
   // 그룹원 할 일 인증 승인
-  @Patch('/:grp_id/user/:todo_id/approve')
+  @Patch('/user/:todo_id/approve')
   updateTodoDone(
-    @Param('user_id') user_id: number,
     @Param('todo_id') todo_id: number
   ): Promise<any>{
-    return;
+    return this.groupService.updateTodoDone(todo_id);
   }
 
   // 그룹 삭제 (인원수가 0이되면 삭제)
