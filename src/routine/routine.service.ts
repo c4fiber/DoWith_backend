@@ -72,7 +72,7 @@ export class RoutineService {
         todo.todo_desc = routIns.rout_desc;
         todo.todo_start = routIns.rout_srt;
         todo.todo_end = routIns.rout_end;
-        todo.todo_label = '2020-11-11 11:11:11';
+        todo.todo_label = 0;
 
         await queryRunner.manager.save(Todo, todo);
       });

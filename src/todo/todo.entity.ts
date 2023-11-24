@@ -21,8 +21,8 @@ export class Todo {
   @Column({ nullable: true })
   todo_desc: string;
 
-  @Column({ nullable: true, default: 'etc' })
-  todo_label: string;
+  @Column({ nullable: true, default: 0 })
+  todo_label: number;
 
   @CreateDateColumn({ type: 'date' }) // default: now()
   todo_date: Date;
