@@ -21,8 +21,8 @@ export class Todo {
   @Column({ nullable: true })
   todo_desc: string;
 
-  @Column({ nullable: true, default: 'etc' })
-  todo_label: string;
+  @Column({ nullable: true, default: 0 })
+  todo_label: number;
 
   @CreateDateColumn({ type: 'date' }) // default: now()
   todo_date: Date;
@@ -45,7 +45,7 @@ export class Todo {
   @Column({ default: false })
   todo_deleted: boolean;
 
-  @ManyToOne(type => User, user => user.todos)
+  @ManyToOne((type) => User, (user) => user.todos)
   user: User;
   // NOTE todo데이터 보존을 위해 CASCADE 미설정
   // TODO ManyToOne: grp_id
