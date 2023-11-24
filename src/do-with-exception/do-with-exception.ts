@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { NODATA } from 'dns';
 
 export class DoWithException extends Error {
   name: string;
@@ -36,6 +37,7 @@ enum DoWithErrorCode {
   ThereIsNoFile           = '1001',  // 파일 업로드 모듈 이용시 요청에 파일을 보내지 않았을 때
   FailedToDeletedOirginal = '1002',  // 이미지 압축 후 원본 파일 삭제 실패시
   FailedToResizeImage     = '1003',  // 업로드한 이미지 압축에 실패시
+  NoData                  = '1004'   // 요청한 데이터가 없는 경우
 }
 
 enum DoWithErrorMsg {
@@ -56,7 +58,8 @@ enum DoWithErrorMsg {
   NotAllowedExtension     = '지원하지 않는 파일 확장자입니다.',
   ThereIsNoFile           = '파일을 업로드 하지 않았습니다.',
   FailedToDeletedOirginal = '원본 파일을 삭제하는데 실패 했습니다.',
-  FailedToResizeImage     = '이미지 압축에 실패 했습니다.'
+  FailedToResizeImage     = '이미지 압축에 실패 했습니다.',
+  NoData                  = '요청하신 데이터가 없습니다.',
 }
 
 @Injectable()
@@ -125,6 +128,12 @@ export class DoWithExceptions {
   FailedToResizeImage = new DoWithException(
     DoWithErrorMsg.FailedToResizeImage,
     DoWithErrorCode.FailedToResizeImage,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  NoData = new DoWithException(
+    DoWithErrorMsg.NoData,
+    DoWithErrorCode.NoData,
     HttpStatus.BAD_REQUEST,
   );
 }

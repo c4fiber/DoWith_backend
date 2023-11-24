@@ -9,7 +9,7 @@ import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Routine } from 'src/routine/entities/routine.entity';
 import * as sharp from 'sharp'
 import * as fs from 'fs/promises'
-import { PagingOptions, applyPaging } from 'src/utils/paging/PagingOptions';
+import { PagingOptions, applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 
 @Injectable()
 export class GroupService {
@@ -25,20 +25,18 @@ export class GroupService {
     private readonly logger: Logger
   ){}
 
-  async getGroupAll(
-    @PagingOptions() pagingOptions: { page: number; limit: number }
-  ){
+  async getGroupAll(pagingOptions: { page: number; limit: number }): Promise<{result: Group[], total: number}> {
     const { page, limit } = pagingOptions;
-    const pagingList = await this.groupRepository.createQueryBuilder('g');
-    const [ items, total ] = await applyPaging(pagingList, page, limit);
-    const grpIds = items.map(item => item.grp_id);
+    const pagingQuery = this.groupRepository.createQueryBuilder();
+    const [ items, total ] = await applyPaging(pagingQuery, page, limit);
+    const grpIds = getIdsFromItems(items, "grp_id");
 
     const result = await this.groupRepository.createQueryBuilder('g')
                                              .select([
-                                               'g.grp_id          AS grp_id'
-                                             , 'g.grp_name        AS grp_name'
-                                             , 'MAX(u2.user_name) AS owner'
-                                             , 'COUNT(u1.user_id) AS mem_cnt'
+                                               'g.grp_id               AS grp_id'
+                                             , 'g.grp_name             AS grp_name'
+                                             , 'MAX(u2.user_name)      AS owner'
+                                             , 'COUNT(u1.user_id)::int AS mem_cnt'
                                              ])
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                              .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
@@ -142,14 +140,20 @@ export class GroupService {
                                                .where('g.grp_id = :grp_id', { grp_id })
                                                .getRawMany();
 
-    this.logger.debug(grp_detail);
-    this.logger.debug(rout_detail);
-    this.logger.debug(grp_mems);
-    
     return {grp_detail, rout_detail, grp_mems};
   }
 
-  async getAllMyGroups(user_id: number): Promise<Promise<Group[]>>{
+  async getAllMyGroups(
+      user_id: number
+    , pagingOptions: { page: number; limit: number }
+  ): Promise<Promise<{result: Group[], total: number}>>{
+    const { page, limit } = pagingOptions;
+    const pagingQuery = await this.groupRepository.createQueryBuilder('g')
+                                                  .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                                  .where('ug.user_id = :user_id', { user_id });
+    const [ items, total ] = await applyPaging(pagingQuery, page, limit);
+    const grpIds = getIdsFromItems(items, "grp_id");
+
     const Count = await this.groupRepository.createQueryBuilder('g')
                                             .select([ 'g.grp_id AS grp_id'
                                                     , 'count(*) AS mem_cnt'])
@@ -174,11 +178,11 @@ export class GroupService {
                                              .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
                                              .leftJoin(`(${Count})`, 'g2', 'g.grp_id = g2.grp_id')
                                              .where('u1.user_id = :user_id', { user_id })
+                                             .andWhere('g.grp_id IN (:...grpIds)', { grpIds })
                                              .groupBy('g.grp_id')
                                              .orderBy('MAX(g2.mem_cnt)', 'DESC')
                                              .getRawMany();
-    this.logger.debug(result);
-    return result;
+    return { result, total };
   }
 
   async createJoinGroup(grp_id: number, user_id: number): Promise<any>{
