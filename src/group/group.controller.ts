@@ -4,6 +4,7 @@ import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
+import { PagingOptions } from 'src/utils/paging/PagingOptions';
 
 @Controller('group')
 export class GroupController {
@@ -17,8 +18,13 @@ export class GroupController {
   
   // 모든 그룹 조회
   @Get('/')
-  getGroupAll(): Promise<Group[]>{
-    return this.groupService.getGroupAll();
+  getGroupAll(
+    @PagingOptions() pagingOptions: { page: number; limit: number }
+  ){
+    this.logger.debug(pagingOptions.page);
+    this.logger.debug(pagingOptions.limit);
+
+    return this.groupService.getGroupAll(pagingOptions);
   }
 
   // 그룹 생성

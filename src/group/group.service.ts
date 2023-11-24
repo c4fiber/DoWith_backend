@@ -9,6 +9,7 @@ import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Routine } from 'src/routine/entities/routine.entity';
 import * as sharp from 'sharp'
 import * as fs from 'fs/promises'
+import { PagingOptions, applyPaging } from 'src/utils/paging/PagingOptions';
 
 @Injectable()
 export class GroupService {
@@ -24,7 +25,14 @@ export class GroupService {
     private readonly logger: Logger
   ){}
 
-  async getGroupAll(): Promise<Group[]>{
+  async getGroupAll(
+    @PagingOptions() pagingOptions: { page: number; limit: number }
+  ){
+    const { page, limit } = pagingOptions;
+    const pagingList = await this.groupRepository.createQueryBuilder('g');
+    const [ items, total ] = await applyPaging(pagingList, page, limit);
+    const grpIds = items.map(item => item.grp_id);
+
     const result = await this.groupRepository.createQueryBuilder('g')
                                              .select([
                                                'g.grp_id          AS grp_id'
@@ -35,13 +43,12 @@ export class GroupService {
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                              .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
                                              .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
+                                             .where('g.grp_id IN (:...grpIds)', { grpIds })
                                              .orderBy('COUNT(u1.user_id)', 'DESC')
                                              .groupBy('g.grp_id')
                                              .getRawMany();
 
-    this.logger.debug(result);
-
-    return result;
+    return { result, total };
   }
 
   async createGroupOne(createGroupDto: CreateGroupDto, routs: Array<any>): Promise<any>{
