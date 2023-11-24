@@ -3,14 +3,14 @@ import { GroupService } from './group.service';
 import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MulterConfigService } from 'src/utils/fileUpload/MulterConfigService';
+import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
 
 @Controller('group')
 export class GroupController {
   constructor(
     private readonly logger: Logger,
     private readonly groupService: GroupService,
-    private readonly multerConifg: MulterConfigService
+    private readonly multerConifg: MulterConfig
   ){
     this.multerConifg.changePath(process.env.IMAGE_PATH);
   }
@@ -105,12 +105,20 @@ export class GroupController {
     @Param('todo_id') todo_id: number,
     @Param('user_id') user_id: number,
     @UploadedFile() file: Express.Multer.File
-  ){
+  ): Promise<any>{
     this.logger.debug("todo_id", todo_id);
     this.logger.debug("user_id", user_id);
     this.logger.debug(file);
     
     return this.groupService.updateImage(todo_id, user_id, file);
+  }
+
+  // 그룹원 할 일 인증 승인
+  @Patch('/user/:todo_id/approve')
+  updateTodoDone(
+    @Param('todo_id') todo_id: number
+  ): Promise<any>{
+    return this.groupService.updateTodoDone(todo_id);
   }
 
   // 그룹 삭제 (인원수가 0이되면 삭제)

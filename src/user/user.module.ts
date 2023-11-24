@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entities';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UtilsModule } from 'src/utils/utils.module';
-import { MulterConfigService } from 'src/utils/fileUpload/MulterConfigService';
+import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { MulterConfigService } from 'src/utils/fileUpload/MulterConfigService';
     , UtilsModule
   ],
   controllers: [UserController],
-  providers: [UserService, DoWithExceptions, MulterConfigService],
+  providers: [UserService, DoWithExceptions, MulterConfig],
   exports: [UserService],
 })
 export class UserModule {}

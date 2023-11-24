@@ -6,7 +6,7 @@ import { Group } from './entities/group.entity';
 import { UserGroup } from 'src/user_group/entities/user_group.entity';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UtilsModule } from 'src/utils/utils.module';
-import { MulterConfigService } from 'src/utils/fileUpload/MulterConfigService';
+import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
 import { Todo } from 'src/todo/todo.entity';
 
 @Module({
@@ -15,6 +15,6 @@ import { Todo } from 'src/todo/todo.entity';
       UtilsModule
   ],
   controllers: [GroupController],
-  providers: [Logger, GroupService, DoWithExceptions, MulterConfigService]
+  providers: [Logger, GroupService, DoWithExceptions, MulterConfig]
 })
 export class GroupModule {}
