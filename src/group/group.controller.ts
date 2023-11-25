@@ -20,7 +20,7 @@ export class GroupController {
   @Get('/')
   getGroupAll(
     @PagingOptions() pagingOptions: { page: number; limit: number }
-  ): Promise<{result: Group[], total: number}>{
+  ){
     return this.groupService.getGroupAll(pagingOptions);
   }
 

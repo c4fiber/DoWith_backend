@@ -25,26 +25,25 @@ export class GroupService {
     private readonly logger: Logger
   ){}
 
-  async getGroupAll(pagingOptions: { page: number; limit: number }): Promise<{result: Group[], total: number}> {
+  async getGroupAll(pagingOptions: { page: number; limit: number }){
     const { page, limit } = pagingOptions;
-    const pagingQuery = this.groupRepository.createQueryBuilder();
-    const [ items, total ] = await applyPaging(pagingQuery, page, limit);
+    const query = await this.groupRepository.createQueryBuilder('g')
+                                            .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                            .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
+                                            .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id');
+    const [ items, total ] = await applyPaging(query, page, limit);
     const grpIds = getIdsFromItems(items, "grp_id");
 
-    const result = await this.groupRepository.createQueryBuilder('g')
-                                             .select([
-                                               'g.grp_id               AS grp_id'
-                                             , 'g.grp_name             AS grp_name'
-                                             , 'MAX(u2.user_name)      AS owner'
-                                             , 'COUNT(u1.user_id)::int AS mem_cnt'
-                                             ])
-                                             .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-                                             .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
-                                             .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
-                                             .where('g.grp_id IN (:...grpIds)', { grpIds })
-                                             .orderBy('COUNT(u1.user_id)', 'DESC')
-                                             .groupBy('g.grp_id')
-                                             .getRawMany();
+    const result = await query.select([
+                                'g.grp_id               AS grp_id'
+                              , 'g.grp_name             AS grp_name'
+                              , 'MAX(u2.user_name)      AS owner'
+                              , 'COUNT(u1.user_id)::int AS mem_cnt'
+                              ])
+                              .where('g.grp_id IN (:...grpIds)', { grpIds })
+                              .orderBy('COUNT(u1.user_id)', 'DESC')
+                              .groupBy('g.grp_id')
+                              .getRawMany();
 
     return { result, total };
   }
