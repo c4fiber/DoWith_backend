@@ -23,7 +23,7 @@ export class DoWithInterceptor implements NestInterceptor{
         const req = http.getRequest();
         const res = http.getResponse();
         const method = req.method as HttpMethod;
-        Logger.debug("#################");
+
         switch(method){
           case HttpMethod.GET:
             Logger.debug(HttpMethod.GET);
@@ -48,7 +48,7 @@ export class DoWithInterceptor implements NestInterceptor{
             // }
             break;
         }
-        Logger.debug("#################");
+
         return data;
       })
     );

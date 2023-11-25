@@ -22,6 +22,7 @@ import { UserGroupModule } from './user_group/user_group.module';
 import { UtilsModule } from './utils/utils.module';
 import { DoWithInterceptorModule } from './do-with-interceptor/do-with-interceptor.module';
 import { DoWithInterceptor } from './do-with-interceptor/do-with-Interceptor';
+import { ErrorLogModule } from './error-log/error-log.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { DoWithInterceptor } from './do-with-interceptor/do-with-Interceptor';
     CategoryModule,
     UserGroupModule,
     CommentModule,
+    ErrorLogModule,
   ],
   controllers: [AppController],
   providers: [
@@ -72,7 +74,7 @@ import { DoWithInterceptor } from './do-with-interceptor/do-with-Interceptor';
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: DoWithInterceptor
+      useClass: DoWithInterceptor,
     },
   ],
 })

@@ -1,20 +1,15 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { NODATA } from 'dns';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-export class DoWithException extends Error {
-  name: string;
-  errorCode: number;
-  statusCode: number;
+export class DoWithException extends HttpException {
+  private errCode: string;
 
-  constructor(message, errorCode, statusCode) {
-    super(message);
-    this.name = 'DoWithException';
-    this.errorCode = errorCode;
-    this.statusCode = statusCode;
+  constructor(message: string, errCode: string, status: HttpStatus) {
+    super(message, status);
+    this.errCode = errCode;
   }
 
-  getStatus() {
-    return this.statusCode;
+  getErrCode() {
+    return this.errCode;
   }
 }
 

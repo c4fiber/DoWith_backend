@@ -46,7 +46,7 @@ export class MulterConfig implements MulterOptionsFactory{
           done(null, `${name}_${Date.now()}${ext}`);
         }
       }),
-      limits: { fileSize: 1 * 1024 * 1024 } // 1 MB
+      limits: { fileSize: 5 * 1024 * 1024 }
     };
 
     return option;
