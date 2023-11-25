@@ -20,6 +20,7 @@ import { FriendModule } from './friend/friend.module';
 import { CategoryModule } from './category/category.module';
 import { UserGroupModule } from './user_group/user_group.module';
 import { UtilsModule } from './utils/utils.module';
+import { DoWithInterceptorModule } from './do-with-interceptor/do-with-interceptor.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { UtilsModule } from './utils/utils.module';
     CategoryModule,
     UserGroupModule,
     CommentModule,
+    DoWithInterceptorModule,
   ],
   controllers: [AppController],
   providers: [

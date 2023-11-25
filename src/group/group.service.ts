@@ -21,8 +21,7 @@ export class GroupService {
     @InjectRepository(Todo)
     private readonly todoRepository: Repository<Todo>,
     private readonly doWithException: DoWithExceptions,
-    private dataSource: DataSource,
-    private readonly logger: Logger
+    private dataSource: DataSource
   ){}
 
   async getGroupAll(pagingOptions: { page: number; limit: number }){
@@ -96,7 +95,7 @@ export class GroupService {
       return { grpIns };
 
     } catch(err){
-      this.logger.error(err);
+      Logger.error(err);
       await queryRunner.rollbackTransaction();
       throw this.doWithException.FailedToMakeGroup;
     }
@@ -229,7 +228,7 @@ export class GroupService {
                                              .groupBy('t.todo_id')
                                              .orderBy('t.todo_id')
                                              .getRawMany();
-    this.logger.debug(result);                                  
+    Logger.debug(result);                                  
 
     return { 'path': process.env.IMAGE_PATH, result} ;
   }

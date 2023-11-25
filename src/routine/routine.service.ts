@@ -13,8 +13,7 @@ export class RoutineService {
     @InjectRepository(Routine)
     private readonly routineRepository: Repository<Routine>,
     private readonly dowithException: DoWithExceptions,
-    private dataSource: DataSource,
-    private readonly logger: Logger,
+    private dataSource: DataSource
   ) {}
 
   async getAllRoutines(grp_id: number): Promise<any> {
@@ -91,7 +90,7 @@ export class RoutineService {
       await queryRunner.commitTransaction();
       return;
     } catch (err) {
-      this.logger.error(err);
+      Logger.error(err);
       await queryRunner.rollbackTransaction();
     }
   }
