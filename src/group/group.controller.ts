@@ -80,9 +80,10 @@ export class GroupController {
   getGroupsBySearching(
     @Param('user_id') user_id: number,
     @Param('category') cat_id: number,
-    @Param('keyword') keyword: string
-  ): Promise<any[]>{
-    return this.groupService.getGroupsBySearching(user_id, cat_id, keyword);
+    @Param('keyword') keyword: string,
+    @PagingOptions() pagingOptions: { page: number; limit: number }
+  ): Promise<{ result: Group[], total: number}>{
+    return this.groupService.getGroupsBySearching(user_id, cat_id, keyword, pagingOptions);
   }
   
   @UseInterceptors(FileInterceptor('file'))
