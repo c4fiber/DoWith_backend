@@ -9,7 +9,6 @@ import { PagingOptions } from 'src/utils/paging/PagingOptions';
 @Controller('group')
 export class GroupController {
   constructor(
-    private readonly logger: Logger,
     private readonly groupService: GroupService,
     private readonly multerConifg: MulterConfig
   ){

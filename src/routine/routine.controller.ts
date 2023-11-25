@@ -5,8 +5,7 @@ import { CreateRoutineDto } from './dto/create-routine.dto';
 @Controller('routine')
 export class RoutineController {
   constructor(
-    private readonly routineService: RoutineService,
-    private readonly logger: Logger
+    private readonly routineService: RoutineService
   ) {}
 
   @Get('/:grp_id')
@@ -19,8 +18,6 @@ export class RoutineController {
     @Param('grp_id')grp_id: number,
     @Body() createRoutineDto: CreateRoutineDto
   ): Promise<any> {
-    this.logger.debug(JSON.stringify(createRoutineDto));
-
     return this.routineService.createRoutine(grp_id, createRoutineDto);
   }
 

@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GroupController } from './group.controller';
 import { GroupService } from './group.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,6 +15,6 @@ import { Todo } from 'src/todo/todo.entity';
       UtilsModule
   ],
   controllers: [GroupController],
-  providers: [Logger, GroupService, DoWithExceptions, MulterConfig]
+  providers: [ GroupService, DoWithExceptions, MulterConfig]
 })
 export class GroupModule {}
