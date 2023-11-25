@@ -12,7 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './group/group.module';
 import { RoutineModule } from './routine/routine.module';
 import { CommentModule } from './comment/comment.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -21,6 +21,7 @@ import { CategoryModule } from './category/category.module';
 import { UserGroupModule } from './user_group/user_group.module';
 import { UtilsModule } from './utils/utils.module';
 import { DoWithInterceptorModule } from './do-with-interceptor/do-with-interceptor.module';
+import { DoWithInterceptor } from './do-with-interceptor/do-with-Interceptor';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { DoWithInterceptorModule } from './do-with-interceptor/do-with-intercept
     // Common Module
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
+    DoWithInterceptorModule,
     UtilsModule,
     // API Module
     TodoModule,
@@ -59,7 +61,6 @@ import { DoWithInterceptorModule } from './do-with-interceptor/do-with-intercept
     CategoryModule,
     UserGroupModule,
     CommentModule,
-    DoWithInterceptorModule,
   ],
   controllers: [AppController],
   providers: [
@@ -68,6 +69,10 @@ import { DoWithInterceptorModule } from './do-with-interceptor/do-with-intercept
     {
       provide: APP_FILTER,
       useClass: DoWithExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DoWithInterceptor
     },
   ],
 })

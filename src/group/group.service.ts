@@ -138,7 +138,7 @@ export class GroupService {
                                                .where('g.grp_id = :grp_id', { grp_id })
                                                .getRawMany();
 
-    return {grp_detail, rout_detail, grp_mems};
+    return { grp_detail, rout_detail, grp_mems };
   }
 
   async getAllMyGroups(

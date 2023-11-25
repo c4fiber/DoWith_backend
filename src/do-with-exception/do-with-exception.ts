@@ -37,7 +37,9 @@ enum DoWithErrorCode {
   ThereIsNoFile           = '1001',  // 파일 업로드 모듈 이용시 요청에 파일을 보내지 않았을 때
   FailedToDeletedOirginal = '1002',  // 이미지 압축 후 원본 파일 삭제 실패시
   FailedToResizeImage     = '1003',  // 업로드한 이미지 압축에 실패시
-  NoData                  = '1004'   // 요청한 데이터가 없는 경우
+  NoData                  = '1004',  // 요청한 데이터가 없는 경우
+  FailedToUpdateData      = '1005',  // 수정 요청한 데이터가 DB에 존재하지 않는 경우
+  FailedToDeleteData      = '1006',  // 삭제 ``
 }
 
 enum DoWithErrorMsg {
@@ -60,6 +62,8 @@ enum DoWithErrorMsg {
   FailedToDeletedOirginal = '원본 파일을 삭제하는데 실패 했습니다.',
   FailedToResizeImage     = '이미지 압축에 실패 했습니다.',
   NoData                  = '요청하신 데이터가 없습니다.',
+  FailedToUpdateData      = '수정에 실패 하였습니다.',
+  FailedToDeleteData      = '삭제에 실패 하였습니다.',
 }
 
 @Injectable()
@@ -134,6 +138,18 @@ export class DoWithExceptions {
   NoData = new DoWithException(
     DoWithErrorMsg.NoData,
     DoWithErrorCode.NoData,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  FailedToDeleteData = new DoWithException(
+    DoWithErrorMsg.FailedToDeleteData,
+    DoWithErrorCode.FailedToDeleteData,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  FailedToUpdateData = new DoWithException(
+    DoWithErrorMsg.FailedToUpdateData,
+    DoWithErrorCode.FailedToUpdateData,
     HttpStatus.BAD_REQUEST,
   );
 }
