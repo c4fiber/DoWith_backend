@@ -7,8 +7,8 @@ import { HttpModule } from '@nestjs/axios';
 import { Logger } from 'winston';
 
 @Module({
-  imports: [UserModule, HttpModule, Logger],
+  imports: [UserModule, HttpModule],
   providers: [AuthService, DoWithExceptions],
-  controllers: [AuthController],
+  controllers: [AuthController, Logger],
 })
 export class AuthModule {}
