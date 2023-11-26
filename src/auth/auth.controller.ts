@@ -10,7 +10,7 @@ export class AuthController {
     return await this.authService.login(token);
   }
 
-  @Get('/redirect')
+  @Get('/')
   async oauth(@Headers('Authorization') token: string) {
     console.log(token);
     return await this.authService.oauth(token);

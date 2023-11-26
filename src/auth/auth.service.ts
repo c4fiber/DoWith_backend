@@ -5,6 +5,7 @@ import { UserResponseDto } from 'src/user/dto/user-response.dto';
 import { UserService } from 'src/user/user.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { lastValueFrom, map } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -39,8 +40,14 @@ export class AuthService {
       code: token,
     };
 
-    const response = await this.httpService.post(this.kakaoUrl, data, config);
+    const response = await lastValueFrom(
+      this.httpService.post(this.kakaoUrl, data, config).pipe(
+        map((response) => {
+          return response.data;
+        }),
+      ),
+    );
+
     console.log(response);
-    return response;
   }
 }
