@@ -17,15 +17,10 @@ export class AuthController {
     @Query('state') state: string,
     @Query('error_description') desc: string,
   ) {
-    Logger.debug(`code: ${code}`);
-    Logger.debug(`error: ${error}`);
-    Logger.debug(`state: ${state}`);
-    Logger.debug(`description: ${desc}`);
-
     if (error) {
       // TODO: 만약 error이면 error message html 띄워줘야 함
       Logger.log(`Error while kakao auth. ${error}: ${desc} `);
-      return;
+      return desc;
     }
 
     // Get token from kakao server

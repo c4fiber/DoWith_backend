@@ -4,7 +4,7 @@ import { UserRequestDto } from 'src/user/dto/user-request.dto';
 import { UserResponseDto } from 'src/user/dto/user-response.dto';
 import { UserService } from 'src/user/user.service';
 import { HttpService } from '@nestjs/axios';
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
 
 @Injectable()
@@ -36,8 +36,8 @@ export class AuthService {
 
     const data = {
       grant_type: 'authorization_code',
-      client_id: process.env.KAKAO_CLIENT,
-      redirect_uri: `${process.env.SERVER}/auth/redirect`,
+      client_id: process.env.KAKAO_REST_API_KEY,
+      redirect_uri: `${process.env.SERVER}/auth`,
       code: code,
     };
 
