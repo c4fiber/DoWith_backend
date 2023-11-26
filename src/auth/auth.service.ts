@@ -26,8 +26,8 @@ export class AuthService {
   }
 
   // 인가 코드로 토큰 발급을 요청합니다.
-
   async oauth(code: string) {
+    Logger.debug('카카오에 인증 토큰 요청 필요');
     const config: AxiosRequestConfig = {
       headers: {
         'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -41,15 +41,19 @@ export class AuthService {
       code: code,
     };
 
+    const params = new URLSearchParams();
+    Object.keys(data).forEach((key) => {
+      params.append(key, data[key]);
+    });
+
     const response = await lastValueFrom(
-      this.httpService.post(this.kakaoUrl, data, config).pipe(
+      this.httpService.post(this.kakaoUrl, params, config).pipe(
         map((response) => {
           return response.data;
         }),
       ),
     );
 
-    Logger.debug('카카오에 인증 토큰 요청 필요');
     Logger.log(response);
   }
 }
