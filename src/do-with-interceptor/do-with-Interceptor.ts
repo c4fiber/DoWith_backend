@@ -23,12 +23,13 @@ export class DoWithInterceptor implements NestInterceptor{
         const req = http.getRequest();
         const res = http.getResponse();
         const method = req.method as HttpMethod;
+        const mainKey = 'result';
         
         switch(method){
           case HttpMethod.GET:
-            if('result' in data){           // result: single row data
-              Object.keys(data['result']).forEach((key, val) => {
-                if(data['result'][key] === undefined){
+            if(mainKey in data){           // result: single row data
+              Object.keys(data[mainKey]).forEach((key, val) => {
+                if(data[mainKey][key] === undefined){
                   throw this.doWithException.NoData;
                 }
               });
@@ -45,14 +46,12 @@ export class DoWithInterceptor implements NestInterceptor{
             Logger.debug(HttpMethod.POST);
             break;
           case HttpMethod.PATCH:
-            if(data['result']['affected'] == 0){
+            if(data[mainKey]['affected'] == 0){
               throw this.doWithException.FailedToUpdateData;
             }
             break;
           case HttpMethod.DELETE:
-            Logger.debug(HttpMethod.DELETE);
-            
-            if(data['result']['affected'] == 0){
+            if(data[mainKey]['affected'] == 0){
               throw this.doWithException.FailedToDeleteData;
             }
             break;

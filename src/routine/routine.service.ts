@@ -17,7 +17,7 @@ export class RoutineService {
   ) {}
 
   async getAllRoutines(grp_id: number): Promise<any> {
-    const result = await this.routineRepository.createQueryBuilder('r')
+    const results = await this.routineRepository.createQueryBuilder('r')
                                                .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
                                                .where('g.grp_id = :grp_id', { grp_id })
                                                .select([
@@ -31,14 +31,14 @@ export class RoutineService {
                                                .getRawMany();
     
     const namesOfDays = ['월', '화', '수', '목', '금', '토', '일'];
-    result.map((data) => {
+    results.map((data) => {
       const bitsOfDay = data.rout_repeat.split('').map(Number);
 
       data['week'] = bitsOfDay.map((bit, idx) => (bit ? namesOfDays[idx] : ''))
                               .filter(Boolean);
     })
 
-    return result;
+    return { results };
   }
 
   async createRoutine(
@@ -64,34 +64,32 @@ export class RoutineService {
     try {
       createRoutineDto['grp_id'] = grp_id;
 
-      const routIns = await queryRunner.manager.save(Routine, createRoutineDto);
+      const result = await queryRunner.manager.save(Routine, createRoutineDto);
       const memList = await queryRunner.manager.createQueryBuilder()
                                                .select('ug.user_id AS user_id')
                                                .from(Group, 'g')
                                                .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                                .where('g.grp_id = :grp_id', { grp_id })
                                                .getRawMany();
-
-      memList.forEach(async (data) => {
+      for(const data of memList){
         const todo = new Todo();
         // local storage 해결할 루틴으로 To-Do 만들기임
         todo['user_id'] = data.user_id;
         todo.grp_id = grp_id;
-        todo.todo_name = routIns.rout_name;
-        todo.todo_desc = routIns.rout_desc;
-        todo.todo_start = routIns.rout_srt;
-        todo.todo_end = routIns.rout_end;
+        todo.todo_name = result.rout_name;
+        todo.todo_desc = result.rout_desc;
+        todo.todo_start = result.rout_srt;
+        todo.todo_end = result.rout_end;
         todo.todo_label = 0;
 
         await queryRunner.manager.save(Todo, todo);
-      });
+      }
 
-      //return;
       await queryRunner.commitTransaction();
-      return;
+      return { result };
     } catch (err) {
-      Logger.error(err);
       await queryRunner.rollbackTransaction();
+      throw this.dowithException.FailedToInsertData;
     }
   }
 

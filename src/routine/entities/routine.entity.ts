@@ -1,13 +1,10 @@
-import { time } from "console";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Group } from "src/group/entities/group.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Routine {
   @PrimaryGeneratedColumn()
   rout_id: number;
-  
-  @Column()
-  grp_id: number;
 
   @Column()
   rout_name: string;
@@ -23,4 +20,8 @@ export class Routine {
 
   @Column({nullable: true, type: 'time'})
   rout_end: string;
+
+  @ManyToOne(() => Group, grp => grp.rout_id)
+  @JoinColumn({ name: 'grp_id' })
+  grp_id: Group;
 }

@@ -66,12 +66,14 @@ export class GroupService {
 
       // UserGroup Insert
       const ugIns = await queryRunner.manager.save(UserGroup ,ug);
+      const grp = new Group();
+      grp.grp_id = ug.grp_id;
 
       // Routine Insert
       for(const data of routs) {
         const rout = new Routine();
 
-        rout.grp_id = ug.grp_id;
+        rout.grp_id = grp;
         rout.rout_name = data.rout_name;
         rout.rout_desc = data.rout_desc;
         rout.rout_repeat = data.rout_repeat;
@@ -202,7 +204,7 @@ export class GroupService {
 
     try{
       const result = await queryRunner.manager.delete(UserGroup, { grp_id, user_id });
-      const todoUpt = await queryRunner.manager.update(
+      await queryRunner.manager.update(
           Todo
         , { user_id, grp_id, todo_date: Raw(todo_date => `to_char(${todo_date}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`),}
         , { todo_deleted: true }
@@ -232,7 +234,7 @@ export class GroupService {
                                               .orderBy('t.todo_id')
                                               .getRawMany();            
 
-    return { results, 'path': process.env.IMAGE_PATH } ;
+    return { results, path: process.env.IMAGE_PATH } ;
   }
 
   async getGroupsBySearching(
