@@ -23,6 +23,7 @@ import { UtilsModule } from './utils/utils.module';
 import { DoWithInterceptorModule } from './do-with-interceptor/do-with-interceptor.module';
 import { DoWithInterceptor } from './do-with-interceptor/do-with-Interceptor';
 import { ErrorLogModule } from './error-log/error-log.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ErrorLogModule } from './error-log/error-log.module';
     DoWithExceptionFilterModule,
     DoWithInterceptorModule,
     UtilsModule,
+
     // API Module
     TodoModule,
     GroupModule,
@@ -94,4 +96,4 @@ function getNow() {
   return event.toISOString();
 }
 
-console.log( getNow()); // 현재 타임존의 시간 출력
+console.log(getNow()); // 현재 타임존의 시간 출력
