@@ -1,4 +1,4 @@
-import { Get, Header, Headers, Injectable } from '@nestjs/common';
+import { Get, Header, Headers, Injectable, Logger } from '@nestjs/common';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UserRequestDto } from 'src/user/dto/user-request.dto';
 import { UserResponseDto } from 'src/user/dto/user-response.dto';
@@ -6,12 +6,10 @@ import { UserService } from 'src/user/user.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
-import { Logger } from 'winston';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly logger: Logger,
     private readonly usersService: UserService,
     private readonly doWithExceptions: DoWithExceptions,
     private readonly httpService: HttpService,
@@ -50,7 +48,7 @@ export class AuthService {
       ),
     );
 
-    this.logger.info('카카오에 인증 토큰 요청 필요');
-    this.logger.info(response);
+    Logger.debug('카카오에 인증 토큰 요청 필요');
+    Logger.debug(response);
   }
 }

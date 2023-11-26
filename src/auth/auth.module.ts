@@ -9,6 +9,6 @@ import { Logger } from 'winston';
 @Module({
   imports: [UserModule, HttpModule],
   providers: [AuthService, DoWithExceptions],
-  controllers: [AuthController, Logger],
+  controllers: [AuthController],
 })
 export class AuthModule {}
