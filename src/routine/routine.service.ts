@@ -94,6 +94,8 @@ export class RoutineService {
   }
 
   async deleteRoutine(rout_id: number): Promise<any> {
-    return await this.routineRepository.softDelete({ rout_id });
+    const result = await this.routineRepository.softDelete({ rout_id });
+
+    return { result };
   }
 }
