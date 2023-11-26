@@ -25,8 +25,9 @@ export class AuthService {
     return await this.usersService.updateLastLoginByKakaoId(token);
   }
 
-  // 로그인 요청
-  async oauth(token: string) {
+  // 인가 코드로 토큰 발급을 요청합니다.
+
+  async oauth(code: string) {
     const config: AxiosRequestConfig = {
       headers: {
         'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -37,7 +38,7 @@ export class AuthService {
       grant_type: 'authorization_code',
       client_id: process.env.KAKAO_CLIENT,
       redirect_uri: `${process.env.SERVER}/auth/redirect`,
-      code: token,
+      code: code,
     };
 
     const response = await lastValueFrom(
@@ -49,6 +50,6 @@ export class AuthService {
     );
 
     Logger.debug('카카오에 인증 토큰 요청 필요');
-    Logger.debug(response);
+    Logger.log(response);
   }
 }

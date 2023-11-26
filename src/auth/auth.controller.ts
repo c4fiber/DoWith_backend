@@ -1,4 +1,4 @@
-import { Controller, Get, Headers } from '@nestjs/common';
+import { Controller, Get, Headers, Logger, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -11,8 +11,24 @@ export class AuthController {
   }
 
   @Get('/')
-  async oauth(@Headers('Authorization') token: string) {
-    console.log(token);
-    return await this.authService.oauth(token);
+  async oauth(
+    @Query('code') code: string,
+    @Query('error') error: string,
+    @Query('state') state: string,
+    @Query('error_description') desc: string,
+  ) {
+    Logger.debug(`code: ${code}`);
+    Logger.debug(`error: ${error}`);
+    Logger.debug(`state: ${state}`);
+    Logger.debug(`description: ${desc}`);
+
+    if (error) {
+      // TODO: 만약 error이면 error message html 띄워줘야 함
+      Logger.log(`Error while kakao auth. ${error}: ${desc} `);
+      return;
+    }
+
+    // Get token from kakao server
+    return await this.authService.oauth(code);
   }
 }
