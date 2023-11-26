@@ -1,3 +1,4 @@
+import { time } from "console";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -11,18 +12,15 @@ export class Routine {
   @Column()
   rout_name: string;
 
-  @Column()
+  @Column({nullable: true})
   rout_desc: string;
 
-  @Column()
-  rout_repeat: number;
+  @Column({ type: 'bit varying', width: 7 })
+  rout_repeat: string;
 
-  @CreateDateColumn()
-  rout_srt: Date;
+  @Column({nullable: true, type: 'time'})
+  rout_srt: string;
 
-  @CreateDateColumn()
-  rout_end: Date;
-
-  @DeleteDateColumn()
-  del_at: Date
+  @Column({nullable: true, type: 'time'})
+  rout_end: string;
 }

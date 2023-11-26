@@ -21,19 +21,19 @@ export class Todo {
   @Column({ nullable: true })
   todo_desc: string;
 
-  @Column({ nullable: false, default: "etc" })
-  todo_label: string;
+  @Column({ nullable: true, default: 0 })
+  todo_label: number;
 
-  @CreateDateColumn() // default: now()
+  @CreateDateColumn({ type: 'date' }) // default: now()
   todo_date: Date;
 
   @Column({ default: false })
   todo_done: boolean;
 
-  @Column({ nullable: true, default: "00:00" })
+  @Column({ nullable: true, type: 'time' })
   todo_start: string;
 
-  @Column({ nullable: true, default: "00:00" })
+  @Column({ nullable: true, type: 'time' })
   todo_end: string;
 
   @Column({ nullable: true })
@@ -42,10 +42,10 @@ export class Todo {
   @Column({ nullable: true })
   todo_img: string;
 
-  @Column({ nullable: false, default: false })
+  @Column({ default: false })
   todo_deleted: boolean;
 
-  @ManyToOne(type => User, user => user.todos)
+  @ManyToOne((type) => User, (user) => user.todos)
   user: User;
   // NOTE todo데이터 보존을 위해 CASCADE 미설정
   // TODO ManyToOne: grp_id

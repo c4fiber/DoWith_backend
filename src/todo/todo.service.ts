@@ -14,29 +14,45 @@ export class TodoService {
 
   // READ
   async findAllByUser(user_id: number): Promise<Todo[]> {
-    return await this.todoRepository.findBy({ user_id, todo_deleted: false });
+    return await this.todoRepository
+      .createQueryBuilder('todo')
+      .where('todo.user_id = :user_id', { user_id })
+      .andWhere('todo.todo_deleted = :todo_deleted', { todo_deleted: false })
+      .orderBy('todo.todo_date', 'ASC')
+      .orderBy('todo.todo_id', 'ASC')
+      .getMany();
+    // return await this.todoRepository.findBy({ user_id, todo_deleted: false });
   }
 
   async findOne(todo_id: number): Promise<Todo> {
-    return await this.todoRepository.findOneBy({ todo_id, todo_deleted: false });
+    return await this.todoRepository.findOneBy({
+      todo_id,
+      todo_deleted: false,
+    });
   }
 
   // CREATE
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
     const todo = new Todo();
-    // todo_id, todo_deleted: default
-    todo.user_id = createTodoDto.user_id;
+    Object.keys(createTodoDto).forEach((key) => {
+      if (createTodoDto[key] !== undefined && createTodoDto[key] !== null) {
+        todo[key] = createTodoDto[key];
+      }
+    });
 
-    todo.todo_name = createTodoDto.todo_name;
-    todo.todo_desc = createTodoDto.todo_desc;
-    todo.todo_label = createTodoDto.todo_label;
-    todo.todo_date = createTodoDto.todo_date;
-    todo.todo_done = createTodoDto.todo_done;
+    // // todo_id, todo_deleted: default
+    // todo.user_id = createTodoDto.user_id;
 
-    todo.todo_start = createTodoDto.todo_start;
-    todo.todo_end = createTodoDto.todo_end;
-    todo.grp_id = createTodoDto.grp_id;
-    todo.todo_img = createTodoDto.todo_img;
+    // todo.todo_name = createTodoDto.todo_name;
+    // todo.todo_desc = createTodoDto.todo_desc;
+    // todo.todo_label = createTodoDto.todo_label;
+    // todo.todo_date = createTodoDto.todo_date;
+    // todo.todo_done = createTodoDto.todo_done;
+
+    // todo.todo_start = createTodoDto.todo_start;
+    // todo.todo_end = createTodoDto.todo_end;
+    // todo.grp_id = createTodoDto.grp_id;
+    // todo.todo_img = createTodoDto.todo_img;
 
     return await this.todoRepository.save(todo);
   }
@@ -45,7 +61,7 @@ export class TodoService {
   async update(todo_id: number, dto: UpdateTodoDto): Promise<Todo> {
     const todo = await this.todoRepository.findOneBy({ todo_id });
 
-    Object.keys(dto).forEach(key => {
+    Object.keys(dto).forEach((key) => {
       if (dto[key] !== null && dto[key] !== undefined) {
         todo[key] = dto[key];
       }
@@ -65,7 +81,7 @@ export class TodoService {
   async editDone(todo_id: number, dto: UpdateTodoDto): Promise<Todo> {
     const todo = await this.todoRepository.findOneBy({ todo_id });
     todo.todo_done = dto.todo_done;
-    
+
     return this.todoRepository.save(todo);
   }
 }

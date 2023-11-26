@@ -3,6 +3,9 @@ import { Category } from "src/category/entities/category.entity";
 
 export class CreateGroupDto {
   @IsNotEmpty()
+  user_id: number;
+  
+  @IsNotEmpty()
   grp_name: string;
 
   grp_decs: string;

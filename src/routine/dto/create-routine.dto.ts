@@ -5,7 +5,7 @@ export class CreateRoutineDto {
   rout_name: string;
   
   rout_desc: string;
-  rout_repeat: number;
-  rout_srt: Date;
-  rout_end: Date;
+  rout_repeat: string;
+  rout_srt: string;
+  rout_end: string;
 }

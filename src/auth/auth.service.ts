@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Get, Header, Headers, Injectable } from '@nestjs/common';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UserRequestDto } from 'src/user/dto/user-request.dto';
 import { UserResponseDto } from 'src/user/dto/user-response.dto';
@@ -13,7 +13,9 @@ export class AuthService {
 
   // 카카오 아이디로 DB를 검색하여
   // lastLogin 필드를 업데이트
-  async login(kakao_id: string): Promise<boolean> {
-    return await this.usersService.updateLastLoginByKakaoId(kakao_id);
+  async login(token: string): Promise<boolean> {
+    //
+
+    return await this.usersService.updateLastLoginByKakaoId(token);
   }
 }
