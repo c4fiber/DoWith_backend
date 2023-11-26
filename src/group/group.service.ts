@@ -33,7 +33,7 @@ export class GroupService {
     const [ items, total ] = await applyPaging(query, page, limit);
     const grpIds = getIdsFromItems(items, "grp_id");
 
-    const result = await query.select([
+    const results = await query.select([
                                 'g.grp_id               AS grp_id'
                               , 'g.grp_name             AS grp_name'
                               , 'MAX(u2.user_name)      AS owner'
@@ -44,16 +44,16 @@ export class GroupService {
                               .groupBy('g.grp_id')
                               .getRawMany();
 
-    return { result, total };
+    return { results, total };
   }
 
   async createGroupOne(createGroupDto: CreateGroupDto, routs: Array<any>): Promise<any>{
     const queryRunner = this.dataSource.createQueryRunner();
 
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
     try{
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
       createGroupDto.grp_owner =  createGroupDto.user_id;
       createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
@@ -63,12 +63,12 @@ export class GroupService {
 
       ug.user_id = +createGroupDto.user_id;
       ug.grp_id = +grpIns.grp_id
-      
+
       // UserGroup Insert
       const ugIns = await queryRunner.manager.save(UserGroup ,ug);
-      
+
       // Routine Insert
-      routs.forEach(async (data) => {
+      for(const data of routs) {
         const rout = new Routine();
 
         rout.grp_id = ug.grp_id;
@@ -79,6 +79,7 @@ export class GroupService {
         rout.rout_end = data.rout_end;
 
         await queryRunner.manager.save(Routine, rout);
+
         const todo = new Todo();
 
         todo.grp_id = ug.grp_id;
@@ -89,7 +90,7 @@ export class GroupService {
         todo.todo_end = data.rout_end;
 
         await queryRunner.manager.save(Todo, todo);
-      });
+    }
 
       await queryRunner.commitTransaction();
       return { grpIns };
@@ -138,7 +139,7 @@ export class GroupService {
                                                .where('g.grp_id = :grp_id', { grp_id })
                                                .getRawMany();
 
-    return { grp_detail, rout_detail, grp_mems };
+    return { result: { grp_detail, rout_detail, grp_mems }};
   }
 
   async getAllMyGroups(
@@ -227,8 +228,7 @@ export class GroupService {
                                              .andWhere('g.grp_id = :grp_id', { grp_id })
                                              .groupBy('t.todo_id')
                                              .orderBy('t.todo_id')
-                                             .getRawMany();
-    Logger.debug(result);                                  
+                                             .getRawMany();            
 
     return { 'path': process.env.IMAGE_PATH, result} ;
   }
@@ -289,8 +289,6 @@ export class GroupService {
       throw this.doWithException.ThereIsNoFile;
     }
 
-    Logger.debug(`file info = ${file}`);
-
     const todoUpt = await this.todoRepository.createQueryBuilder('t')
                                              .update({ todo_img: file.filename })
                                              .where({ todo_id })
@@ -309,7 +307,6 @@ export class GroupService {
                              }
                            });
     } catch(err) {
-      Logger.debug("File Resizing Failed!!!!!");
       throw this.doWithException.FailedToResizeImage;
     }
 
