@@ -289,6 +289,8 @@ export class GroupService {
       throw this.doWithException.ThereIsNoFile;
     }
 
+    Logger.debug(`file info = ${file}`);
+
     const todoUpt = await this.todoRepository.createQueryBuilder('t')
                                              .update({ todo_img: file.filename })
                                              .where({ todo_id })
@@ -307,6 +309,7 @@ export class GroupService {
                              }
                            });
     } catch(err) {
+      Logger.debug("File Resizing Failed!!!!!");
       throw this.doWithException.FailedToResizeImage;
     }
 
