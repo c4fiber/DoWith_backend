@@ -45,16 +45,14 @@ export class DoWithInterceptor implements NestInterceptor{
             Logger.debug(HttpMethod.POST);
             break;
           case HttpMethod.PATCH:
-            Logger.debug(HttpMethod.PATCH);
-
-            if(data.affected == 0){
+            if(data['result']['affected'] == 0){
               throw this.doWithException.FailedToUpdateData;
             }
             break;
           case HttpMethod.DELETE:
             Logger.debug(HttpMethod.DELETE);
             
-            if(data.affected == 0){
+            if(data['result']['affected'] == 0){
               throw this.doWithException.FailedToDeleteData;
             }
             break;
