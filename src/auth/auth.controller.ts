@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   ParseIntPipe,
   Post,
@@ -18,7 +19,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('/login')
-  login(@Query('kakao_id') kakao_id: string): Promise<boolean> {
-    return this.authService.login(kakao_id);
+  login(@Headers('Authorization') token: string): Promise<boolean> {
+    return this.authService.login(token);
+  }
+
+  @Get('/redirect')
+  async oauth(@Headers('Authorization') token: string) {
+    console.log(token);
   }
 }
