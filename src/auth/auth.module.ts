@@ -4,9 +4,10 @@ import { UserModule } from 'src/user/user.module';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
+import { Logger } from 'winston';
 
 @Module({
-  imports: [UserModule, HttpModule],
+  imports: [UserModule, HttpModule, Logger],
   providers: [AuthService, DoWithExceptions],
   controllers: [AuthController],
 })

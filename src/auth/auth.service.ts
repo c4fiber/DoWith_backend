@@ -6,10 +6,12 @@ import { UserService } from 'src/user/user.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
+import { Logger } from 'winston';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly logger: Logger,
     private readonly usersService: UserService,
     private readonly doWithExceptions: DoWithExceptions,
     private readonly httpService: HttpService,
@@ -48,6 +50,7 @@ export class AuthService {
       ),
     );
 
-    console.log(response);
+    this.logger.info('카카오에 인증 토큰 요청 필요');
+    this.logger.info(response);
   }
 }
