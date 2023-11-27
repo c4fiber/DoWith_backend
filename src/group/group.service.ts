@@ -9,8 +9,6 @@ import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Routine } from 'src/routine/entities/routine.entity';
 import * as sharp from 'sharp'
 import * as fs from 'fs/promises'
-import { PagingOptions, applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
-import { Days } from 'src/days/entities/days.entity';
 import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 
 @Injectable()
@@ -68,14 +66,12 @@ export class GroupService {
 
       // UserGroup Insert
       const ugIns = await queryRunner.manager.save(UserGroup ,ug);
-      const grp = new Group();
-      grp.grp_id = ug.grp_id;
 
       // Routine Insert
       for(const data of routs) {
         const rout = new Routine();
 
-        rout.grp_id = grp;
+        rout.grp_id = ug.grp_id;
         rout.rout_name = data.rout_name;
         rout.rout_desc = data.rout_desc;
         rout.rout_repeat = data.rout_repeat;
@@ -307,7 +303,7 @@ export class GroupService {
       await sharp(filePath).resize({ width: 700, height: 700, fit: 'contain' }) // 원하는 크기로 조정
                            .toFile(filePath, async(err, info) => {
                              try{
-                               //await fs.unlink(filePath);
+                               await fs.unlink(filePath);
                              } catch(err){
                                throw this.doWithException.FailedToDeletedOriginal;
                              }
