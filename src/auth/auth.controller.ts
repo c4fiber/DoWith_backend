@@ -28,6 +28,7 @@ export class AuthController {
     @Query('error') error: string,
     @Query('state') state: string,
     @Query('error_description') desc: string,
+
     @Res() response: Response,
   ) {
     if (error) {

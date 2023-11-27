@@ -53,13 +53,17 @@ export class AuthService {
   // 인가 코드로 토큰 발급을 요청합니다.
   async oauth(code: string): Promise<string> {
     // 카카오 서버로 받은 인가 코드로 토큰 발급 요청
-    const kakaoOpenId = await this.requestKakaoToken(code).then((response) =>
+    const kakaoIdToken = await this.requestKakaoToken(code).then((response) =>
       this.jwtService.decode(response.id_token),
     );
 
     // 토큰 디코딩하여 카카오 유저 정보 확인
-    Logger.log(`Kakao openID payload: ${kakaoOpenId.sub}`);
-    const { aud, sub } = kakaoOpenId;
+    // aud: 앱 링크, sub: 유저 카카오 아이디
+    const { aud, sub } = kakaoIdToken;
+    Logger.log(
+      `Kakao open id token is successfully responsed` +
+        `{sub: ${kakaoIdToken.sub}, aud: ${kakaoIdToken.aud}}`,
+    );
 
     // 유저 아이디를 가져와 DB에서 검색하고
     const user: User = await this.userRepository.findOneBy({
