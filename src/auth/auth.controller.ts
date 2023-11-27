@@ -6,6 +6,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -28,13 +29,12 @@ export class AuthController {
     @Query('error_description') desc: string,
   ) {
     if (error) {
-      // TODO: 만약 error이면 error message html 띄워줘야 함
-      Logger.log(`Error while kakao auth. ${error}: ${desc} `);
+      Logger.log(`Error while kakao auth. ${error}: ${state} ${desc} `);
       return desc;
     }
 
-    // Get token from kakao server
-    return await this.authService.oauth(code);
+    const redirectUri = await this.authService.oauth(code);
+    return Response.redirect(redirectUri);
   }
 
   @Post('/test')
