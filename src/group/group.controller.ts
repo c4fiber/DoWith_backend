@@ -49,11 +49,11 @@ export class GroupController {
 
   // 그룹 가입하기
   @Post('/:grp_id/join/:user_id')
-  createJoinGroup(
+  JoinGroup(
     @Param('grp_id')grp_id: number,
     @Param('user_id')user_id: number
   ): Promise<any> {
-    return this.groupService.createJoinGroup(grp_id, user_id);
+    return this.groupService.JoinGroup(grp_id, user_id);
   }
 
   // 그룹 나가기

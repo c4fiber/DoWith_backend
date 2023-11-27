@@ -21,8 +21,9 @@ enum DoWithErrorCode {
   SelfFriendship = '0014',
 
   // Group
-  FailedToleftGroup = '0100',   // 그룹 떠나기에 실패 했을 떄
-  FailedToMakeGroup = '0101',   // 그룹 생성에 실패했을 때
+  FailedTojoinGroup = '0100',   // 그룹에 참가할 때
+  FailedToleftGroup = '0101',   // 그룹 떠나기에 실패 했을 떄
+  FailedToMakeGroup = '0102',   // 그룹 생성에 실패했을 때
 
   // Routine
   ExceedMaxRoutines = '0200',   // 그룹당 최대 3개의 루틴이 등록 가능하다
@@ -46,6 +47,7 @@ enum DoWithErrorMsg {
   SelfFriendship = 'A user cannot befriend themselves',
 
   // Group
+  FailedTojoinGroup = '그룹에 가입하는데 실패 했습니다.',
   FailedToleftGroup = '그룹을 나가는데 실패 했습니다.',
   FailedToMakeGroup = '그룹을 생성하는데 실패 했습니다.',
 
@@ -88,6 +90,12 @@ export class DoWithExceptions {
   );
 
   // =============== [ Group ] ===============
+  FailedTojoinGroup = new DoWithException(
+    DoWithErrorMsg.FailedTojoinGroup,
+    DoWithErrorCode.FailedTojoinGroup,
+    HttpStatus.BAD_REQUEST,
+  );
+
   FailedToleftGroup = new DoWithException(
     DoWithErrorMsg.FailedToleftGroup,
     DoWithErrorCode.FailedToleftGroup,
