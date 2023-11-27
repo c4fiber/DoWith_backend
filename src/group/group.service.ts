@@ -289,7 +289,8 @@ export class GroupService {
       throw this.doWithException.ThereIsNoFile;
     }
 
-    Logger.debug(`file info = ${file}`);
+    Logger.debug(`file info = ${file.buffer.toString()}`);
+    Logger.debug(JSON.stringify(file));
 
     const todoUpt = await this.todoRepository.createQueryBuilder('t')
                                              .update({ todo_img: file.filename })
@@ -303,7 +304,7 @@ export class GroupService {
       await sharp(filePath).resize({ width: 700, height: 700, fit: 'contain' }) // 원하는 크기로 조정
                            .toFile(filePath, async(err, info) => {
                              try{
-                               await fs.unlink(filePath);
+                               //await fs.unlink(filePath);
                              } catch(err){
                                throw this.doWithException.FailedToDeletedOirginal;
                              }
