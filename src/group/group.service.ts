@@ -247,17 +247,21 @@ export class GroupService {
     } 
   }
 
-  async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any>{
+  async getMemberTodoInGroup(grp_id: number, rout_id: number): Promise<any>{
     const results = await this.groupRepository.createQueryBuilder('g')
                                               .select([
-                                                't.todo_id  AS todo_id'
-                                              , 't.todo_img AS todo_img'
+                                                  'r.rout_id   AS rout_id'
+                                                , 't.user_id   AS user_id'
+                                                , 't.todo_img  AS todo_img'
+                                                , 't.todo_done AS todo_done'
+                                                , 'u.user_name AS user_name'
                                               ])
                                               .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
-                                              .leftJoin('routine', 'r', 't.grp_id = r.grp_id')
-                                              .where('t.user_id = :user_id', { user_id })
+                                              .leftJoin('routine', 'r', 't.grp_id = r.grp_id AND t.rout_id = r.rout_id')
+                                              .leftJoin('user'   , 'u', 'u.user_id = t.user_id')
+                                              .where('t.todo_img IS NOT NULL')
                                               .andWhere('g.grp_id = :grp_id', { grp_id })
-                                              .groupBy('t.todo_id')
+                                              .andWhere('r.rout_id = :rout_id', { rout_id })
                                               .orderBy('t.todo_id')
                                               .getRawMany();            
 
@@ -329,10 +333,10 @@ export class GroupService {
     try {
       const filePath = file.path;
 
-      await sharp(filePath).resize({ width: 700, height: 700, fit: 'contain' }) // 원하는 크기로 조정
+      await sharp(filePath).resize({ width: 300, height: 300, fit: 'contain' })
                            .toFile(filePath, async(err, info) => {
                              try{
-                               await fs.unlink(filePath);
+                               //await fs.unlink(filePath);
                              } catch(err){
                                throw this.doWithException.FailedToDeletedOriginal;
                              }

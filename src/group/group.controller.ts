@@ -69,9 +69,9 @@ export class GroupController {
   @Get('/:grp_id/user/:rout_id/image')
   getMemberTodoInGroup (
     @Param('grp_id') grp_id: number,
-    @Param('user_id') user_id: number
+    @Param('rout_id') rout_id: number
   ): Promise<any>{
-    return this.groupService.getMemberTodoInGroup(grp_id, user_id);
+    return this.groupService.getMemberTodoInGroup(grp_id, rout_id);
   }
 
   // 검색 - 카테고리, 검색어 이용
