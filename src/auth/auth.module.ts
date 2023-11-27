@@ -14,13 +14,13 @@ import { JwtStrategy } from './jwt.strategy';
   imports: [
     UserModule,
     HttpModule,
-    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: {
         expiresIn: 60 * 60,
       },
     }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forFeature([User]),
   ],
   providers: [AuthService, DoWithExceptions, JwtStrategy],
