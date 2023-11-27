@@ -19,8 +19,9 @@ export class AuthController {
 
   @Get('/login')
   @UseGuards(AuthGuard())
-  async login(@Headers('Authorization') token: string): Promise<boolean> {
-    return await this.authService.login(token);
+  async login(@Req() req): Promise<boolean> {
+    Logger.log(`🔥 ${req}`);
+    return false;
   }
 
   @Get('/')
