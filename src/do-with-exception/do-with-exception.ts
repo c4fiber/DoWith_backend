@@ -21,8 +21,6 @@ enum DoWithErrorCode {
   SelfFriendship = '0014',
 
   // Group
-  FailedToleftGroup = '0100',   // 그룹 떠나기에 실패 했을 떄
-  FailedToMakeGroup = '0101',   // 그룹 생성에 실패했을 때
 
   // Routine
   ExceedMaxRoutines = '0200',   // 그룹당 최대 3개의 루틴이 등록 가능하다
@@ -30,11 +28,9 @@ enum DoWithErrorCode {
   // Utils
   NotAllowedExtension     = '1000',  // 지원하지 않는 확장자의 파일이 넘어왔을 때
   ThereIsNoFile           = '1001',  // 파일 업로드 모듈 이용시 요청에 파일을 보내지 않았을 때
-  FailedToDeletedOirginal = '1002',  // 이미지 압축 후 원본 파일 삭제 실패시
+  FailedToDeletedOriginal = '1002',  // 이미지 압축 후 원본 파일 삭제 실패시
   FailedToResizeImage     = '1003',  // 업로드한 이미지 압축에 실패시
   NoData                  = '1004',  // 요청한 데이터가 없는 경우
-  FailedToUpdateData      = '1005',  // 수정 요청한 데이터가 DB에 존재하지 않는 경우
-  FailedToDeleteData      = '1006',  // 삭제 ``
 }
 
 enum DoWithErrorMsg {
@@ -45,8 +41,6 @@ enum DoWithErrorMsg {
   SelfFriendship = 'A user cannot befriend themselves',
 
   // Group
-  FailedToleftGroup = '그룹을 나가는데 실패 했습니다.',
-  FailedToMakeGroup = '그룹을 생성하는데 실패 했습니다.',
 
   // Routine
   ExceedMaxRoutines = '등록할 수 있는 최대 루틴을 초과하셨습니다.',
@@ -54,11 +48,9 @@ enum DoWithErrorMsg {
   // Utils
   NotAllowedExtension     = '지원하지 않는 파일 확장자입니다.',
   ThereIsNoFile           = '파일을 업로드 하지 않았습니다.',
-  FailedToDeletedOirginal = '원본 파일을 삭제하는데 실패 했습니다.',
+  FailedToDeletedOriginal = '원본 파일을 삭제하는데 실패 했습니다.',
   FailedToResizeImage     = '이미지 압축에 실패 했습니다.',
   NoData                  = '요청하신 데이터가 없습니다.',
-  FailedToUpdateData      = '수정에 실패 하였습니다.',
-  FailedToDeleteData      = '삭제에 실패 하였습니다.',
 }
 
 @Injectable()
@@ -86,17 +78,6 @@ export class DoWithExceptions {
   );
 
   // =============== [ Group ] ===============
-  FailedToleftGroup = new DoWithException(
-    DoWithErrorMsg.FailedToleftGroup,
-    DoWithErrorCode.FailedToleftGroup,
-    HttpStatus.BAD_REQUEST,
-  );
-
-  FailedToMakeGroup = new DoWithException(
-    DoWithErrorMsg.FailedToMakeGroup,
-    DoWithErrorCode.FailedToMakeGroup,
-    HttpStatus.BAD_REQUEST,
-  );
   
   // =============== [ Routine ] ===============
   ExceedMaxRoutines = new DoWithException(
@@ -118,9 +99,9 @@ export class DoWithExceptions {
     HttpStatus.BAD_REQUEST,
   );
 
-  FailedToDeletedOirginal = new DoWithException(
-    DoWithErrorMsg.FailedToDeletedOirginal,
-    DoWithErrorCode.FailedToDeletedOirginal,
+  FailedToDeletedOriginal = new DoWithException(
+    DoWithErrorMsg.FailedToDeletedOriginal,
+    DoWithErrorCode.FailedToDeletedOriginal,
     HttpStatus.BAD_REQUEST,
   );
 
@@ -133,18 +114,6 @@ export class DoWithExceptions {
   NoData = new DoWithException(
     DoWithErrorMsg.NoData,
     DoWithErrorCode.NoData,
-    HttpStatus.BAD_REQUEST,
-  );
-
-  FailedToDeleteData = new DoWithException(
-    DoWithErrorMsg.FailedToDeleteData,
-    DoWithErrorCode.FailedToDeleteData,
-    HttpStatus.BAD_REQUEST,
-  );
-
-  FailedToUpdateData = new DoWithException(
-    DoWithErrorMsg.FailedToUpdateData,
-    DoWithErrorCode.FailedToUpdateData,
     HttpStatus.BAD_REQUEST,
   );
 }

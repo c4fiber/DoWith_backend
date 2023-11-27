@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Logger, Param, Patch, Post, UploadedFile
 import { GroupService } from './group.service';
 import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
 import { PagingOptions } from 'src/utils/paging/PagingOptions';
 
@@ -19,7 +19,7 @@ export class GroupController {
   @Get('/')
   getGroupAll(
     @PagingOptions() pagingOptions: { page: number; limit: number }
-  ){
+  ): Promise<{results: Group[], total: number}>{
     return this.groupService.getGroupAll(pagingOptions);
   }
 
@@ -34,7 +34,7 @@ export class GroupController {
 
   // 그룹 상세조회
   @Get('/:grp_id')
-  getGroupOne(@Param('grp_id') grp_id: number){
+  getGroupOne(@Param('grp_id') grp_id: number): Promise<{result:{grp_detail: Group, rout_detail:Array<any>, grp_mems:Array<any>}}>{
     return this.groupService.getGroupOne(grp_id);
   }
 
@@ -43,17 +43,17 @@ export class GroupController {
   getAllMyGroups(
       @Param('user_id') user_id: number
     , @PagingOptions() pagingOptions: { page: number; limit: number }
-  ){
+  ): Promise<Promise<{results: Group[], total: number}>>{
     return this.groupService.getAllMyGroups(user_id, pagingOptions);
   }
 
   // 그룹 가입하기
   @Post('/:grp_id/join/:user_id')
-  createJoinGroup(
+  JoinGroup(
     @Param('grp_id')grp_id: number,
     @Param('user_id')user_id: number
   ): Promise<any> {
-    return this.groupService.createJoinGroup(grp_id, user_id);
+    return this.groupService.JoinGroup(grp_id, user_id);
   }
 
   // 그룹 나가기
@@ -66,12 +66,12 @@ export class GroupController {
   }
 
   // 그룹원들의 인증 사진 조회
-  @Get('/:grp_id/user/:user_id/image')
+  @Get('/:grp_id/user/:rout_id/image')
   getMemberTodoInGroup (
     @Param('grp_id') grp_id: number,
-    @Param('user_id') user_id: number
+    @Param('rout_id') rout_id: number
   ): Promise<any>{
-    return this.groupService.getMemberTodoInGroup(grp_id, user_id);
+    return this.groupService.getMemberTodoInGroup(grp_id, rout_id);
   }
 
   // 검색 - 카테고리, 검색어 이용
@@ -81,7 +81,7 @@ export class GroupController {
     @Param('category') cat_id: number,
     @Param('keyword') keyword: string,
     @PagingOptions() pagingOptions: { page: number; limit: number }
-  ): Promise<{ result: Group[], total: number}>{
+  ): Promise<{ results: Group[], total: number}>{
     return this.groupService.getGroupsBySearching(user_id, cat_id, keyword, pagingOptions);
   }
   

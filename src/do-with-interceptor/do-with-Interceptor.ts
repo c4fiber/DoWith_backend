@@ -23,31 +23,39 @@ export class DoWithInterceptor implements NestInterceptor{
         const req = http.getRequest();
         const res = http.getResponse();
         const method = req.method as HttpMethod;
-
-        switch(method){
-          case HttpMethod.GET:
-            Logger.debug(HttpMethod.GET);
-            // throw this.doWithException.NoData;
-            break;
-          case HttpMethod.PUT:
-            Logger.debug(HttpMethod.PUT);
-            break;
-          case HttpMethod.POST:
-            Logger.debug(HttpMethod.POST);
-            break;
-          case HttpMethod.PATCH:
-            Logger.debug(HttpMethod.PATCH);
-            // if(data.affected == 0){
-            //   throw this.doWithException.FailedToUpdateData;
-            // }
-            break;
-          case HttpMethod.DELETE:
-            Logger.debug(HttpMethod.DELETE);
-            // if(data.affected == 0){
-            //   throw this.doWithException.FailedToDeleteData;
-            // }
-            break;
-        }
+        const mainKey = 'result';
+        
+        // switch(method){
+        //   case HttpMethod.GET:
+        //     if(mainKey in data){           // result: single row data
+        //       Object.keys(data[mainKey]).forEach((key, val) => {
+        //         if(data[mainKey][key] === undefined){
+        //           throw this.doWithException.NoData;
+        //         }
+        //       });
+        //     } else if('results' in data) {  // results: mulit row data
+        //       if(data.results.length === 0){
+        //         throw this.doWithException.NoData;
+        //       }
+        //     }
+        //     break;
+        //   case HttpMethod.PUT:
+        //     Logger.debug(HttpMethod.PUT);
+        //     break;
+        //   case HttpMethod.POST:
+        //     Logger.debug(HttpMethod.POST);
+        //     break;
+        //   case HttpMethod.PATCH:
+        //     if(data[mainKey]['affected'] == 0){
+        //       throw this.doWithException.FailedToUpdateData;
+        //     }
+        //     break;
+        //   case HttpMethod.DELETE:
+        //     if(data[mainKey]['affected'] == 0){
+        //       throw this.doWithException.FailedToDeleteData;
+        //     }
+        //     break;
+        // }
 
         return data;
       })
