@@ -7,7 +7,7 @@ export class Routine {
   @PrimaryGeneratedColumn()
   rout_id: number;
 
-  @ManyToMany(() => Group)
+  @ManyToOne(() => Group)
   @JoinColumn({ name: 'grp_id', referencedColumnName: 'grp_id' })
   grp_id: number;
 
