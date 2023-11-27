@@ -306,7 +306,7 @@ export class GroupService {
                              try{
                                //await fs.unlink(filePath);
                              } catch(err){
-                               throw this.doWithException.FailedToDeletedOirginal;
+                               throw this.doWithException.FailedToDeletedOriginal;
                              }
                            });
     } catch(err) {
