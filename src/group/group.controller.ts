@@ -66,7 +66,7 @@ export class GroupController {
   }
 
   // 그룹원들의 인증 사진 조회
-  @Get('/:grp_id/user/:user_id/image')
+  @Get('/:grp_id/user/:rout_id/image')
   getMemberTodoInGroup (
     @Param('grp_id') grp_id: number,
     @Param('user_id') user_id: number
