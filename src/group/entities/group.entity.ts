@@ -1,7 +1,7 @@
 import { Category } from 'src/category/entities/category.entity';
 import { Routine } from 'src/routine/entities/routine.entity';
 import { User } from 'src/user/user.entities';
-import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('group')
 export class Group {
@@ -29,8 +29,6 @@ export class Group {
   @ManyToOne(() => Category)
   @JoinColumn({ name: 'cat_id', referencedColumnName: 'cat_id' })
   cat_id: number;
-  @OneToMany(() => Routine, rout => rout.grp_id)
-  rout_id: Routine[];
 
   @ManyToMany(() => User)
   @JoinTable({ 

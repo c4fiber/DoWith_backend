@@ -1,15 +1,15 @@
 import { Days } from "src/days/entities/days.entity";
-import { Column, Entity, CreateDateColumn, ManyToOne, DeleteDateColumn, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Group } from "src/group/entities/group.entity";
+import { Column, Entity, CreateDateColumn, ManyToOne, DeleteDateColumn, JoinColumn, PrimaryGeneratedColumn, ManyToMany } from "typeorm";
 
 @Entity('routine')
 export class Routine {
   @PrimaryGeneratedColumn()
   rout_id: number;
 
-  @ManyToOne(() => Group, grp => grp.rout_id)
-  @JoinColumn({ name: 'grp_id' })
-  grp_id: Group;
+  @ManyToMany(() => Group)
+  @JoinColumn({ name: 'grp_id', referencedColumnName: 'grp_id' })
+  grp_id: number;
 
   @Column()
   rout_name: string;
