@@ -31,14 +31,6 @@ export class RoutineService {
                                                  'd.days        AS days'
                                                ])
                                                .getRawMany();
-    
-    // const namesOfDays = ['월', '화', '수', '목', '금', '토', '일'];
-    // result.map((data) => {
-    //   const bitsOfDay = data.rout_repeat.split('').map(Number);
-
-    //   data['week'] = bitsOfDay.map((bit, idx) => (bit ? namesOfDays[idx] : ''))
-    //                           .filter(Boolean);
-    // })
 
     return { results };
   }

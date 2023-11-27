@@ -1,5 +1,5 @@
 import { Days } from "src/days/entities/days.entity";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('routine')
 export class Routine {
@@ -15,9 +15,9 @@ export class Routine {
   @Column({nullable: true})
   rout_desc: string;
 
-  @OneToOne(() => Days, {createForeignKeyConstraints: false})
-  @JoinColumn({ name: 'rout_repeat'})
-  days: Days;
+  @ManyToOne(() => Days)
+  @JoinColumn({ name: 'rout_repeat', referencedColumnName: 'rout_repeat' })
+  rout_repeat: string;
 
   @Column({nullable: true, type: 'time'})
   rout_srt: string;

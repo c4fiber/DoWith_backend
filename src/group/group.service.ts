@@ -71,14 +71,11 @@ export class GroupService {
       // Routine Insert
       routs.forEach(async (data) => {
         const rout = new Routine();
-        const days = new Days();
-
-        days.rout_repeat = data.rout_repeat;
 
         rout.grp_id = ug.grp_id;
         rout.rout_name = data.rout_name;
         rout.rout_desc = data.rout_desc;
-        rout.days = days;
+        rout.rout_repeat = data.rout_repeat;
         rout.rout_srt = data.rout_srt;
         rout.rout_end = data.rout_end;
 
