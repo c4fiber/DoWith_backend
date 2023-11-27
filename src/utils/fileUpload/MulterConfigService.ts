@@ -2,7 +2,6 @@ import { HttpStatus, Injectable, Logger } from "@nestjs/common";
 import { MulterOptionsFactory } from "@nestjs/platform-express";
 import * as multer from 'multer';
 import * as path from 'path';
-import * as fs from 'fs';
 import { DoWithException } from "src/do-with-exception/do-with-exception";
 
 @Injectable()

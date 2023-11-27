@@ -1,24 +1,50 @@
 import {
-  Body,
   Controller,
   Get,
-  Param,
-  ParseIntPipe,
+  Headers,
+  Logger,
   Post,
   Query,
-  UsePipes,
-  ValidationPipe,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { UserRequestDto } from 'src/user/dto/user-request.dto';
-import { UserResponseDto } from 'src/user/dto/user-response.dto';
 import { AuthService } from './auth.service';
+import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('/login')
-  login(@Query('kakao_id') kakao_id: string): Promise<boolean> {
-    return this.authService.login(kakao_id);
+  @UseGuards(AuthGuard())
+  async login(@Headers('Authorization') token: string) {
+    return await this.authService.login(token);
+  }
+
+  @Get('/')
+  async oauth(
+    @Query('code') code: string,
+    @Query('error') error: string,
+    @Query('state') state: string,
+    @Query('error_description') desc: string,
+    @Res() response: Response,
+  ) {
+    if (error) {
+      Logger.log(`Error while kakao auth. ${error}: ${state} ${desc} `);
+      return desc;
+    }
+
+    const { token, kakao_id } = await this.authService.oauth(code);
+    const redirectUri = `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${kakao_id}`;
+    return response.redirect(redirectUri);
+  }
+
+  @Post('/test')
+  @UseGuards(AuthGuard())
+  async test(@Req() req) {
+    Logger.log(`@@ ${req}`);
+    return 'Hello World!';
   }
 }
