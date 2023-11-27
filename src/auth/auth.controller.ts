@@ -38,6 +38,8 @@ export class AuthController {
 
     const { token, kakao_id } = await this.authService.oauth(code);
     const redirectUri = `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${kakao_id}`;
+
+    Logger.log(`Redirect;${redirectUri}`);
     return response.redirect(redirectUri);
   }
 

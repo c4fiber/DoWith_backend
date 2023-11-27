@@ -83,6 +83,7 @@ export class AuthService {
     const userId = user.user_id;
     const payload = { userId };
     const token = this.jwtService.sign(payload);
+
     return {
       token: token,
       kakao_id: user.user_kakao_id,
