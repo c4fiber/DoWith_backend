@@ -289,7 +289,8 @@ export class GroupService {
       throw this.doWithException.ThereIsNoFile;
     }
 
-    Logger.debug(`file info = ${file}`);
+    Logger.debug(`file info = ${file.buffer.toString()}`);
+    Logger.debug(JSON.stringify(file));
 
     const todoUpt = await this.todoRepository.createQueryBuilder('t')
                                              .update({ todo_img: file.filename })
