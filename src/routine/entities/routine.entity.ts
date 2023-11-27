@@ -1,7 +1,8 @@
+import { Days } from "src/days/entities/days.entity";
+import { Column, Entity, CreateDateColumn, ManyToOne, DeleteDateColumn, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Group } from "src/group/entities/group.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity('routine')
 export class Routine {
   @PrimaryGeneratedColumn()
   rout_id: number;
@@ -16,7 +17,8 @@ export class Routine {
   @Column({nullable: true})
   rout_desc: string;
 
-  @Column({ type: 'bit varying', width: 7 })
+  @ManyToOne(() => Days)
+  @JoinColumn({ name: 'rout_repeat', referencedColumnName: 'rout_repeat' })
   rout_repeat: string;
 
   @Column({nullable: true, type: 'time'})

@@ -1,9 +1,9 @@
 import { Category } from 'src/category/entities/category.entity';
 import { Routine } from 'src/routine/entities/routine.entity';
 import { User } from 'src/user/user.entities';
-import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable, JoinColumn, OneToOne, ManyToOne } from 'typeorm';
+import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn, ManyToOne } from 'typeorm';
 
-@Entity()
+@Entity('group')
 export class Group {
   @PrimaryGeneratedColumn()
   grp_id: number;
@@ -26,10 +26,9 @@ export class Group {
   @DeleteDateColumn()
   del_at: Date
 
-  @OneToOne(() => Category, {createForeignKeyConstraints: false})
-  @JoinColumn({ name: 'cat_id'})
-  category: Category;
-  
+  @ManyToOne(() => Category)
+  @JoinColumn({ name: 'cat_id', referencedColumnName: 'cat_id' })
+  cat_id: number;
   @OneToMany(() => Routine, rout => rout.grp_id)
   rout_id: Routine[];
 
