@@ -28,7 +28,7 @@ export class AuthController {
     @Query('error') error: string,
     @Query('state') state: string,
     @Query('error_description') desc: string,
-    // @Res() response: Response,
+    @Res() response: Response,
   ) {
     if (error) {
       Logger.log(`Error while kakao auth. ${error}: ${state} ${desc} `);
@@ -37,7 +37,7 @@ export class AuthController {
 
     const redirectUri = await this.authService.oauth(code);
     // return response.redirect(redirectUri);
-    return redirectUri;
+    return response.redirect(redirectUri);
   }
 
   @Post('/test')
