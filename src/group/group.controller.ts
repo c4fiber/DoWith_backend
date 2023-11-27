@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Logger, Param, Patch, Post, UploadedFile
 import { GroupService } from './group.service';
 import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
 import { PagingOptions } from 'src/utils/paging/PagingOptions';
 
@@ -19,7 +19,7 @@ export class GroupController {
   @Get('/')
   getGroupAll(
     @PagingOptions() pagingOptions: { page: number; limit: number }
-  ){
+  ): Promise<{results: Group[], total: number}>{
     return this.groupService.getGroupAll(pagingOptions);
   }
 
@@ -34,7 +34,7 @@ export class GroupController {
 
   // 그룹 상세조회
   @Get('/:grp_id')
-  getGroupOne(@Param('grp_id') grp_id: number){
+  getGroupOne(@Param('grp_id') grp_id: number): Promise<{result:{grp_detail: Group, rout_detail:Array<any>, grp_mems:Array<any>}}>{
     return this.groupService.getGroupOne(grp_id);
   }
 
@@ -43,7 +43,7 @@ export class GroupController {
   getAllMyGroups(
       @Param('user_id') user_id: number
     , @PagingOptions() pagingOptions: { page: number; limit: number }
-  ){
+  ): Promise<Promise<{results: Group[], total: number}>>{
     return this.groupService.getAllMyGroups(user_id, pagingOptions);
   }
 
@@ -81,7 +81,7 @@ export class GroupController {
     @Param('category') cat_id: number,
     @Param('keyword') keyword: string,
     @PagingOptions() pagingOptions: { page: number; limit: number }
-  ): Promise<{ result: Group[], total: number}>{
+  ): Promise<{ results: Group[], total: number}>{
     return this.groupService.getGroupsBySearching(user_id, cat_id, keyword, pagingOptions);
   }
   

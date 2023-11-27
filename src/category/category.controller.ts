@@ -9,7 +9,7 @@ export class CategoryController {
   ) {}
 
   @Get('/')
-  getAllCategories(): Promise<Category[]> {
+  getAllCategories() {
     return this.categoryService.getAllCategories();
   }
 }

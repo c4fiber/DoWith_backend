@@ -11,15 +11,6 @@ export class MulterConfig implements MulterOptionsFactory{
 
   constructor(){
     this.dir_path = process.env.IMAGE_PATH;
-    this.mkdir();
-  }
-
-  mkdir(){
-    try{
-      fs.readdirSync(this.dir_path);
-    } catch(err){
-      fs.mkdirSync(this.dir_path);
-    }
   }
 
   changePath(dir_path: string){
@@ -31,7 +22,6 @@ export class MulterConfig implements MulterOptionsFactory{
     const option = {
       storage: multer.diskStorage({
         destination(req, file, done){
-
           done(null, dir_path);
         },
         filename(req, file, done){
@@ -46,7 +36,7 @@ export class MulterConfig implements MulterOptionsFactory{
           done(null, `${name}_${Date.now()}${ext}`);
         }
       }),
-      limits: { fileSize: 5 * 1024 * 1024 }
+      //limits: { fileSize: 5 * 1024 * 1024 }
     };
 
     return option;
