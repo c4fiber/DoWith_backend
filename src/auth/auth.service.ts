@@ -74,7 +74,7 @@ export class AuthService {
 
     const userId = user.user_id;
     const payload = { userId };
-    Logger.log(`payload: ${payload}`);
+    Logger.log(`payload: ${payload.userId}`);
     const token = this.jwtService.sign(payload);
     return `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${user.user_kakao_id}`;
   }
