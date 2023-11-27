@@ -1,7 +1,6 @@
 import { Days } from "src/days/entities/days.entity";
 import { Group } from "src/group/entities/group.entity";
-import { Todo } from "src/todo/todo.entity";
-import { Column, Entity, CreateDateColumn, ManyToOne, DeleteDateColumn, JoinColumn, PrimaryGeneratedColumn, ManyToMany } from "typeorm";
+import { Column, Entity, CreateDateColumn, ManyToOne, DeleteDateColumn, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('routine')
 export class Routine {
