@@ -52,10 +52,8 @@ export class UserService {
     user.user_name = user_name;
     user.user_tel = user_tel;
     user.user_kakao_id = user_kakao_id;
-    user.reg_at = now;
     user.last_login = now;
     user.user_hp = 0;
-    user.upt_at = now;
 
     await this.userRepository.save(user);
     return new UserResponseDto(user);
@@ -76,7 +74,6 @@ export class UserService {
       .set({
         user_name: user_name,
         user_tel: user_tel,
-        upt_at: new Date(),
       })
       .where('user_id = :id', { id })
       .execute();
@@ -87,14 +84,24 @@ export class UserService {
     return true;
   }
 
-  // 유저 삭제
+  // 아이디를 기준으로 유저 삭제
   async deleteUser(id: number): Promise<void> {
     const user = await this.getUser(id);
     if (user == null) {
       throw this.doWithException.UserNotFound;
     }
 
-    this.userRepository.delete(id);
+    this.userRepository.softDelete(id);
+  }
+
+  // 카카오 아이디를 기준으로 유저 삭제
+  async deleteUserByKakaoId(kakao_id: string): Promise<void> {
+    const user = await this.getUserByKakaoId(kakao_id);
+    if (user == null) {
+      throw this.doWithException.UserNotFound;
+    }
+
+    this.userRepository.softDelete(user.user_id);
   }
 
   // 유저 HP 업데이트
