@@ -57,10 +57,10 @@ export class AuthService {
 
     // 토큰 디코딩하여 카카오 유저 정보 확인
     // aud: 앱 링크, sub: 유저 카카오 아이디
-    const { aud, sub } = kakaoIdToken;
+    const { sub } = kakaoIdToken;
     Logger.log(
       `Kakao open id token is successfully responsed` +
-        `{sub: ${kakaoIdToken.sub}, aud: ${kakaoIdToken.aud}}`,
+        `{sub: ${kakaoIdToken.sub}}`,
     );
 
     // 유저 아이디를 가져와 DB에서 검색하고
@@ -70,13 +70,13 @@ export class AuthService {
 
     if (user == null) {
       // 유저가 없는 경우 권한 없음 메시지 전달
-      return `${process.env.APP_SCHEME}://oauth?token=access_denied`;
+      return `${process.env.APP_SCHEME}://oauth?token=access_denied&kakao_id=${sub}`;
     }
 
-    const kakaoId = user.user_kakao_id;
-    const payload = { kakaoId };
+    const userId = user.user_id;
+    const payload = { userId };
     const token = await this.jwtService.sign(payload);
-    return `${process.env.APP_SCHEME}://oauth?token=${token}`;
+    return `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${user.user_kakao_id}`;
   }
 
   // === Helpers === //
