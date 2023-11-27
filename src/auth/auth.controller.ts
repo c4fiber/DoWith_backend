@@ -18,6 +18,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('/login')
+  @UseGuards(AuthGuard())
   async login(@Headers('Authorization') token: string): Promise<boolean> {
     return await this.authService.login(token);
   }
@@ -28,7 +29,6 @@ export class AuthController {
     @Query('error') error: string,
     @Query('state') state: string,
     @Query('error_description') desc: string,
-    @Query('app_key') appKey: string,
 
     @Res() response: Response,
   ) {
@@ -37,16 +37,13 @@ export class AuthController {
       return desc;
     }
 
-    Logger.log(`##### ${appKey}`);
-
     const redirectUri = await this.authService.oauth(code);
-    // return response.redirect(redirectUri);
     return response.redirect(redirectUri);
   }
 
   @Post('/test')
   @UseGuards(AuthGuard())
   async test(@Req() req) {
-    Logger.log(req);
+    Logger.log(`@@ ${req}`);
   }
 }

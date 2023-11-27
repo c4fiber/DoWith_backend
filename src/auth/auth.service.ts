@@ -45,8 +45,6 @@ export class AuthService {
   // 유저 아이디로 DB를 검색하여
   // lastLogin 필드를 업데이트
   async login(token: string): Promise<boolean> {
-    //
-
     return await this.usersService.updateLastLoginByKakaoId(token);
   }
 
