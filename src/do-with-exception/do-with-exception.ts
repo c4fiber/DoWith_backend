@@ -33,8 +33,9 @@ enum DoWithErrorCode {
   FailedToDeletedOriginal = '1002',  // 이미지 압축 후 원본 파일 삭제 실패시
   FailedToResizeImage     = '1003',  // 업로드한 이미지 압축에 실패시
   NoData                  = '1004',  // 요청한 데이터가 없는 경우
-  FailedToUpdateData      = '1005',  // 수정 요청한 데이터가 DB에 존재하지 않는 경우
-  FailedToDeleteData      = '1006',  // 삭제 ``
+  FailedToInsertData      = '1005',
+  FailedToUpdateData      = '1006',  // 수정 요청한 데이터가 DB에 존재하지 않는 경우
+  FailedToDeleteData      = '1007',  // 삭제 ``
 }
 
 enum DoWithErrorMsg {
@@ -57,6 +58,7 @@ enum DoWithErrorMsg {
   FailedToDeletedOriginal = '원본 파일을 삭제하는데 실패 했습니다.',
   FailedToResizeImage     = '이미지 압축에 실패 했습니다.',
   NoData                  = '요청하신 데이터가 없습니다.',
+  FailedToInsertData      = '삽입에 실패 하였습니다.',
   FailedToUpdateData      = '수정에 실패 하였습니다.',
   FailedToDeleteData      = '삭제에 실패 하였습니다.',
 }
@@ -133,6 +135,12 @@ export class DoWithExceptions {
   NoData = new DoWithException(
     DoWithErrorMsg.NoData,
     DoWithErrorCode.NoData,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  FailedToInsertData = new DoWithException(
+    DoWithErrorMsg.FailedToInsertData,
+    DoWithErrorCode.FailedToInsertData,
     HttpStatus.BAD_REQUEST,
   );
 

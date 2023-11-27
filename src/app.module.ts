@@ -23,6 +23,8 @@ import { UtilsModule } from './utils/utils.module';
 import { DoWithInterceptorModule } from './do-with-interceptor/do-with-interceptor.module';
 import { DoWithInterceptor } from './do-with-interceptor/do-with-Interceptor';
 import { ErrorLogModule } from './error-log/error-log.module';
+import { AchievementsModule } from './achievements/achievements.module';
+import { UserAchiModule } from './user_achi/user_achi.module';
 
 @Module({
   imports: [
@@ -63,6 +65,8 @@ import { ErrorLogModule } from './error-log/error-log.module';
     UserGroupModule,
     CommentModule,
     ErrorLogModule,
+    AchievementsModule,
+    UserAchiModule,
   ],
   controllers: [AppController],
   providers: [

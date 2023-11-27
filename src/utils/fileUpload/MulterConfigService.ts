@@ -11,15 +11,6 @@ export class MulterConfig implements MulterOptionsFactory{
 
   constructor(){
     this.dir_path = process.env.IMAGE_PATH;
-    this.mkdir();
-  }
-
-  mkdir(){
-    try{
-      fs.readdirSync(this.dir_path);
-    } catch(err){
-      fs.mkdirSync(this.dir_path);
-    }
   }
 
   changePath(dir_path: string){
@@ -31,7 +22,6 @@ export class MulterConfig implements MulterOptionsFactory{
     const option = {
       storage: multer.diskStorage({
         destination(req, file, done){
-          Logger.debug(`File Path = ${dir_path}`);
           done(null, dir_path);
         },
         filename(req, file, done){
@@ -43,7 +33,6 @@ export class MulterConfig implements MulterOptionsFactory{
             done(new DoWithException('지원하지 않는 파일 확장자입니다.', '1000', HttpStatus.BAD_REQUEST), file.originalname);
           }
 
-          Logger.debug(`Saved File name = ${name}_${Date.now()}${ext}`);
           done(null, `${name}_${Date.now()}${ext}`);
         }
       }),
