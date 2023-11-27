@@ -58,7 +58,7 @@ export class AuthService {
     );
 
     // 토큰 디코딩하여 카카오 유저 정보 확인
-    Logger.log(`Kakao openID payload: ${kakaoOpenId}`);
+    Logger.log(`Kakao openID payload: ${kakaoOpenId.sub}`);
     const { aud, sub } = kakaoOpenId;
 
     // 유저 아이디를 가져와 DB에서 검색하고

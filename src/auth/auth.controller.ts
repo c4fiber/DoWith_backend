@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -27,6 +28,7 @@ export class AuthController {
     @Query('error') error: string,
     @Query('state') state: string,
     @Query('error_description') desc: string,
+    @Res() response: Response,
   ) {
     if (error) {
       Logger.log(`Error while kakao auth. ${error}: ${state} ${desc} `);
@@ -34,7 +36,7 @@ export class AuthController {
     }
 
     const redirectUri = await this.authService.oauth(code);
-    return Response.redirect(redirectUri);
+    return response.redirect(redirectUri);
   }
 
   @Post('/test')
