@@ -43,12 +43,18 @@ export class AuthService {
 
   // 유저 아이디로 DB를 검색하여
   // lastLogin 필드를 업데이트
-  async login(token: string): Promise<boolean> {
-    return await this.usersService.updateLastLoginByKakaoId(token);
+  async login(token: string) {
+    const { userId } = await this.jwtService.decode(token);
+
+    const result: User = await this.userRepository.findOneBy({
+      user_id: userId,
+    });
+
+    return { result };
   }
 
   // 인가 코드로 토큰 발급을 요청합니다.
-  async oauth(code: string): Promise<string> {
+  async oauth(code: string): Promise<{ token: string; kakao_id: string }> {
     // 카카오 서버로 받은 인가 코드로 토큰 발급 요청
     const kakaoIdToken = await this.requestKakaoToken(code).then((response) =>
       this.jwtService.decode(response.id_token),
@@ -69,14 +75,19 @@ export class AuthService {
 
     if (user == null) {
       // 유저가 없는 경우 권한 없음 메시지 전달
-      return `${process.env.APP_SCHEME}://oauth?token=access_denied&kakao_id=${sub}`;
+      return {
+        token: 'access_denied',
+        kakao_id: sub,
+      };
     }
 
     const userId = user.user_id;
-    const payload = { userId };
-    Logger.log(`payload: ${payload.userId}`);
+    const payload = { userId: userId };
     const token = this.jwtService.sign(payload);
-    return `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${user.user_kakao_id}`;
+    return {
+      token: token,
+      kakao_id: user.user_kakao_id,
+    };
   }
 
   // === Helpers === //

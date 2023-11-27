@@ -19,9 +19,8 @@ export class AuthController {
 
   @Get('/login')
   @UseGuards(AuthGuard())
-  async login(@Req() req): Promise<boolean> {
-    Logger.log(`🔥 ${req}`);
-    return false;
+  async login(@Headers('Authorization') token: string) {
+    return await this.authService.login(token);
   }
 
   @Get('/')
@@ -30,7 +29,6 @@ export class AuthController {
     @Query('error') error: string,
     @Query('state') state: string,
     @Query('error_description') desc: string,
-
     @Res() response: Response,
   ) {
     if (error) {
@@ -38,7 +36,8 @@ export class AuthController {
       return desc;
     }
 
-    const redirectUri = await this.authService.oauth(code);
+    const { token, kakao_id } = await this.authService.oauth(code);
+    const redirectUri = `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${kakao_id}`;
     return response.redirect(redirectUri);
   }
 
@@ -46,5 +45,6 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async test(@Req() req) {
     Logger.log(`@@ ${req}`);
+    return 'Hello World!';
   }
 }
