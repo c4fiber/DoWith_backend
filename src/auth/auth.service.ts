@@ -42,7 +42,7 @@ export class AuthService {
 
   private kakaoUrl = 'https://kauth.kakao.com/oauth/token';
 
-  // 카카오 아이디로 DB를 검색하여
+  // 유저 아이디로 DB를 검색하여
   // lastLogin 필드를 업데이트
   async login(token: string): Promise<boolean> {
     //
@@ -72,15 +72,16 @@ export class AuthService {
 
     if (user == null) {
       // 유저가 없는 경우 권한 없음 메시지 전달
-      return `dowithapp://oauth?token=access_denied`;
+      return `${process.env.APP_SCHEME}://oauth?token=access_denied`;
     }
 
     const kakaoId = user.user_kakao_id;
     const payload = { kakaoId };
     const token = await this.jwtService.sign(payload);
-    return `dowithapp://oauth?token=${token}`;
+    return `${process.env.APP_SCHEME}://oauth?token=${token}`;
   }
 
+  // === Helpers === //
   // 인가 코드를 카카오 서버로 보내어 토큰 발급을 요청합니다.
   private async requestKakaoToken(code: string): Promise<KakaoTokenResponse> {
     const config: AxiosRequestConfig = {
