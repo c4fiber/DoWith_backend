@@ -72,13 +72,13 @@ export class AuthService {
 
     if (user == null) {
       // 유저가 없는 경우 권한 없음 메시지 전달
-      return `kakao${aud}://oauth?token=access_denied`;
+      return `dowithapp://oauth?token=access_denied`;
     }
 
     const kakaoId = user.user_kakao_id;
     const payload = { kakaoId };
     const token = await this.jwtService.sign(payload);
-    return `kakao${aud}://oauth?token=${token}`;
+    return `dowithapp://oauth?token=${token}`;
   }
 
   // 인가 코드를 카카오 서버로 보내어 토큰 발급을 요청합니다.
