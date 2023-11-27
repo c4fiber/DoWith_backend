@@ -9,6 +9,7 @@ import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Routine } from 'src/routine/entities/routine.entity';
 import * as sharp from 'sharp'
 import * as fs from 'fs/promises'
+import * as path from 'path';
 import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 
 @Injectable()
@@ -332,11 +333,14 @@ export class GroupService {
                                             
     try {
       const filePath = file.path;
+      const ext = path.extname(file.originalname);
+      const name = path.basename(file.originalname, ext);
+      const newPath = `${process.env.IMAGE_PATH}${name}_${Date.now()}${ext}`;
 
       await sharp(filePath).resize({ width: 300, height: 300, fit: 'contain' })
-                           .toFile(filePath, async(err, info) => {
+                           .toFile(newPath, async(err, info) => {
                              try{
-                               //await fs.unlink(filePath);
+                               await fs.unlink(filePath);
                              } catch(err){
                                throw this.doWithException.FailedToDeletedOriginal;
                              }
