@@ -2,7 +2,7 @@ import { Category } from 'src/category/entities/category.entity';
 import { User } from 'src/user/user.entities';
 import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable, JoinColumn, OneToOne, ManyToOne } from 'typeorm';
 
-@Entity()
+@Entity('group')
 export class Group {
   @PrimaryGeneratedColumn()
   grp_id: number;
@@ -25,7 +25,7 @@ export class Group {
   @DeleteDateColumn()
   del_at: Date
 
-  @OneToOne(() => Category, {createForeignKeyConstraints: false})
+  @OneToOne(() => Category) //, {createForeignKeyConstraints: false}
   @JoinColumn({ name: 'cat_id'})
   category: Category;
 

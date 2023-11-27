@@ -1,7 +1,7 @@
-import { time } from "console";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Days } from "src/days/entities/days.entity";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity('routine')
 export class Routine {
   @PrimaryGeneratedColumn()
   rout_id: number;
@@ -15,8 +15,9 @@ export class Routine {
   @Column({nullable: true})
   rout_desc: string;
 
-  @Column({ type: 'bit varying', width: 7 })
-  rout_repeat: string;
+  @OneToOne(() => Days)
+  @JoinColumn({ name: 'rout_repeat'})
+  days: Days;
 
   @Column({nullable: true, type: 'time'})
   rout_srt: string;
