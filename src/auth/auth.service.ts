@@ -6,13 +6,25 @@ import { UserService } from 'src/user/user.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
+import { JwtService } from '@nestjs/jwt';
+
+export class KakaoTokenResponse {
+  token_type: string;
+  access_token: string;
+  id_token: string;
+  expires_in: number;
+  refresh_token: string;
+  refresh_token_expires_in: number;
+  scope: string;
+}
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly jwtService: JwtService,
     private readonly usersService: UserService,
-    private readonly doWithExceptions: DoWithExceptions,
     private readonly httpService: HttpService,
+    private readonly doWithExceptions: DoWithExceptions,
   ) {}
 
   private kakaoUrl = 'https://kauth.kakao.com/oauth/token';
@@ -27,7 +39,32 @@ export class AuthService {
 
   // 인가 코드로 토큰 발급을 요청합니다.
   async oauth(code: string) {
-    Logger.debug('카카오에 인증 토큰 요청 필요');
+    // 토큰 발급
+    const response = await this.requestKakaoToken(code);
+    // 토큰 디코딩
+    const decoded = this.jwtService.decode(response.id_token);
+
+    Logger.log(`iss: ${decoded.iss}`);
+    Logger.log(`aud: ${decoded.aud}`);
+    Logger.log(`sub: ${decoded.sub}`);
+    Logger.log(`iat: ${decoded.iat}`);
+    Logger.log(`exp: ${decoded.exp}`);
+    Logger.log(`auth_time: ${decoded.auth_time}`);
+    Logger.log(`nonce: ${decoded.nonce}`);
+    Logger.log(`nickname: ${decoded.nickname}`);
+    Logger.log(`picture: ${decoded.picture}`);
+    Logger.log(`email: ${decoded.email}`);
+
+    // 유저 아이디를 가져와 DB에서 검색하고
+    // 있으면 - 로그린
+    // 없으면 - 회원가입
+    // const payload = { userKakaoId };
+    // const accessToken = await this.jwtService.sign(payload);
+    // return  {accessToken ? result? }
+  }
+
+  // 인가 코드를 카카오 서버로 보내어 토큰 발급을 요청합니다.
+  private async requestKakaoToken(code: string): Promise<KakaoTokenResponse> {
     const config: AxiosRequestConfig = {
       headers: {
         'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -47,13 +84,16 @@ export class AuthService {
     });
 
     const response = await lastValueFrom(
-      this.httpService.post(this.kakaoUrl, params, config).pipe(
-        map((response) => {
-          return response.data;
-        }),
-      ),
+      this.httpService
+        .post<KakaoTokenResponse>(this.kakaoUrl, params, config)
+        .pipe(
+          map((res) => {
+            return res.data;
+          }),
+        ),
     );
 
-    Logger.log(response);
+    Logger.log(response.access_token);
+    return response;
   }
 }

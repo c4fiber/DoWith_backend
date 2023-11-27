@@ -1,5 +1,15 @@
-import { Controller, Get, Headers, Logger, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Headers,
+  Logger,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -25,5 +35,11 @@ export class AuthController {
 
     // Get token from kakao server
     return await this.authService.oauth(code);
+  }
+
+  @Post('/test')
+  @UseGuards(AuthGuard())
+  async test(@Req() req) {
+    Logger.log(req);
   }
 }
