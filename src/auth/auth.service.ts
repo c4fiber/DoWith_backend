@@ -44,7 +44,7 @@ export class AuthService {
   // 유저 아이디로 DB를 검색하여
   // lastLogin 필드를 업데이트
   async login(token: string) {
-    const userId = await this.jwtService.decode(token);
+    const { userId } = await this.jwtService.decode(token);
 
     const result: User = await this.userRepository.findOneBy({
       user_id: userId,
