@@ -1,4 +1,11 @@
-import { Get, Header, Headers, Injectable, Logger } from '@nestjs/common';
+import {
+  Get,
+  Header,
+  Headers,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UserRequestDto } from 'src/user/dto/user-request.dto';
 import { UserResponseDto } from 'src/user/dto/user-response.dto';
@@ -7,6 +14,9 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/user.entities';
+import { Repository } from 'typeorm';
 
 export class KakaoTokenResponse {
   token_type: string;
@@ -25,6 +35,9 @@ export class AuthService {
     private readonly usersService: UserService,
     private readonly httpService: HttpService,
     private readonly doWithExceptions: DoWithExceptions,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   private kakaoUrl = 'https://kauth.kakao.com/oauth/token';
@@ -38,29 +51,30 @@ export class AuthService {
   }
 
   // 인가 코드로 토큰 발급을 요청합니다.
-  async oauth(code: string) {
-    // 토큰 발급
-    const response = await this.requestKakaoToken(code);
-    // 토큰 디코딩
-    const decoded = this.jwtService.decode(response.id_token);
+  async oauth(code: string): Promise<string> {
+    // 카카오 서버로 받은 인가 코드로 토큰 발급 요청
+    const kakaoOpenId = await this.requestKakaoToken(code).then((response) =>
+      this.jwtService.decode(response.id_token),
+    );
 
-    Logger.log(`iss: ${decoded.iss}`);
-    Logger.log(`aud: ${decoded.aud}`);
-    Logger.log(`sub: ${decoded.sub}`);
-    Logger.log(`iat: ${decoded.iat}`);
-    Logger.log(`exp: ${decoded.exp}`);
-    Logger.log(`auth_time: ${decoded.auth_time}`);
-    Logger.log(`nonce: ${decoded.nonce}`);
-    Logger.log(`nickname: ${decoded.nickname}`);
-    Logger.log(`picture: ${decoded.picture}`);
-    Logger.log(`email: ${decoded.email}`);
+    // 토큰 디코딩하여 카카오 유저 정보 확인
+    Logger.log(`Kakao openID payload: ${kakaoOpenId}`);
+    const { aud, sub } = kakaoOpenId;
 
     // 유저 아이디를 가져와 DB에서 검색하고
-    // 있으면 - 로그린
-    // 없으면 - 회원가입
-    // const payload = { userKakaoId };
-    // const accessToken = await this.jwtService.sign(payload);
-    // return  {accessToken ? result? }
+    const user: User = await this.userRepository.findOneBy({
+      user_kakao_id: sub,
+    });
+
+    if (user == null) {
+      // 유저가 없는 경우 권한 없음 메시지 전달
+      return `${aud}://oauth?token=access_denied`;
+    }
+
+    const kakaoId = user.user_kakao_id;
+    const payload = { kakaoId };
+    const token = await this.jwtService.sign(payload);
+    return `${aud}://oauth?token=${token}`;
   }
 
   // 인가 코드를 카카오 서버로 보내어 토큰 발급을 요청합니다.
@@ -93,7 +107,6 @@ export class AuthService {
         ),
     );
 
-    Logger.log(response.access_token);
     return response;
   }
 }
