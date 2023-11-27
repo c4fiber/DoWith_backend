@@ -5,6 +5,6 @@ export class Days {
   @PrimaryColumn({ type: 'bit varying', width: 7 })
   rout_repeat: number;
   
-  @Column()
-  days: string;
+  @Column({ type: 'text', array: true, nullable: true })
+  days: String[];
 }

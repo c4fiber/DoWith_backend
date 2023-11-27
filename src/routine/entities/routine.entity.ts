@@ -15,7 +15,7 @@ export class Routine {
   @Column({nullable: true})
   rout_desc: string;
 
-  @OneToOne(() => Days)
+  @OneToOne(() => Days, {createForeignKeyConstraints: false})
   @JoinColumn({ name: 'rout_repeat'})
   days: Days;
 

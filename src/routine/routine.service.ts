@@ -17,8 +17,9 @@ export class RoutineService {
   ) {}
 
   async getAllRoutines(grp_id: number): Promise<any> {
-    const result = await this.routineRepository.createQueryBuilder('r')
+    const results = await this.routineRepository.createQueryBuilder('r')
                                                .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
+                                               .leftJoin('days' , 'd', 'r.rout_repeat = d.rout_repeat')
                                                .where('g.grp_id = :grp_id', { grp_id })
                                                .select([
                                                  'r.grp_id      AS grp_id',
@@ -27,18 +28,19 @@ export class RoutineService {
                                                  'r.rout_repeat AS rout_repeat',
                                                  'r.rout_srt    AS rout_srt',
                                                  'r.rout_end    AS rout_end',
+                                                 'd.days        AS days'
                                                ])
                                                .getRawMany();
     
-    const namesOfDays = ['월', '화', '수', '목', '금', '토', '일'];
-    result.map((data) => {
-      const bitsOfDay = data.rout_repeat.split('').map(Number);
+    // const namesOfDays = ['월', '화', '수', '목', '금', '토', '일'];
+    // result.map((data) => {
+    //   const bitsOfDay = data.rout_repeat.split('').map(Number);
 
-      data['week'] = bitsOfDay.map((bit, idx) => (bit ? namesOfDays[idx] : ''))
-                              .filter(Boolean);
-    })
+    //   data['week'] = bitsOfDay.map((bit, idx) => (bit ? namesOfDays[idx] : ''))
+    //                           .filter(Boolean);
+    // })
 
-    return result;
+    return { results };
   }
 
   async createRoutine(
@@ -96,6 +98,8 @@ export class RoutineService {
   }
 
   async deleteRoutine(rout_id: number): Promise<any> {
-    return await this.routineRepository.softDelete({ rout_id });
+    const result = await this.routineRepository.softDelete({ rout_id });
+    
+    return { result };
   }
 }

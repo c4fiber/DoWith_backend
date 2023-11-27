@@ -25,7 +25,7 @@ export class Group {
   @DeleteDateColumn()
   del_at: Date
 
-  @OneToOne(() => Category) //, {createForeignKeyConstraints: false}
+  @OneToOne(() => Category, {createForeignKeyConstraints: false})
   @JoinColumn({ name: 'cat_id'})
   category: Category;
 
