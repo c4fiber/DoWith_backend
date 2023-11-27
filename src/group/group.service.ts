@@ -301,7 +301,7 @@ export class GroupService {
       await sharp(filePath).resize({ width: 700, height: 700, fit: 'contain' }) // 원하는 크기로 조정
                            .toFile(filePath, async(err, info) => {
                              try{
-                               await fs.unlink(filePath);
+                               //await fs.unlink(filePath);
                              } catch(err){
                                throw this.doWithException.FailedToDeletedOirginal;
                              }
