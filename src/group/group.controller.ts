@@ -49,11 +49,11 @@ export class GroupController {
 
   // 그룹 가입하기
   @Post('/:grp_id/join/:user_id')
-  createJoinGroup(
+  JoinGroup(
     @Param('grp_id')grp_id: number,
     @Param('user_id')user_id: number
   ): Promise<any> {
-    return this.groupService.createJoinGroup(grp_id, user_id);
+    return this.groupService.JoinGroup(grp_id, user_id);
   }
 
   // 그룹 나가기
@@ -66,12 +66,12 @@ export class GroupController {
   }
 
   // 그룹원들의 인증 사진 조회
-  @Get('/:grp_id/user/:user_id/image')
+  @Get('/:grp_id/user/:rout_id/image')
   getMemberTodoInGroup (
     @Param('grp_id') grp_id: number,
-    @Param('user_id') user_id: number
+    @Param('rout_id') rout_id: number
   ): Promise<any>{
-    return this.groupService.getMemberTodoInGroup(grp_id, user_id);
+    return this.groupService.getMemberTodoInGroup(grp_id, rout_id);
   }
 
   // 검색 - 카테고리, 검색어 이용

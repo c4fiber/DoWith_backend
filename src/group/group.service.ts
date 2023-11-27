@@ -96,9 +96,8 @@ export class GroupService {
       return { result };
 
     } catch(err){
-      Logger.error(err);
       await queryRunner.rollbackTransaction();
-      throw this.doWithException.FailedToMakeGroup;
+      throw new Error(err);
     }
   }
 
@@ -183,25 +182,55 @@ export class GroupService {
     return { results, total };
   }
 
-  async createJoinGroup(grp_id: number, user_id: number): Promise<any>{
-    const userGrpInsert = new UserGroup();
-
-    userGrpInsert.user_id = user_id;
-    userGrpInsert.grp_id = grp_id;
-
-    const result = await this.userGroupRepository.save(userGrpInsert);
-
-    return { result };
-  }
-  
-  async leftGroup(grp_id: number, user_id: number): Promise<any>{
+  async JoinGroup(grp_id: number, user_id: number): Promise<any>{
     const queryRunner = this.dataSource.createQueryRunner();
-
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try{
-      const result = await queryRunner.manager.delete(UserGroup, { grp_id, user_id });
+      const result = await queryRunner.manager.save(UserGroup, { user_id, grp_id });
+      const routs = await this.groupRepository.createQueryBuilder('g')
+                                              .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
+                                              .select([
+                                                  'r.rout_name AS todo_name'
+                                                , 'r.rout_desc AS todo_desc'
+                                                , 'g.cat_id    AS todo_label'
+                                                , 'r.rout_srt  AS todo_start'
+                                                , 'r.rout_end  AS todo_end'
+                                              ])
+                                              .where({ grp_id })
+                                              .getRawMany();
+      
+      for(const rout of routs){
+        const todo = new Todo();
+
+        todo.user_id = user_id;
+        todo.grp_id = grp_id;
+        todo.todo_name = rout.todo_name;
+        todo.todo_desc = rout.todo_desc;
+        todo.todo_label = rout.todo_label;
+        todo.todo_start = rout.todo_start;
+        todo.todo_end = rout.todo_end;
+
+        await queryRunner.manager.save(Todo, todo);
+      }
+
+      await queryRunner.commitTransaction();
+
+      return { result };
+    } catch(err){
+      await queryRunner.rollbackTransaction();
+      throw new Error(err);
+    }
+  }
+  
+  async leftGroup(grp_id: number, user_id: number): Promise<any>{
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try{
+      const result = await queryRunner.manager.delete(UserGroup, { user_id, grp_id });
       await queryRunner.manager.update(
           Todo
         , { user_id, grp_id, todo_date: Raw(todo_date => `to_char(${todo_date}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`),}
@@ -214,21 +243,25 @@ export class GroupService {
 
     } catch(err) {
       await queryRunner.rollbackTransaction();
-      throw this.doWithException.FailedToleftGroup;
+      throw new Error(err);
     } 
   }
 
-  async getMemberTodoInGroup(grp_id: number, user_id: number): Promise<any>{
+  async getMemberTodoInGroup(grp_id: number, rout_id: number): Promise<any>{
     const results = await this.groupRepository.createQueryBuilder('g')
                                               .select([
-                                                't.todo_id  AS todo_id'
-                                              , 't.todo_img AS todo_img'
+                                                  'r.rout_id   AS rout_id'
+                                                , 't.user_id   AS user_id'
+                                                , 't.todo_img  AS todo_img'
+                                                , 't.todo_done AS todo_done'
+                                                , 'u.user_name AS user_name'
                                               ])
                                               .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
-                                              .leftJoin('routine', 'r', 't.grp_id = r.grp_id')
-                                              .where('t.user_id = :user_id', { user_id })
+                                              .leftJoin('routine', 'r', 't.grp_id = r.grp_id AND t.rout_id = r.rout_id')
+                                              .leftJoin('user'   , 'u', 'u.user_id = t.user_id')
+                                              .where('t.todo_img IS NOT NULL')
                                               .andWhere('g.grp_id = :grp_id', { grp_id })
-                                              .groupBy('t.todo_id')
+                                              .andWhere('r.rout_id = :rout_id', { rout_id })
                                               .orderBy('t.todo_id')
                                               .getRawMany();            
 
@@ -300,10 +333,10 @@ export class GroupService {
     try {
       const filePath = file.path;
 
-      await sharp(filePath).resize({ width: 700, height: 700, fit: 'contain' }) // 원하는 크기로 조정
+      await sharp(filePath).resize({ width: 300, height: 300, fit: 'contain' })
                            .toFile(filePath, async(err, info) => {
                              try{
-                               await fs.unlink(filePath);
+                               //await fs.unlink(filePath);
                              } catch(err){
                                throw this.doWithException.FailedToDeletedOriginal;
                              }

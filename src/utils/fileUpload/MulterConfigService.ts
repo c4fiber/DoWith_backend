@@ -32,11 +32,10 @@ export class MulterConfig implements MulterOptionsFactory{
           if(!allowed_exts.includes(ext.toLowerCase())) {
             done(new DoWithException('지원하지 않는 파일 확장자입니다.', '1000', HttpStatus.BAD_REQUEST), file.originalname);
           }
-
           done(null, `${name}_${Date.now()}${ext}`);
         }
       }),
-      //limits: { fileSize: 5 * 1024 * 1024 }
+      limits: { fileSize: 5 * 1024 * 1024 }
     };
 
     return option;

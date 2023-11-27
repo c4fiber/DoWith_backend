@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../user/user.entities';
+import { Routine } from 'src/routine/entities/routine.entity';
 
 @Entity()
 export class Todo {
@@ -14,6 +16,10 @@ export class Todo {
 
   @Column()
   user_id: number; // foreign key
+
+  @ManyToOne(() => Routine, { nullable: true })
+  @JoinColumn({ name: 'rout_id', referencedColumnName: 'rout_id' })
+  rout_id: number; // foreign key referenced on Routine
 
   @Column()
   todo_name: string;

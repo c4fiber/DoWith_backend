@@ -1,5 +1,6 @@
 import { Days } from "src/days/entities/days.entity";
 import { Group } from "src/group/entities/group.entity";
+import { Todo } from "src/todo/todo.entity";
 import { Column, Entity, CreateDateColumn, ManyToOne, DeleteDateColumn, JoinColumn, PrimaryGeneratedColumn, ManyToMany } from "typeorm";
 
 @Entity('routine')
@@ -7,7 +8,7 @@ export class Routine {
   @PrimaryGeneratedColumn()
   rout_id: number;
 
-  @ManyToMany(() => Group)
+  @ManyToOne(() => Group)
   @JoinColumn({ name: 'grp_id', referencedColumnName: 'grp_id' })
   grp_id: number;
 
