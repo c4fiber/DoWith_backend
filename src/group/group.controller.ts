@@ -85,8 +85,7 @@ export class GroupController {
     return this.groupService.getGroupsBySearching(user_id, cat_id, keyword, pagingOptions);
   }
   
-  //@UseInterceptors(FileInterceptor('file'))
-  @UseInterceptors(AnyFilesInterceptor())
+  @UseInterceptors(FileInterceptor('file'))
   @Patch('/:todo_id/user/:user_id/image')
   updateImage(
     @Param('todo_id') todo_id: number,
