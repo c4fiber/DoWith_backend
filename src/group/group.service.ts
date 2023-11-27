@@ -9,7 +9,7 @@ import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Routine } from 'src/routine/entities/routine.entity';
 import * as sharp from 'sharp'
 import * as fs from 'fs/promises'
-import { PagingOptions, applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
+import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 
 @Injectable()
 export class GroupService {
@@ -289,6 +289,8 @@ export class GroupService {
       throw this.doWithException.ThereIsNoFile;
     }
 
+    Logger.debug(`file info = ${file}`);
+
     const todoUpt = await this.todoRepository.createQueryBuilder('t')
                                              .update({ todo_img: file.filename })
                                              .where({ todo_id })
@@ -307,6 +309,7 @@ export class GroupService {
                              }
                            });
     } catch(err) {
+      Logger.debug("File Resizing Failed!!!!!");
       throw this.doWithException.FailedToResizeImage;
     }
 

@@ -11,7 +11,9 @@ export class CategoryService {
     private readonly logger: Logger
   ) {}
 
-  getAllCategories(): Promise<Category[]> {
-    return this.categoryRepository.find({});
+  getAllCategories() {
+    const result = this.categoryRepository.find({});
+
+    return { result };
   }
 }
