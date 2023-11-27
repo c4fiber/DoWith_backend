@@ -35,7 +35,6 @@ export class AuthService {
     private readonly usersService: UserService,
     private readonly httpService: HttpService,
     private readonly doWithExceptions: DoWithExceptions,
-
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
@@ -75,7 +74,7 @@ export class AuthService {
 
     const userId = user.user_id;
     const payload = { userId };
-    Logger.log(`Is env null? ${process.env.JWT_SECRET}`);
+    Logger.log(`payload: ${payload}`);
     const token = this.jwtService.sign(payload);
     return `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${user.user_kakao_id}`;
   }
