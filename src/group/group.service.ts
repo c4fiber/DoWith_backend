@@ -96,9 +96,8 @@ export class GroupService {
       return { result };
 
     } catch(err){
-      Logger.error(err);
       await queryRunner.rollbackTransaction();
-      throw this.doWithException.FailedToMakeGroup;
+      throw new Error(err);
     }
   }
 
@@ -221,14 +220,8 @@ export class GroupService {
       return { result };
     } catch(err){
       await queryRunner.rollbackTransaction();
-      throw this.doWithException.FailedTojoinGroup;
+      throw new Error(err);
     }
-    // const userGrpInsert = new UserGroup();
-
-    // userGrpInsert.user_id = user_id;
-    // userGrpInsert.grp_id = grp_id;
-
-    // const result = await this.userGroupRepository.save(userGrpInsert);
   }
   
   async leftGroup(grp_id: number, user_id: number): Promise<any>{
@@ -250,7 +243,7 @@ export class GroupService {
 
     } catch(err) {
       await queryRunner.rollbackTransaction();
-      throw this.doWithException.FailedToleftGroup;
+      throw new Error(err);
     } 
   }
 

@@ -21,9 +21,6 @@ enum DoWithErrorCode {
   SelfFriendship = '0014',
 
   // Group
-  FailedTojoinGroup = '0100',   // 그룹에 참가할 때
-  FailedToleftGroup = '0101',   // 그룹 떠나기에 실패 했을 떄
-  FailedToMakeGroup = '0102',   // 그룹 생성에 실패했을 때
 
   // Routine
   ExceedMaxRoutines = '0200',   // 그룹당 최대 3개의 루틴이 등록 가능하다
@@ -34,9 +31,6 @@ enum DoWithErrorCode {
   FailedToDeletedOriginal = '1002',  // 이미지 압축 후 원본 파일 삭제 실패시
   FailedToResizeImage     = '1003',  // 업로드한 이미지 압축에 실패시
   NoData                  = '1004',  // 요청한 데이터가 없는 경우
-  FailedToInsertData      = '1005',
-  FailedToUpdateData      = '1006',  // 수정 요청한 데이터가 DB에 존재하지 않는 경우
-  FailedToDeleteData      = '1007',  // 삭제 ``
 }
 
 enum DoWithErrorMsg {
@@ -47,9 +41,6 @@ enum DoWithErrorMsg {
   SelfFriendship = 'A user cannot befriend themselves',
 
   // Group
-  FailedTojoinGroup = '그룹에 가입하는데 실패 했습니다.',
-  FailedToleftGroup = '그룹을 나가는데 실패 했습니다.',
-  FailedToMakeGroup = '그룹을 생성하는데 실패 했습니다.',
 
   // Routine
   ExceedMaxRoutines = '등록할 수 있는 최대 루틴을 초과하셨습니다.',
@@ -60,9 +51,6 @@ enum DoWithErrorMsg {
   FailedToDeletedOriginal = '원본 파일을 삭제하는데 실패 했습니다.',
   FailedToResizeImage     = '이미지 압축에 실패 했습니다.',
   NoData                  = '요청하신 데이터가 없습니다.',
-  FailedToInsertData      = '삽입에 실패 하였습니다.',
-  FailedToUpdateData      = '수정에 실패 하였습니다.',
-  FailedToDeleteData      = '삭제에 실패 하였습니다.',
 }
 
 @Injectable()
@@ -90,23 +78,6 @@ export class DoWithExceptions {
   );
 
   // =============== [ Group ] ===============
-  FailedTojoinGroup = new DoWithException(
-    DoWithErrorMsg.FailedTojoinGroup,
-    DoWithErrorCode.FailedTojoinGroup,
-    HttpStatus.BAD_REQUEST,
-  );
-
-  FailedToleftGroup = new DoWithException(
-    DoWithErrorMsg.FailedToleftGroup,
-    DoWithErrorCode.FailedToleftGroup,
-    HttpStatus.BAD_REQUEST,
-  );
-
-  FailedToMakeGroup = new DoWithException(
-    DoWithErrorMsg.FailedToMakeGroup,
-    DoWithErrorCode.FailedToMakeGroup,
-    HttpStatus.BAD_REQUEST,
-  );
   
   // =============== [ Routine ] ===============
   ExceedMaxRoutines = new DoWithException(
@@ -143,24 +114,6 @@ export class DoWithExceptions {
   NoData = new DoWithException(
     DoWithErrorMsg.NoData,
     DoWithErrorCode.NoData,
-    HttpStatus.BAD_REQUEST,
-  );
-
-  FailedToInsertData = new DoWithException(
-    DoWithErrorMsg.FailedToInsertData,
-    DoWithErrorCode.FailedToInsertData,
-    HttpStatus.BAD_REQUEST,
-  );
-
-  FailedToDeleteData = new DoWithException(
-    DoWithErrorMsg.FailedToDeleteData,
-    DoWithErrorCode.FailedToDeleteData,
-    HttpStatus.BAD_REQUEST,
-  );
-
-  FailedToUpdateData = new DoWithException(
-    DoWithErrorMsg.FailedToUpdateData,
-    DoWithErrorCode.FailedToUpdateData,
     HttpStatus.BAD_REQUEST,
   );
 }

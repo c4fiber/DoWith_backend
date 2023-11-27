@@ -83,7 +83,7 @@ export class RoutineService {
       return { result };
     } catch (err) {
       await queryRunner.rollbackTransaction();
-      throw this.dowithException.FailedToInsertData;
+      throw new Error(err);
     }
   }
 
