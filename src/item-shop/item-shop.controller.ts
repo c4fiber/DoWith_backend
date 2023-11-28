@@ -1,6 +1,5 @@
 import { Controller, Get, Param, Post } from '@nestjs/common';
 import { ItemShopService } from './item-shop.service';
-import { PagingOptions } from 'src/utils/paging/PagingOptions';
 
 @Controller('item-shop')
 export class ItemShopController {
@@ -8,10 +7,9 @@ export class ItemShopController {
 
   @Get('/:user_id')
   getAllItems(
-    @Param('user_id') user_id: number,
-    @PagingOptions() pagingOptions: { page: number, limit: number}
+    @Param('user_id') user_id: number
   ){
-    return this.itemShopService.getAllItems(user_id, pagingOptions);
+    return this.itemShopService.getAllItems(user_id);
   }
 
   @Post('/:user_id/:item_id')
