@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
 import { DataSource, Raw, Repository } from 'typeorm';
@@ -17,8 +17,6 @@ export class GroupService {
   constructor(
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
-    @InjectRepository(UserGroup)
-    private readonly userGroupRepository: Repository<UserGroup>,
     @InjectRepository(Todo)
     private readonly todoRepository: Repository<Todo>,
     private readonly doWithException: DoWithExceptions,
