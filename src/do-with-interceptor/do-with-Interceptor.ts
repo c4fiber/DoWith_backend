@@ -19,6 +19,8 @@ export class DoWithInterceptor implements NestInterceptor{
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     return next.handle().pipe(
       map(data => {
+        Logger.debug("############### [ Interceptor In ] ###############");
+
         const http = context.switchToHttp(); 
         const req = http.getRequest();
         const res = http.getResponse();
@@ -57,6 +59,8 @@ export class DoWithInterceptor implements NestInterceptor{
         //     break;
         // }
 
+        Logger.debug(`data = ${data}`);
+        Logger.debug("############### [ Interceptor Out ] ###############");
         return data;
       })
     );
