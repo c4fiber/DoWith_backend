@@ -8,6 +8,9 @@ import { Todo } from 'src/todo/todo.entity';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Routine } from 'src/routine/entities/routine.entity';
 import * as sharp from 'sharp'
+import * as fs from 'fs/promises'
+import * as path from 'path';
+
 import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 
 @Injectable()
@@ -323,28 +326,43 @@ export class GroupService {
       throw this.doWithException.ThereIsNoFile;
     }
 
-    const result = await this.todoRepository.createQueryBuilder('t')
-                                            .update({ todo_img: file.filename })
-                                            .where({ todo_id })
-                                            .andWhere({ user_id })
-                                            .execute();
-                                            
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+                                        
     try {
       const filePath = file.path;
+      const ext = path.extname(file.originalname);
+      const name = path.basename(file.originalname, ext);
+      const newPath = `${process.env.IMAGE_PATH}${name}_${Date.now()}${ext}`;
 
-      await sharp(filePath).resize({ width: 300, height: 300, fit: 'contain' })
-                           .toFile(filePath, async(err, info) => {
-                             try{
-                               //await fs.unlink(filePath);
-                             } catch(err){
-                               throw this.doWithException.FailedToDeletedOriginal;
-                             }
+      await sharp(filePath).resize({ width: 1000, height: 1000, fit: 'contain' })
+                           .toFile(newPath, async(err, info) => {
+                              await fs.unlink(filePath);  // 업로드한 원본 파일 삭제
                            });
-    } catch(err) {
-      throw this.doWithException.FailedToResizeImage;
-    }
+      
+      const oldFile = await this.todoRepository.createQueryBuilder('t')
+                                               .select(['t.todo_img AS todo_img'])
+                                               .where({ todo_id })
+                                               .andWhere({ user_id })
+                                               .getRawOne();
 
-    return { result };
+      if(oldFile.todo_img){
+        await fs.unlink(oldFile.todo_img);  // 기존에 저장했던 인증 사진 삭제(새로운 사진 업로드 했으니까)
+      }
+
+      const result = await this.todoRepository.createQueryBuilder('t')
+                                              .update({ todo_img: newPath })
+                                              .where({ todo_id })
+                                              .andWhere({ user_id })
+                                              .execute();
+
+      await queryRunner.commitTransaction();
+      return { result };
+    } catch(err) {
+      await queryRunner.rollbackTransaction();
+      throw new Error(err);
+    }
   }
 
   async updateTodoDone(todo_id: number): Promise<any>{
