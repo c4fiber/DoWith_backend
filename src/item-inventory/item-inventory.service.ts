@@ -11,15 +11,15 @@ export class ItemInventoryService {
   ){}
 
   async renameMyPet(user_id: number, item_id: number, pet_name: string){
-    const result = this.itemInventoryRepository.createQueryBuilder('iv')
-                                               .update()
-                                               .set({ 
-                                                 pet_name: pet_name
-                                               , pet_exp: 0
-                                               })
-                                               .where({ user_id })
-                                               .andWhere({ item_id })
-                                               .execute();
+    const result = await this.itemInventoryRepository.createQueryBuilder('iv')
+                                                     .update()
+                                                     .set({ 
+                                                       pet_name: pet_name
+                                                     , pet_exp: 0
+                                                     })
+                                                     .where({ user_id })
+                                                     .andWhere({ item_id })
+                                                     .execute();
 
     return { result };
   }
