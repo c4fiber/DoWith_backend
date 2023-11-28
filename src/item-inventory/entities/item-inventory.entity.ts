@@ -14,10 +14,10 @@ export class ItemInventory {
   @JoinColumn({ name: 'item_id', referencedColumnName: 'item_id' })
   item_id: number;
 
-  @Column()
+  @Column({ nullable: true })
   pet_name: string;
 
-  @Column()
+  @Column({ nullable: true })
   pet_exp: number;
 
   @CreateDateColumn()
