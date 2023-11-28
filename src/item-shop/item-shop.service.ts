@@ -1,8 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemShop } from './entities/item-shop.entity';
-import { Repository } from 'typeorm';
-import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
+import { DataSource, Repository } from 'typeorm';
 import { ItemType } from 'src/item-type/entities/item-type.entity';
 
 @Injectable()
@@ -11,7 +10,8 @@ export class ItemShopService {
     @InjectRepository(ItemShop)
     private readonly itemShopRepository: Repository<ItemShop>,
     @InjectRepository(ItemType)
-    private readonly itemTypeRepository: Repository<ItemType>
+    private readonly itemTypeRepository: Repository<ItemType>,
+    private readonly dataSource: DataSource
   ){}
 
   async getAllItems(user_id: number, pagingOptions: { page: number; limit: number }){
@@ -52,5 +52,19 @@ export class ItemShopService {
     }
 
     return { results };
+  }
+
+  async buyItem(user_id: number, item_id: number){
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      
+
+      return;
+    } catch(err) {
+
+    }
   }
 }

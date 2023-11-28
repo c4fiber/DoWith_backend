@@ -13,4 +13,12 @@ export class ItemShopController {
   ){
     return this.itemShopService.getAllItems(user_id, pagingOptions);
   }
+
+  @Post('/:user_id/:item_id')
+  buyItem(
+    @Param('user_id') user_id: number,
+    @Param('item_id') item_id: number
+  ){
+    return this.itemShopService.buyItem(user_id, item_id);
+  }
 }

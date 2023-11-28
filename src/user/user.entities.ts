@@ -28,6 +28,9 @@ export class User {
   @Column()
   user_hp: number;
 
+  @Column({ default: 0 })
+  user_cash: number
+
   // @OneToOne(() => Room)
   // @JoinColumn()
   // room_id: number;
