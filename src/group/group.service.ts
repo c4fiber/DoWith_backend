@@ -8,7 +8,6 @@ import { Todo } from 'src/todo/todo.entity';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { Routine } from 'src/routine/entities/routine.entity';
 import * as sharp from 'sharp'
-import * as fs from 'fs/promises'
 import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 
 @Injectable()
@@ -263,7 +262,7 @@ export class GroupService {
                                               .andWhere('g.grp_id = :grp_id', { grp_id })
                                               .andWhere('r.rout_id = :rout_id', { rout_id })
                                               .orderBy('t.todo_id')
-                                              .getRawMany();            
+                                              .getRawMany();
 
     return { results, path: process.env.IMAGE_PATH } ;
   }

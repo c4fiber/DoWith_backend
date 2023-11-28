@@ -6,7 +6,7 @@ export const PagingOptions = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): { page: number; limit: number } => {
     const req = ctx.switchToHttp().getRequest();
     const page = parseInt(req.query.page, 10) || 1;  
-    const limit = parseInt(req.query.limit, 10) || 10;
+    const limit = parseInt(req.query.limit, 10) || 10000; // 한 번에 페이징할 개수 화면에서 준비되면 줄여도됨
 
     return { page, limit };
   }

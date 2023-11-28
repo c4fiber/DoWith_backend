@@ -27,6 +27,9 @@ import { HttpModule } from '@nestjs/axios';
 import { DaysModule } from './days/days.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { UserAchiModule } from './user_achi/user_achi.module';
+import { ItemInventoryModule } from './item-inventory/item-inventory.module';
+import { ItemShopModule } from './item-shop/item-shop.module';
+import { ItemTypeModule } from './item-type/item-type.module';
 
 @Module({
   imports: [
@@ -71,6 +74,9 @@ import { UserAchiModule } from './user_achi/user_achi.module';
     DaysModule,
     AchievementsModule,
     UserAchiModule,
+    ItemShopModule,
+    ItemInventoryModule,
+    ItemTypeModule,
   ],
   controllers: [AppController],
   providers: [
