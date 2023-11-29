@@ -95,6 +95,8 @@ export class ItemShopService {
       return { result };
     } catch(err) {
       throw new Error(err);
+    } finally {
+      await queryRunner.release();
     }
   }
 }

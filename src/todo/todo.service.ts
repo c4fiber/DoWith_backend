@@ -24,6 +24,11 @@ export class TodoService {
     // return await this.todoRepository.findBy({ user_id, todo_deleted: false });
   }
 
+  async createTodayTodo(user_id: number){
+    
+    return;
+  }
+
   async findOne(todo_id: number): Promise<Todo> {
     return await this.todoRepository.findOneBy({
       todo_id,
