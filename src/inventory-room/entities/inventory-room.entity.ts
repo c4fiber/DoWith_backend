@@ -1,7 +1,7 @@
 import { Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { ItemInventory } from 'src/item-inventory/entities/item-inventory.entity';
 
-@Entity('Room')
+@Entity('room')
 export class InventoryRoom {
   @PrimaryColumn()
   user_id: number;
