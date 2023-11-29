@@ -47,12 +47,12 @@ export class DoWithInterceptor implements NestInterceptor{
             break;
           case HttpMethod.PATCH:
             if(data[mainKey]['affected'] == 0){
-              throw this.doWithException.FailedToUpdateData;
+              //throw this.doWithException.FailedToUpdateData;
             }
             break;
           case HttpMethod.DELETE:
             if(data[mainKey]['affected'] == 0){
-              throw this.doWithException.FailedToDeleteData;
+              //throw this.doWithException.FailedToDeleteData;
             }
             break;
         }
