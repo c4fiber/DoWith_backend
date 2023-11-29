@@ -86,10 +86,10 @@ import { ItemTypeModule } from './item-type/item-type.module';
       provide: APP_FILTER,
       useClass: DoWithExceptionFilter,
     },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: DoWithInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: DoWithInterceptor,
+    // },
   ],
 })
 export class AppModule implements NestModule {
