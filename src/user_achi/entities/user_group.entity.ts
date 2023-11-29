@@ -1,10 +1,10 @@
 import { Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
-export class UserGroup {
+export class UserAchi {
   @PrimaryColumn()
   user_id: number;
 
   @PrimaryColumn()
-  ache_id: number;
+  achi_id: number;
 }
