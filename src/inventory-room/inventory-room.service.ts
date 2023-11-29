@@ -9,8 +9,9 @@ import { isIn } from 'class-validator';
 @Injectable()
 export class InventoryRoomService {
   constructor(
-    @InjectRepository(InventoryRoom)
+    @InjectRepository(ItemInventory)
     private readonly itemInventoryRepo: Repository<ItemInventory>,
+    @InjectRepository(InventoryRoom)
     private readonly inventoryRoomRepo: Repository<InventoryRoom>,
     private dataSource: DataSource,
   ) {}
@@ -48,7 +49,17 @@ export class InventoryRoomService {
   }
 
   async findAll(user_id: number) {
-    const results = await this.inventoryRoomRepo.findBy({ user_id });
+    const results = await this.inventoryRoomRepo
+      .createQueryBuilder('r')
+      .innerJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
+      .select([
+        'r.item_id    AS item_id',
+        'iv.pet_name AS pet_name',
+        'iv.pet_exp AS pet_exp'
+      ])
+      // .where('r.user_id = :user_id', { user_id })
+      // .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
+      .getMany();
     return { results };
   }
 
