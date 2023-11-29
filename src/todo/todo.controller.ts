@@ -27,6 +27,13 @@ export class TodoController {
     return this.todoService.findAllByUser(user_id);
   }
 
+  @Post('/user/:user_id')
+  createTodayTodo(
+    @Param('user_id') user_id: number
+  ){
+    return this.todoService.createTodayTodo(user_id);
+  }
+
   @Get('/:todo_id')
   findOne(@Param('todo_id', ParseIntPipe) todo_id: number): Promise<Todo> {
     return this.todoService.findOne(todo_id);

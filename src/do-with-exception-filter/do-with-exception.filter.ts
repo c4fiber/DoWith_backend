@@ -55,12 +55,15 @@ export class DoWithExceptionFilter implements ExceptionFilter {
       err.err_name = exception.name;
       err.err_stack = exception.stack;
 
-      queryRunner.manager.save(doWithError, err);
+      await queryRunner.manager.save(doWithError, err);
     } catch (err) {
       // 조치 없음
       this.logger.error('DB Insert Exception');
     } finally {
-      queryRunner.release();
+      if(!queryRunner.isReleased) {
+        await queryRunner.release(); // 이미 해제된 QueryRunner인 경우에만 호출
+      }
+      // queryRunner.release();
     }
 
     res.json(comRes);

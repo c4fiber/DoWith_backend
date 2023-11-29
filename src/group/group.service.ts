@@ -100,6 +100,8 @@ export class GroupService {
     } catch(err){
       await queryRunner.rollbackTransaction();
       throw new Error(err);
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -223,6 +225,8 @@ export class GroupService {
     } catch(err){
       await queryRunner.rollbackTransaction();
       throw new Error(err);
+    } finally {
+      await queryRunner.release();
     }
   }
   
@@ -246,7 +250,9 @@ export class GroupService {
     } catch(err) {
       await queryRunner.rollbackTransaction();
       throw new Error(err);
-    } 
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async getMemberTodoInGroup(grp_id: number, rout_id: number): Promise<any>{
@@ -361,6 +367,8 @@ export class GroupService {
     } catch(err) {
       await queryRunner.rollbackTransaction();
       throw new Error(err);
+    } finally {
+      await queryRunner.release();
     }
   }
 

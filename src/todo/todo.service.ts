@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Todo } from './todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -10,6 +10,7 @@ export class TodoService {
   constructor(
     @InjectRepository(Todo)
     private readonly todoRepository: Repository<Todo>,
+    private readonly dataSource: DataSource
   ) {}
 
   // READ
@@ -22,6 +23,48 @@ export class TodoService {
       .orderBy('todo.todo_id', 'ASC')
       .getMany();
     // return await this.todoRepository.findBy({ user_id, todo_deleted: false });
+  }
+
+  async createTodayTodo(user_id: number){
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try{
+      // last로그인 비교해주고 오늘날짜로 변경해줘야 할듯ㅇ
+
+      const result = await queryRunner.query(`
+        INSERT INTO todo (user_id, todo_name, todo_desc, todo_label, todo_start, todo_end, grp_id, rout_id)
+        SELECT ${user_id} AS user_id
+             , r.rout_name AS todo_name
+             , r.rout_desc AS todo_desc
+             , 99 AS todo_label -- 임시 값(routine에 cat_id 컬럼 추가되면 변경 해야함)
+             , r.rout_srt AS todo_start
+             , r.rout_end AS todo_end
+             , r.grp_id
+             , r.rout_id
+          FROM "routine" r
+          LEFT OUTER JOIN "days" d 
+            ON r.rout_repeat = d.rout_repeat
+         WHERE r.grp_id IN (
+                            SELECT g.grp_id
+                              FROM user_group ug
+                              LEFT OUTER JOIN "group" g ON ug.grp_id = g.grp_id
+                             WHERE ug.user_id = ${user_id}
+                           )
+           AND to_char(now(), 'dy') = ANY(d.days)
+      `);
+
+      await queryRunner.commitTransaction();
+
+      return { result };
+    } catch(err){
+      await queryRunner.rollbackTransaction();
+      throw new Error(err);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findOne(todo_id: number): Promise<Todo> {
