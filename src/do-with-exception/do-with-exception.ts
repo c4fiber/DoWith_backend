@@ -28,6 +28,9 @@ enum DoWithErrorCode {
   // Shop
   NotEnoughCash     = '300',    // 물건 구입 시 보유한 금액이 충분하지 않은 경우
 
+  // Todo
+  AlreadyMadeTodos  = '400',
+
   // Utils
   NotAllowedExtension     = '1000',  // 지원하지 않는 확장자의 파일이 넘어왔을 때
   ThereIsNoFile           = '1001',  // 파일 업로드 모듈 이용시 요청에 파일을 보내지 않았을 때
@@ -50,6 +53,9 @@ enum DoWithErrorMsg {
 
   // Shop
   NotEnoughCash     = '보유한 캐시가 부족합니다.',
+
+  // Todo
+  AlreadyMadeTodos  = '이미 할 일이 생성되었습니다.',
 
   // Utils
   NotAllowedExtension     = '지원하지 않는 파일 확장자입니다.',
@@ -92,7 +98,14 @@ export class DoWithExceptions {
     HttpStatus.BAD_REQUEST,
   );
 
-  // Shop
+  // =============== [ Shop ] ===============
+  AlreadyMadeTodos = new DoWithException(
+    DoWithErrorMsg.AlreadyMadeTodos,
+    DoWithErrorCode.AlreadyMadeTodos,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  // =============== [ Todo ] ===============
   NotEnoughCash = new DoWithException(
     DoWithErrorMsg.NotEnoughCash,
     DoWithErrorCode.NotEnoughCash,
