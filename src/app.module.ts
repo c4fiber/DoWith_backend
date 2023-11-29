@@ -88,10 +88,10 @@ import { InventoryRoomModule } from './inventory-room/inventory-room.module';
       provide: APP_FILTER,
       useClass: DoWithExceptionFilter,
     },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: DoWithInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: DoWithInterceptor,
+    // },
   ],
 })
 export class AppModule implements NestModule {

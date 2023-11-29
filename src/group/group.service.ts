@@ -252,11 +252,10 @@ export class GroupService {
   async getMemberTodoInGroup(grp_id: number, rout_id: number): Promise<any>{
     const results = await this.groupRepository.createQueryBuilder('g')
                                               .select([
-                                                  'r.rout_id   AS rout_id'
-                                                , 't.user_id   AS user_id'
-                                                , 't.todo_img  AS todo_img'
-                                                , 't.todo_done AS todo_done'
-                                                , 'u.user_name AS user_name'
+                                                't.user_id   AS user_id'
+                                              , 't.todo_img  AS todo_img'
+                                              , 't.todo_done AS todo_done'
+                                              , 'u.user_name AS user_name'
                                               ])
                                               .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
                                               .leftJoin('routine', 'r', 't.grp_id = r.grp_id AND t.rout_id = r.rout_id')

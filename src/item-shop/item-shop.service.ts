@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemShop } from './entities/item-shop.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ItemType } from 'src/item-type/entities/item-type.entity';
+import { User } from 'src/user/user.entities';
+import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
+import { ItemInventory } from 'src/item-inventory/entities/item-inventory.entity';
 
 @Injectable()
 export class ItemShopService {
@@ -11,11 +14,15 @@ export class ItemShopService {
     private readonly itemShopRepository: Repository<ItemShop>,
     @InjectRepository(ItemType)
     private readonly itemTypeRepository: Repository<ItemType>,
+    @InjectRepository(ItemInventory)
+    private readonly itemInventoryRepository: Repository<ItemInventory>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly doWithExceptions: DoWithExceptions,
     private readonly dataSource: DataSource
   ){}
 
-  async getAllItems(user_id: number, pagingOptions: { page: number; limit: number }){
-    const { page, limit } = pagingOptions;
+  async getAllItems(user_id: number){
     // 유저가 소유한 아이템 번호 목록
     const ItemsIds = await this.itemShopRepository.createQueryBuilder('ish')
                                                   .leftJoin('item_inventory', 'iv', 'ish.item_id = iv.item_id')
@@ -56,15 +63,38 @@ export class ItemShopService {
 
   async buyItem(user_id: number, item_id: number){
     const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    // 유저 보유 캐시
+    const item_cost = await this.itemShopRepository.createQueryBuilder('ish')
+                                                     .select(['ish.item_cost AS item_cost'])
+                                                     .where('ish.item_id = :item_id', { item_id })
+                                                     .getRawOne();
 
     try {
-      
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-      return;
+      // 유저 캐시 차감
+      const result = await this.userRepository.createQueryBuilder('u')
+                                              .update()
+                                              .set({ user_cash: () => `user_cash - ${item_cost.item_cost}` })
+                                              .where({ user_id })
+                                              .andWhere(`user_cash - ${item_cost.item_cost} >= 0`)
+                                              .execute();
+      if(result.affected === 0){
+        throw this.doWithExceptions.NotEnoughCash;
+      }
+
+      this.itemInventoryRepository.createQueryBuilder('iv')
+                                  .insert()
+                                  .values({
+                                    user_id: user_id,
+                                    item_id: item_id
+                                  })
+                                  .execute();
+
+      return { result };
     } catch(err) {
-
+      throw new Error(err);
     }
   }
 }
