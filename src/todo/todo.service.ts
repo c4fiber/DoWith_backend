@@ -32,6 +32,8 @@ export class TodoService {
     await queryRunner.startTransaction();
 
     try{
+      // last로그인 비교해주고 오늘날짜로 변경해줘야 할듯ㅇ
+
       const result = await queryRunner.query(`
         INSERT INTO todo (user_id, todo_name, todo_desc, todo_label, todo_start, todo_end, grp_id, rout_id)
         SELECT ${user_id} AS user_id
