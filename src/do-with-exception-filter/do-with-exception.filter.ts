@@ -45,9 +45,8 @@ export class DoWithExceptionFilter implements ExceptionFilter {
 
     res.status(err.http_code);
 
+    const queryRunner = this.dataSource.createQueryRunner();
     try {
-      const queryRunner = this.dataSource.createQueryRunner();
-
       err.method = req.method;
       err.url = req.url;
       err.agent = req.headers['user-agent'];
@@ -57,10 +56,11 @@ export class DoWithExceptionFilter implements ExceptionFilter {
       err.err_stack = exception.stack;
 
       await queryRunner.manager.save(doWithError, err);
-      await queryRunner.release();
     } catch (err) {
       // 조치 없음
       this.logger.error('DB Insert Exception');
+    } finally {
+      await queryRunner.release();
     }
 
     res.json(comRes);
