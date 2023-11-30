@@ -1,15 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Todo } from './todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
+import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 
 @Injectable()
 export class TodoService {
   constructor(
     @InjectRepository(Todo)
     private readonly todoRepository: Repository<Todo>,
+    private readonly doWithExceptions: DoWithExceptions,
     private readonly dataSource: DataSource
   ) {}
 
@@ -28,33 +30,66 @@ export class TodoService {
   async createTodayTodo(user_id: number){
     const queryRunner = this.dataSource.createQueryRunner();
 
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const user = await queryRunner.manager.createQueryBuilder()
+                                          .from('user', 'u')
+                                          .where('u.user_id = :user_id', { user_id })
+                                          .andWhere(`to_char(u.last_login, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`)
+                                          .getRawOne();
+    // 이미 todo 생성했을 경우
+    if(user){
+      throw this.doWithExceptions.AlreadyMadeTodos;
+    }
 
     try{
-      // last로그인 비교해주고 오늘날짜로 변경해줘야 할듯ㅇ
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      // 오늘 로그인 날짜로 최신화
+      const result = await queryRunner.manager.createQueryBuilder()
+                                              .update('User')
+                                              .set({last_login: ()=> 'now()' })
+                                              .where('user_id = :user_id', { user_id })
+                                              .execute();
+      // 여기 밑 부터는 todo 생성기
+      const subQuery = await queryRunner.manager.createQueryBuilder()
+                                                .select(['g.grp_id AS grp_id'])
+                                                .from('group', 'g')
+                                                .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                                .where('ug.user_id = :user_id', { user_id })
+                                                .getQuery();
 
-      const result = await queryRunner.query(`
-        INSERT INTO todo (user_id, todo_name, todo_desc, todo_label, todo_start, todo_end, grp_id, rout_id)
-        SELECT ${user_id} AS user_id
-             , r.rout_name AS todo_name
-             , r.rout_desc AS todo_desc
-             , 99 AS todo_label -- 임시 값(routine에 cat_id 컬럼 추가되면 변경 해야함)
-             , r.rout_srt AS todo_start
-             , r.rout_end AS todo_end
-             , r.grp_id
-             , r.rout_id
-          FROM "routine" r
-          LEFT OUTER JOIN "days" d 
-            ON r.rout_repeat = d.rout_repeat
-         WHERE r.grp_id IN (
-                            SELECT g.grp_id
-                              FROM user_group ug
-                              LEFT OUTER JOIN "group" g ON ug.grp_id = g.grp_id
-                             WHERE ug.user_id = ${user_id}
-                           )
-           AND to_char(now(), 'dy') = ANY(d.days)
-      `);
+      const todos =  await queryRunner.manager.createQueryBuilder()
+                                              .select([
+                                                `${user_id}  AS user_id`
+                                              , 'r.rout_name AS todo_name'
+                                              , 'r.rout_desc AS todo_desc'
+                                              , '99          AS todo_label'
+                                              , 'r.rout_srt  AS todo_start' 
+                                              , 'r.rout_end  AS todo_end' 
+                                              , 'r.grp_id    AS grp_id'
+                                              , 'r.rout_id   AS rout_id'
+                                              ])
+                                              .from('routine', 'r')
+                                              .leftJoin('days', 'd', 'r.rout_repeat = d.rout_repeat')
+                                              .where(`r.grp_id IN (${subQuery})`, { user_id })
+                                              .andWhere(`to_char(now(), 'dy') = ANY(d.days)`)
+                                              .getRawMany();
+
+      for(const todo of todos){
+        const res = await queryRunner.manager.createQueryBuilder()
+                                             .insert()
+                                             .into('todo')
+                                             .values({
+                                               user_id     : user_id
+                                             , todo_name : todo.todo_name
+                                             , todo_desc : todo.todo_desc
+                                             , todo_label: todo.todo_label
+                                             , todo_start: todo.todo_start
+                                             , todo_end  : todo.todo_end
+                                             , grp_id    : todo.grp_id
+                                             , rout_id   : todo.rout_id
+                                             })
+                                             .execute();
+      }
 
       await queryRunner.commitTransaction();
 
