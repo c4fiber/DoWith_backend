@@ -9,7 +9,7 @@ import { Room } from './entities/room.entity';
 import { DataSource } from 'typeorm';
 import { ItemInventory } from 'src/item-inventory/entities/item-inventory.entity';
 import { isIn } from 'class-validator';
-import { DoWithException } from 'src/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 
 @Injectable()
 export class RoomService {
@@ -19,6 +19,7 @@ export class RoomService {
     @InjectRepository(Room)
     private readonly roomRepo: Repository<Room>,
     private dataSource: DataSource,
+    private readonly doWithException: DoWithExceptions,
   ) {}
 
   async isInInventory(user_id: number, item_id: number): Promise<boolean> {
@@ -31,17 +32,13 @@ export class RoomService {
     return  result1 !== null;
   }
 
-  async isValid(user_id: number, item_id: number): Promise<boolean> {
-    return (
-      (await this.isInInventory(user_id, item_id)) &&
-      !(await this.isInMyRoom(user_id, item_id))
-    );
-  }
-
   // for controller
   async create(user_id: number, item_id: number): Promise<any> {
-    if (!(await this.isValid(user_id, item_id))) {
-      throw new ConflictException();
+    if (!(await this.isInInventory(user_id, item_id))) {
+      throw this.doWithException.ItemNotInInventory;
+    }
+    if (await this.isInMyRoom(user_id, item_id)) {
+      throw this.doWithException.ItemAlreadyInMyRoom;
     }
 
     // TODO 펫이 여러마리 들어가면 안된다.
