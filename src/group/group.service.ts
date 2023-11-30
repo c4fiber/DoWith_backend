@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
 import { DataSource, Raw, Repository } from 'typeorm';
@@ -53,12 +53,15 @@ export class GroupService {
     try{
       await queryRunner.connect();
       await queryRunner.startTransaction();
+      Logger.debug(JSON.stringify(createGroupDto));
+      Logger.debug(JSON.stringify(routs));
 
       createGroupDto.grp_owner =  createGroupDto.user_id;
       createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
       // Group Insert
       const result = await queryRunner.manager.save(Group, createGroupDto);
+      Logger.debug(result);
       const ug = new UserGroup();
 
       ug.user_id = +createGroupDto.user_id;
@@ -66,6 +69,7 @@ export class GroupService {
 
       // UserGroup Insert
       const ugIns = await queryRunner.manager.save(UserGroup ,ug);
+      Logger.debug(ugIns);
 
       // Routine Insert
       for(const data of routs) {
