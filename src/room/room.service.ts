@@ -29,14 +29,16 @@ export class RoomService {
 
   async isInMyRoom(user_id: number, item_id: number): Promise<boolean> {
     const result1 = await this.roomRepo.findOneBy({ user_id, item_id });
-    return  result1 !== null;
+    return result1 !== null;
   }
 
   // for controller
   async create(user_id: number, item_id: number): Promise<any> {
+    // 보유한 아이템이 아니다
     if (!(await this.isInInventory(user_id, item_id))) {
       throw this.doWithException.ItemNotInInventory;
     }
+    // 이미 방에 있는 아이템이다.
     if (await this.isInMyRoom(user_id, item_id)) {
       throw this.doWithException.ItemAlreadyInMyRoom;
     }
@@ -65,8 +67,9 @@ export class RoomService {
   }
 
   async remove(user_id: number, item_id: number) {
+    // 방에 아이템이 존재하지 않으면 에러
     if (!(await this.isInMyRoom(user_id, item_id))) {
-      throw new Error('Not exist');
+      throw new NotFoundException();
     }
 
     const result = await this.roomRepo.delete({ user_id, item_id });
