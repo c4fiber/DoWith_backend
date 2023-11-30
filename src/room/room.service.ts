@@ -53,11 +53,12 @@ export class RoomService {
       .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
       .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
       .select([
-        'iv.pet_name as pet_name',
-        'iv.pet_exp as pet_exp',
+        'ish.item_id as item_id',
+        'ish.item_type as item_type',
         'ish.item_name as item_name',
         'ish.item_path as item_path',
-        'ish.item_id as item_id',
+        'iv.pet_name as pet_name',
+        'iv.pet_exp as pet_exp',
       ])
       .getRawMany();
     return { result };
