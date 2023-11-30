@@ -12,7 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './group/group.module';
 import { RoutineModule } from './routine/routine.module';
 import { CommentModule } from './comment/comment.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -20,6 +20,18 @@ import { FriendModule } from './friend/friend.module';
 import { CategoryModule } from './category/category.module';
 import { UserGroupModule } from './user_group/user_group.module';
 import { UtilsModule } from './utils/utils.module';
+import { DoWithInterceptorModule } from './do-with-interceptor/do-with-interceptor.module';
+import { DoWithInterceptor } from './do-with-interceptor/do-with-Interceptor';
+import { ErrorLogModule } from './error-log/error-log.module';
+import { HttpModule } from '@nestjs/axios';
+import { DaysModule } from './days/days.module';
+import { AchievementsModule } from './achievements/achievements.module';
+import { UserAchiModule } from './user_achi/user_achi.module';
+import { ItemInventoryModule } from './item-inventory/item-inventory.module';
+import { ItemShopModule } from './item-shop/item-shop.module';
+import { ItemTypeModule } from './item-type/item-type.module';
+import { InventoryRoomModule } from './inventory-room/inventory-room.module';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: [
@@ -47,7 +59,9 @@ import { UtilsModule } from './utils/utils.module';
     // Common Module
     DoWithExceptionModule,
     DoWithExceptionFilterModule,
+    DoWithInterceptorModule,
     UtilsModule,
+
     // API Module
     TodoModule,
     GroupModule,
@@ -58,6 +72,14 @@ import { UtilsModule } from './utils/utils.module';
     CategoryModule,
     UserGroupModule,
     CommentModule,
+    ErrorLogModule,
+    DaysModule,
+    AchievementsModule,
+    UserAchiModule,
+    ItemShopModule,
+    ItemInventoryModule,
+    ItemTypeModule,
+    InventoryRoomModule,
   ],
   controllers: [AppController],
   providers: [
@@ -67,6 +89,11 @@ import { UtilsModule } from './utils/utils.module';
       provide: APP_FILTER,
       useClass: DoWithExceptionFilter,
     },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: DoWithInterceptor,
+    // },
+    AppGateway,
   ],
 })
 export class AppModule implements NestModule {
@@ -85,4 +112,4 @@ function getNow() {
   return event.toISOString();
 }
 
-console.log( getNow()); // 현재 타임존의 시간 출력
+console.log(getNow()); // 현재 타임존의 시간 출력

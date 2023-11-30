@@ -4,11 +4,11 @@ import { Group } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
+import { PagingOptions } from 'src/utils/paging/PagingOptions';
 
 @Controller('group')
 export class GroupController {
   constructor(
-    private readonly logger: Logger,
     private readonly groupService: GroupService,
     private readonly multerConifg: MulterConfig
   ){
@@ -17,8 +17,10 @@ export class GroupController {
   
   // 모든 그룹 조회
   @Get('/')
-  getGroupAll(): Promise<Group[]>{
-    return this.groupService.getGroupAll();
+  getGroupAll(
+    @PagingOptions() pagingOptions: { page: number; limit: number }
+  ): Promise<{results: Group[], total: number}>{
+    return this.groupService.getGroupAll(pagingOptions);
   }
 
   // 그룹 생성
@@ -27,38 +29,31 @@ export class GroupController {
     @Body('grpInfo') createGroupDto: CreateGroupDto,
     @Body('routInfo') routs: Array<any>
   ): Promise<any>{
-    this.logger.debug("createGroupDto", JSON.stringify(createGroupDto));
-    this.logger.debug(routs);
-
     return this.groupService.createGroupOne(createGroupDto, routs);
   }
 
   // 그룹 상세조회
   @Get('/:grp_id')
-  getGroupOne(@Param('grp_id') grp_id: number){
-    this.logger.debug("grp_id", grp_id);
-
+  getGroupOne(@Param('grp_id') grp_id: number): Promise<{result:{grp_detail: Group, rout_detail:Array<any>, grp_mems:Array<any>}}>{
     return this.groupService.getGroupOne(grp_id);
   }
 
   // 내가 속한 그룹 조회
   @Get('/:user_id/groups')
-  getAllMyGroups(@Param('user_id') user_id: number){
-    this.logger.debug("user_id", user_id);
-
-    return this.groupService.getAllMyGroups(user_id);
+  getAllMyGroups(
+      @Param('user_id') user_id: number
+    , @PagingOptions() pagingOptions: { page: number; limit: number }
+  ): Promise<Promise<{results: Group[], total: number}>>{
+    return this.groupService.getAllMyGroups(user_id, pagingOptions);
   }
 
   // 그룹 가입하기
   @Post('/:grp_id/join/:user_id')
-  createJoinGroup(
+  JoinGroup(
     @Param('grp_id')grp_id: number,
     @Param('user_id')user_id: number
   ): Promise<any> {
-    this.logger.debug("grp_id", grp_id);
-    this.logger.debug("user_id", user_id);
-    
-    return this.groupService.createJoinGroup(grp_id, user_id);
+    return this.groupService.JoinGroup(grp_id, user_id);
   }
 
   // 그룹 나가기
@@ -67,22 +62,16 @@ export class GroupController {
     @Param('grp_id')grp_id: number,
     @Param('user_id')user_id: number
   ): Promise<any>{
-    this.logger.debug("grp_id", grp_id);
-    this.logger.debug("user_id", user_id);
-
     return this.groupService.leftGroup(grp_id, user_id);
   }
 
   // 그룹원들의 인증 사진 조회
-  @Get('/:grp_id/user/:user_id/image')
+  @Get('/:grp_id/user/:rout_id/image')
   getMemberTodoInGroup (
     @Param('grp_id') grp_id: number,
-    @Param('user_id') user_id: number
+    @Param('rout_id') rout_id: number
   ): Promise<any>{
-    this.logger.debug("grp_id", grp_id);
-    this.logger.debug("user_id", user_id);
-
-    return this.groupService.getMemberTodoInGroup(grp_id, user_id);
+    return this.groupService.getMemberTodoInGroup(grp_id, rout_id);
   }
 
   // 검색 - 카테고리, 검색어 이용
@@ -90,13 +79,10 @@ export class GroupController {
   getGroupsBySearching(
     @Param('user_id') user_id: number,
     @Param('category') cat_id: number,
-    @Param('keyword') keyword: string
-  ): Promise<any[]>{
-    this.logger.debug("user_id = ", user_id);
-    this.logger.debug("category = ", cat_id);
-    this.logger.debug("keyword = ", keyword);
-
-    return this.groupService.getGroupsBySearching(user_id, cat_id, keyword);
+    @Param('keyword') keyword: string,
+    @PagingOptions() pagingOptions: { page: number; limit: number }
+  ): Promise<{ results: Group[], total: number}>{
+    return this.groupService.getGroupsBySearching(user_id, cat_id, keyword, pagingOptions);
   }
   
   @UseInterceptors(FileInterceptor('file'))
@@ -106,10 +92,6 @@ export class GroupController {
     @Param('user_id') user_id: number,
     @UploadedFile() file: Express.Multer.File
   ): Promise<any>{
-    this.logger.debug("todo_id", todo_id);
-    this.logger.debug("user_id", user_id);
-    this.logger.debug(file);
-    
     return this.groupService.updateImage(todo_id, user_id, file);
   }
 
@@ -124,8 +106,6 @@ export class GroupController {
   // 그룹 삭제 (인원수가 0이되면 삭제)
   @Delete('/:grp_id')
   deleteGroup(@Param('grp_id')grp_id : number){
-    this.logger.debug("grp_id", grp_id);
-
     return this.groupService.deleteGroup(grp_id);
   }
 }

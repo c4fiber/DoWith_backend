@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { RoutineService } from './routine.service';
 import { RoutineController } from './routine.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +8,6 @@ import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 @Module({
   imports: [TypeOrmModule.forFeature([Routine])],
   controllers: [RoutineController],
-  providers: [Logger, RoutineService, DoWithExceptions ],
+  providers: [ RoutineService, DoWithExceptions ],
 })
 export class RoutineModule {}

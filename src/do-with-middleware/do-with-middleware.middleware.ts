@@ -9,7 +9,6 @@ export class DoWithMiddlewareMiddleware implements NestMiddleware {
     const logDate      = `date     : ${new Date()}`;
     const logAgent     = `agent    : ${req.headers['user-agent']}`;
     const logClientIp  = `client Ip: ${req.ip}`;
-    const logProxyIps  = `proxy Ips: ${req.ips}`;
     const reqBody = {...req.body};
 
     const keys = Object.keys(reqBody);
@@ -28,7 +27,6 @@ ${logHeader}
 ${logDate}
 ${logAgent}
 ${logClientIp}
-${logProxyIps}
 ${params}`);
     
     next();

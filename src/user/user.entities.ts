@@ -1,10 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Todo } from '../todo/todo.entity';
 
@@ -25,6 +28,9 @@ export class User {
   @Column()
   user_hp: number;
 
+  @Column({ default: 0 })
+  user_cash: number
+
   // @OneToOne(() => Room)
   // @JoinColumn()
   // room_id: number;
@@ -33,15 +39,18 @@ export class User {
   @JoinTable()
   friends: User[];
 
-  @Column()
-  reg_at: Date;
-
-  @Column()
-  upt_at: Date;
+  @OneToMany(() => Todo, (todo) => todo.user)
+  todos: Todo[];
 
   @Column()
   last_login: Date;
 
-  @OneToMany(() => Todo, (todo) => todo.user)
-  todos: Todo[];
+  @CreateDateColumn()
+  reg_at: Date;
+
+  @UpdateDateColumn()
+  upt_at: Date;
+
+  @DeleteDateColumn()
+  del_at: Date;
 }

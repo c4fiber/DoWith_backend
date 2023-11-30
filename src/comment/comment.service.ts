@@ -15,12 +15,18 @@ export class CommentService {
 
     // READ
     async findAllByOwner(owner_id: number): Promise<Comment[]> {
-        return await this.commentRepository.find({
-            where: {
-                owner_id: owner_id,
-                is_del: false
-            }
-        });
+        return await this.commentRepository.createQueryBuilder('comment')
+        .leftJoinAndSelect('comment.author', 'author')
+        .select([
+            'comment.com_id', 
+            'comment.content', 
+            'comment.is_mod', 
+            'author.user_id', 
+            'author.user_name' // user_name만 선택적으로 가져옵니다.
+        ])
+        .where('comment.owner_id = :owner_id', { owner_id })
+        .andWhere('comment.is_del = false')
+        .getMany();
     }
 
     // CREATE

@@ -1,3 +1,8 @@
+# docker
+docker-compose.*
+do.sh
+
+
 # compiled output
 /dist
 /node_modules
