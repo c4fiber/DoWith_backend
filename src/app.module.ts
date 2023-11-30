@@ -30,6 +30,7 @@ import { UserAchiModule } from './user_achi/user_achi.module';
 import { ItemInventoryModule } from './item-inventory/item-inventory.module';
 import { ItemShopModule } from './item-shop/item-shop.module';
 import { ItemTypeModule } from './item-type/item-type.module';
+import { InventoryRoomModule } from './inventory-room/inventory-room.module';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { ItemTypeModule } from './item-type/item-type.module';
     ItemShopModule,
     ItemInventoryModule,
     ItemTypeModule,
+    InventoryRoomModule,
   ],
   controllers: [AppController],
   providers: [
@@ -86,10 +88,10 @@ import { ItemTypeModule } from './item-type/item-type.module';
       provide: APP_FILTER,
       useClass: DoWithExceptionFilter,
     },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: DoWithInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: DoWithInterceptor,
+    // },
   ],
 })
 export class AppModule implements NestModule {

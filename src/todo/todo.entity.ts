@@ -17,7 +17,7 @@ export class Todo {
   @Column()
   user_id: number; // foreign key
 
-  @ManyToOne(() => Routine, { nullable: true })
+  @ManyToOne(() => Routine)
   @JoinColumn({ name: 'rout_id', referencedColumnName: 'rout_id' })
   rout_id: number; // foreign key referenced on Routine
 

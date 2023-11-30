@@ -18,19 +18,19 @@ export class RoutineService {
 
   async getAllRoutines(grp_id: number): Promise<any> {
     const results = await this.routineRepository.createQueryBuilder('r')
-                                               .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
-                                               .leftJoin('days' , 'd', 'r.rout_repeat = d.rout_repeat')
-                                               .where('g.grp_id = :grp_id', { grp_id })
-                                               .select([
-                                                 'r.grp_id      AS grp_id',
-                                                 'r.rout_name   AS rout_name',
-                                                 'r.rout_desc   AS rout_desc',
-                                                 'r.rout_repeat AS rout_repeat',
-                                                 'r.rout_srt    AS rout_srt',
-                                                 'r.rout_end    AS rout_end',
-                                                 'd.days        AS days'
-                                               ])
-                                               .getRawMany();
+                                                .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
+                                                .leftJoin('days' , 'd', 'r.rout_repeat = d.rout_repeat')
+                                                .where('g.grp_id = :grp_id', { grp_id })
+                                                .select([
+                                                  'r.grp_id      AS grp_id'
+                                                , 'r.rout_name   AS rout_name'
+                                                , 'r.rout_desc   AS rout_desc'
+                                                , 'r.rout_repeat AS rout_repeat'
+                                                , 'r.rout_srt    AS rout_srt'
+                                                , 'r.rout_end    AS rout_end'
+                                                , 'd.days        AS days'
+                                                ])
+                                                .getRawMany();
 
     return { results };
   }
@@ -84,6 +84,8 @@ export class RoutineService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw new Error(err);
+    } finally {
+      await queryRunner.release();
     }
   }
 

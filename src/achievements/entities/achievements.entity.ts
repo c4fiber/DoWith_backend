@@ -4,7 +4,7 @@ import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "t
 @Entity()
 export class Achievements {
   @PrimaryGeneratedColumn()
-  ache_id: number;
+  achi_id: number;
 
   @Column()
   ache_name: string;
@@ -19,8 +19,8 @@ export class Achievements {
   @JoinTable({
     name: 'user_achi',
     joinColumn: {
-      name: 'ache_id',
-      referencedColumnName: 'ache_id'
+      name: 'achi_id',
+      referencedColumnName: 'achi_id'
     },
     inverseJoinColumn:{
       name: 'user_id',
