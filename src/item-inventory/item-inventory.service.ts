@@ -23,4 +23,9 @@ export class ItemInventoryService {
 
     return { result };
   }
+
+  async findAll(user_id: number) {
+    const result = await this.itemInventoryRepository.findBy({ user_id });
+    return { result };
+  }
 }
