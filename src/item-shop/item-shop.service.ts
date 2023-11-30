@@ -33,8 +33,8 @@ export class ItemShopService {
     // 현재 프로덕트가 가진 아이템 타입 정보
     const types = await this.itemTypeRepository.createQueryBuilder('t')
                                                .select([
-                                                  't.type_id   AS type_id'
-                                               ,  't.type_name   AS type_name'
+                                                 't.type_id   AS type_id'
+                                               , 't.type_name   AS type_name'
                                                ])
                                                .getRawMany();
     // 상점 아이템 조회                    
@@ -63,12 +63,12 @@ export class ItemShopService {
 
   async buyItem(user_id: number, item_id: number){
     const queryRunner = this.dataSource.createQueryRunner();
-    // 유저 보유 캐시
+    // 아이템 가격
     const item_cost = await this.itemShopRepository.createQueryBuilder('ish')
-                                                     .select(['ish.item_cost AS item_cost'])
-                                                     .where('ish.item_id = :item_id', { item_id })
-                                                     .getRawOne();
-
+                                                   .select(['ish.item_cost AS item_cost'])
+                                                   .where('ish.item_id = :item_id', { item_id })
+                                                   .getRawOne();
+                                                   
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();

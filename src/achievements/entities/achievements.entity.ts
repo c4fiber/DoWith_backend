@@ -12,7 +12,7 @@ export class Achievements {
   @Column()
   ache_decs: string;
 
-  @Column()
+  @Column({ default: false })
   is_hidden: boolean;
 
   @ManyToMany(() => User)
