@@ -49,16 +49,16 @@ export class ItemShopService {
                                                ])
                                                .where('ish.item_id NOT IN (:...ownItems)', { ownItems })
     
-    let results = {};                                           
+    let result = {};                                           
     for(const type of types){
       const type_id = type.type_id;
       const type_name = type.type_name;
 
-      results[`${type_name}`] = await query.andWhere('it.type_id = :type_id', { type_id })
+      result[`${type_name}`] = await query.andWhere('it.type_id = :type_id', { type_id })
                                            .getRawMany();
     }
 
-    return { results, path: process.env.PUBLIC_IMAGE_PATH };
+    return { result, path: process.env.PUBLIC_IMAGE_PATH };
   }
 
   async buyItem(user_id: number, item_id: number){
