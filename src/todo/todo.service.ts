@@ -90,14 +90,15 @@ export class TodoService {
                                                 `${user_id}  AS user_id`
                                               , 'r.rout_name AS todo_name'
                                               , 'r.rout_desc AS todo_desc'
-                                              , '99          AS todo_label'
+                                              , 'g.cat_id    AS todo_label'
                                               , 'r.rout_srt  AS todo_start' 
                                               , 'r.rout_end  AS todo_end' 
                                               , 'r.grp_id    AS grp_id'
                                               , 'r.rout_id   AS rout_id'
                                               ])
                                               .from('routine', 'r')
-                                              .leftJoin('days', 'd', 'r.rout_repeat = d.rout_repeat')
+                                              .leftJoin('days' , 'd', 'r.rout_repeat = d.rout_repeat')
+                                              .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
                                               .where(`r.grp_id IN (${subQuery})`, { user_id })
                                               .andWhere(`to_char(now(), 'dy') = ANY(d.days)`)
                                               .getRawMany();

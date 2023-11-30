@@ -25,7 +25,7 @@ export class User {
   @Column()
   user_kakao_id: string;
 
-  @Column()
+  @Column({ default: 100 })
   user_hp: number;
 
   @Column({ default: 0 })
