@@ -53,15 +53,12 @@ export class GroupService {
     try{
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      Logger.debug(JSON.stringify(createGroupDto));
-      Logger.debug(JSON.stringify(routs));
 
       createGroupDto.grp_owner =  createGroupDto.user_id;
       createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
       // Group Insert
       const result = await queryRunner.manager.save(Group, createGroupDto);
-      Logger.debug(result);
       const ug = new UserGroup();
 
       ug.user_id = +createGroupDto.user_id;
@@ -69,20 +66,33 @@ export class GroupService {
 
       // UserGroup Insert
       const ugIns = await queryRunner.manager.save(UserGroup ,ug);
-      Logger.debug(ugIns);
 
       // Routine Insert
       for(const data of routs) {
         const rout = new Routine();
 
-        rout.grp_id = ug.grp_id;
-        rout.rout_name = data.rout_name;
-        rout.rout_desc = data.rout_desc;
-        rout.rout_repeat = data.rout_repeat;
-        rout.rout_srt = data.rout_srt;
-        rout.rout_end = data.rout_end;
+        // rout.grp_id = ug.grp_id;
+        // rout.rout_name = data.rout_name;
+        // rout.rout_desc = data.rout_desc;
+        // rout.rout_repeat = data.rout_repeat;
+        // rout.rout_srt = data.rout_srt;
+        // rout.rout_end = data.rout_end;
 
-        await queryRunner.manager.save(Routine, rout);
+        // await queryRunner.manager.save(Routine, rout);
+
+        await queryRunner.manager.createQueryBuilder()
+                                 .insert()
+                                 .into('routine')
+                                 .values({
+                                    grp_id     : ug.grp_id
+                                  , rout_name  : data.rout_name
+                                  , rout_desc  : data.rout_desc
+                                  , rout_repeat: data.rout_repeat
+                                  , rout_srt   : data.rout_srt
+                                  , rout_end   : data.rout_end
+                                  
+                                 })
+                                 .execute();
 
         const todo = new Todo();
 
