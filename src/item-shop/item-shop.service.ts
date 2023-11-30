@@ -58,7 +58,7 @@ export class ItemShopService {
                                            .getRawMany();
     }
 
-    return { results, path: process.env.IMAGE_PATH };
+    return { results, path: process.env.PUBLIC_IMAGE_PATH };
   }
 
   async buyItem(user_id: number, item_id: number){
