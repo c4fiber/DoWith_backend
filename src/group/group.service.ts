@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
 import { DataSource, Raw, Repository } from 'typeorm';
@@ -18,15 +18,13 @@ export class GroupService {
   constructor(
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
-    @InjectRepository(UserGroup)
-    private readonly userGroupRepository: Repository<UserGroup>,
     @InjectRepository(Todo)
     private readonly todoRepository: Repository<Todo>,
     private readonly doWithException: DoWithExceptions,
     private dataSource: DataSource
   ){}
 
-  async getGroupAll(pagingOptions: { page: number; limit: number }): Promise<{results: Group[], total: number}>{
+  async getGroupAll(pagingOptions: { page: number; limit: number }): Promise<{result: Group[], total: number}>{
     const { page, limit } = pagingOptions;
     const query = await this.groupRepository.createQueryBuilder('g')
                                             .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
@@ -35,18 +33,18 @@ export class GroupService {
     const [ items, total ] = await applyPaging(query, page, limit);
     const grpIds = getIdsFromItems(items, "grp_id");
 
-    const results = await query.select([
-                                 'g.grp_id               AS grp_id'
-                               , 'g.grp_name             AS grp_name'
-                               , 'MAX(u2.user_name)      AS owner'
-                               , 'COUNT(u1.user_id)::int AS mem_cnt'
-                               ])
-                               .where('g.grp_id IN (:...grpIds)', { grpIds })
-                               .orderBy('COUNT(u1.user_id)', 'DESC')
-                               .groupBy('g.grp_id')
-                               .getRawMany();
+    const result = await query.select([
+                                'g.grp_id               AS grp_id'
+                              , 'g.grp_name             AS grp_name'
+                              , 'MAX(u2.user_name)      AS owner'
+                              , 'COUNT(u1.user_id)::int AS mem_cnt'
+                              ])
+                              .where('g.grp_id IN (:...grpIds)', { grpIds })
+                              .orderBy('COUNT(u1.user_id)', 'DESC')
+                              .groupBy('g.grp_id')
+                              .getRawMany();
 
-    return { results, total };
+    return { result, total };
   }
 
   async createGroupOne(createGroupDto: CreateGroupDto, routs: Array<any>): Promise<any>{
@@ -148,7 +146,7 @@ export class GroupService {
   async getAllMyGroups(
       user_id: number
     , pagingOptions: { page: number; limit: number }
-  ): Promise<Promise<{results: Group[], total: number}>>{
+  ): Promise<Promise<{result: Group[], total: number}>>{
     const { page, limit } = pagingOptions;
     const Count = await this.groupRepository.createQueryBuilder('g')
                                             .select([ 'g.grp_id AS grp_id'
@@ -169,21 +167,21 @@ export class GroupService {
 
     const [ items, total ] = await applyPaging(query, page, limit);
     const grpIds = getIdsFromItems(items, "grp_id");
-    const results = await query.select([
-                                 'g.grp_id          AS grp_id'
-                               , 'g.grp_name        AS grp_name'
-                               , 'g.grp_decs        AS grp_decs'
-                               , 'MAX(u2.user_name) AS owner'
-                               , 'g.cat_id          AS cat_id'
-                               , 'MAX(c.cat_name)   AS cat_name'
-                               , 'MAX(g2.mem_cnt)   AS mem_cnt'
-                               ])
-                               .andWhere('g.grp_id IN (:...grpIds)', { grpIds })
-                               .groupBy('g.grp_id')
-                               .orderBy('MAX(g2.mem_cnt)', 'DESC')
-                               .getRawMany();
+    const result = await query.select([
+                                'g.grp_id          AS grp_id'
+                              , 'g.grp_name        AS grp_name'
+                              , 'g.grp_decs        AS grp_decs'
+                              , 'MAX(u2.user_name) AS owner'
+                              , 'g.cat_id          AS cat_id'
+                              , 'MAX(c.cat_name)   AS cat_name'
+                              , 'MAX(g2.mem_cnt)   AS mem_cnt'
+                              ])
+                              .andWhere('g.grp_id IN (:...grpIds)', { grpIds })
+                              .groupBy('g.grp_id')
+                              .orderBy('MAX(g2.mem_cnt)', 'DESC')
+                              .getRawMany();
 
-    return { results, total };
+    return { result, total };
   }
 
   async JoinGroup(grp_id: number, user_id: number): Promise<any>{
@@ -256,23 +254,23 @@ export class GroupService {
   }
 
   async getMemberTodoInGroup(grp_id: number, rout_id: number): Promise<any>{
-    const results = await this.groupRepository.createQueryBuilder('g')
-                                              .select([
-                                                't.user_id   AS user_id'
-                                              , 't.todo_img  AS todo_img'
-                                              , 't.todo_done AS todo_done'
-                                              , 'u.user_name AS user_name'
-                                              ])
-                                              .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
-                                              .leftJoin('routine', 'r', 't.grp_id = r.grp_id AND t.rout_id = r.rout_id')
-                                              .leftJoin('user'   , 'u', 'u.user_id = t.user_id')
-                                              .where('t.todo_img IS NOT NULL')
-                                              .andWhere('g.grp_id = :grp_id', { grp_id })
-                                              .andWhere('r.rout_id = :rout_id', { rout_id })
-                                              .orderBy('t.todo_id')
-                                              .getRawMany();
+    const result = await this.groupRepository.createQueryBuilder('g')
+                                             .select([
+                                               't.user_id   AS user_id'
+                                             , 't.todo_img  AS todo_img'
+                                             , 't.todo_done AS todo_done'
+                                             , 'u.user_name AS user_name'
+                                             ])
+                                             .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
+                                             .leftJoin('routine', 'r', 't.grp_id = r.grp_id AND t.rout_id = r.rout_id')
+                                             .leftJoin('user'   , 'u', 'u.user_id = t.user_id')
+                                             .where('t.todo_img IS NOT NULL')
+                                             .andWhere('g.grp_id = :grp_id', { grp_id })
+                                             .andWhere('r.rout_id = :rout_id', { rout_id })
+                                             .orderBy('t.todo_id')
+                                             .getRawMany();
 
-    return { results, path: process.env.IMAGE_PATH } ;
+    return { result, path: process.env.IMAGE_PATH } ;
   }
 
   async getGroupsBySearching(
@@ -280,7 +278,7 @@ export class GroupService {
     , cat_id: number
     , keyword: string
     ,pagingOptions: { page: number; limit: number }
-  ): Promise<{ results: Group[], total: number}>{
+  ): Promise<{ result: Group[], total: number}>{
     const { page, limit } = pagingOptions;
     const myGrps = await this.groupRepository.createQueryBuilder('g')
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
@@ -289,12 +287,12 @@ export class GroupService {
                                              .getRawMany();
     const myGrpsIds = myGrps.map(data => data.grp_id);
     const query = await this.groupRepository.createQueryBuilder('g')
-                                             .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
-                                             .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-                                             .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
-                                             .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
-                                             .where('1 = 1')
-                                             .groupBy('g.grp_id');
+                                            .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
+                                            .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                            .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
+                                            .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
+                                            .where('1 = 1')
+                                            .groupBy('g.grp_id');
 
     if(myGrpsIds.length > 0){
       query.andWhere('g.grp_id NOT IN (:...myGrpsIds)', { myGrpsIds });
@@ -310,20 +308,20 @@ export class GroupService {
 
     const [ items, total ] = await applyPaging(query, page, limit);
     const grpIds = getIdsFromItems(items, "grp_id");
-    const results = await query.select([
-                                 'g.grp_id          AS grp_id'
-                               , 'g.grp_name        AS grp_name' 
-                               , 'g.grp_decs        AS grp_decs' 
-                               , 'g.grp_owner       AS grp_owner'
-                               , 'max(c.cat_name)   AS cat_name'
-                               , 'max(u2.user_name) AS owner'
-                               , 'count(u1.user_id) AS mem_cnt'
-                               ])
-                               .andWhere('g.grp_id IN (:...grpIds)', { grpIds })
-                               .orderBy('count(u1.user_id)', 'DESC')
-                               .getRawMany();
+    const result = await query.select([
+                                'g.grp_id          AS grp_id'
+                              , 'g.grp_name        AS grp_name' 
+                              , 'g.grp_decs        AS grp_decs' 
+                              , 'max(c.cat_id)     AS cat_id'
+                              , 'max(c.cat_name)   AS cat_name'
+                              , 'max(u2.user_name) AS owner'
+                              , 'count(u1.user_id) AS mem_cnt'
+                              ])
+                              .andWhere('g.grp_id IN (:...grpIds)', { grpIds })
+                              .orderBy('count(u1.user_id)', 'DESC')
+                              .getRawMany();
 
-    return { results, total };
+    return { result, total };
   }
 
   async updateImage(todo_id: number, user_id: number, file: Express.Multer.File): Promise<any>{

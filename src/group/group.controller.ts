@@ -19,7 +19,7 @@ export class GroupController {
   @Get('/')
   getGroupAll(
     @PagingOptions() pagingOptions: { page: number; limit: number }
-  ): Promise<{results: Group[], total: number}>{
+  ): Promise<{result: Group[], total: number}>{
     return this.groupService.getGroupAll(pagingOptions);
   }
 
@@ -43,7 +43,7 @@ export class GroupController {
   getAllMyGroups(
       @Param('user_id') user_id: number
     , @PagingOptions() pagingOptions: { page: number; limit: number }
-  ): Promise<Promise<{results: Group[], total: number}>>{
+  ): Promise<Promise<{result: Group[], total: number}>>{
     return this.groupService.getAllMyGroups(user_id, pagingOptions);
   }
 
@@ -81,7 +81,7 @@ export class GroupController {
     @Param('category') cat_id: number,
     @Param('keyword') keyword: string,
     @PagingOptions() pagingOptions: { page: number; limit: number }
-  ): Promise<{ results: Group[], total: number}>{
+  ): Promise<{ result: Group[], total: number}>{
     return this.groupService.getGroupsBySearching(user_id, cat_id, keyword, pagingOptions);
   }
   
