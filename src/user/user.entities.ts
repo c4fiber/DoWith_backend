@@ -29,7 +29,13 @@ export class User {
   user_hp: number;
 
   @Column({ default: 0 })
-  user_cash: number
+  user_cash: number;
+
+  @Column({ default: 0 })
+  login_cnt: number;
+
+  @Column({ default: 0 })
+  login_seq: number;
 
   // @OneToOne(() => Room)
   // @JoinColumn()

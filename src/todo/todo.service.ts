@@ -28,35 +28,63 @@ export class TodoService {
   }
 
   async createTodayTodo(user_id: number){
+    /**
+     * 1. 마지막 로그인 일자 갱신
+     * 2. 연속 로그인 갱신
+     * 3. 누적 로그인 갱신
+     * 4. Routine에서 만들어지는 To-Do 생성
+     */
     const queryRunner = this.dataSource.createQueryRunner();
-
+    // 마지막 로그인 유저 정보
     const user = await queryRunner.manager.createQueryBuilder()
                                           .from('user', 'u')
                                           .where('u.user_id = :user_id', { user_id })
                                           .andWhere(`to_char(u.last_login, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`)
                                           .getRawOne();
+    // 1. 마지막 로그인 일자 갱신 쿼리 (실행 x)
+    const newLastLogin = queryRunner.manager.createQueryBuilder()
+                                            .update('user')
+                                            .set({ last_login: ()=> 'now()' })
+                                            .where('user_id = :user_id', { user_id });
     // 이미 todo 생성했을 경우
     if(user){
+      // 1. 오늘 로그인 날짜로 최신화
+      await newLastLogin.execute();
       throw this.doWithExceptions.AlreadyMadeTodos;
     }
 
     try{
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      // 오늘 로그인 날짜로 최신화
+
+      // 3. 연속 로그인 증가
       const result = await queryRunner.manager.createQueryBuilder()
-                                              .update('User')
-                                              .set({last_login: ()=> 'now()' })
-                                              .where('user_id = :user_id', { user_id })
-                                              .execute();
-      // 여기 밑 부터는 todo 생성기
+                               .update('user')
+                               .set({ login_cnt: () => '"login_cnt" + 1' })
+                               .where({ user_id })
+                               .execute();
+      if(result.affected === 0){
+        throw this.doWithExceptions.UserNotFound;  
+      }
+      // 3. 누적 로그인 증가
+      const test = await queryRunner.manager.createQueryBuilder()
+                               .update('user')
+                               .set({ login_seq: () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
+                                                             THEN "login_seq" + 1 
+                                                             ELSE 1
+                                                         END` })
+                               .where({ user_id })
+                               .execute();
+      // 1. 오늘 로그인 날짜로 최신화
+      await newLastLogin.execute();
+      // 4. todo 생성기 - 유저가 가입한 그룹 리스트
       const subQuery = await queryRunner.manager.createQueryBuilder()
                                                 .select(['g.grp_id AS grp_id'])
                                                 .from('group', 'g')
                                                 .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                                 .where('ug.user_id = :user_id', { user_id })
                                                 .getQuery();
-
+      // 4. todo 생성기 - 가입한 그룹에서 오늘 요일에 해당하는 루틴 리스트
       const todos =  await queryRunner.manager.createQueryBuilder()
                                               .select([
                                                 `${user_id}  AS user_id`
@@ -75,6 +103,7 @@ export class TodoService {
                                               .getRawMany();
 
       for(const todo of todos){
+        // 4. todo 생성기 - 루틴 리스트를 To-Do로 삽입
         const res = await queryRunner.manager.createQueryBuilder()
                                              .insert()
                                              .into('todo')
