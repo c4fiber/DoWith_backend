@@ -196,11 +196,11 @@ export class GroupService {
       const routs = await this.groupRepository.createQueryBuilder('g')
                                               .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
                                               .select([
-                                                  'r.rout_name AS todo_name'
-                                                , 'r.rout_desc AS todo_desc'
-                                                , 'g.cat_id    AS todo_label'
-                                                , 'r.rout_srt  AS todo_start'
-                                                , 'r.rout_end  AS todo_end'
+                                                'r.rout_name AS todo_name'
+                                              , 'r.rout_desc AS todo_desc'
+                                              , 'g.cat_id    AS todo_label'
+                                              , 'r.rout_srt  AS todo_start'
+                                              , 'r.rout_end  AS todo_end'
                                               ])
                                               .where({ grp_id })
                                               .getRawMany();
