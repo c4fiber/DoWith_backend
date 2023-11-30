@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Room } from './entities/room.entity';
 import { DataSource } from 'typeorm';
 import { ItemInventory } from 'src/item-inventory/entities/item-inventory.entity';
 import { isIn } from 'class-validator';
+import { DoWithException } from 'src/do-with-exception/do-with-exception';
 
 @Injectable()
 export class RoomService {
@@ -17,13 +22,13 @@ export class RoomService {
   ) {}
 
   async isInInventory(user_id: number, item_id: number): Promise<boolean> {
-    return (
-      null !== (await this.itemInventoryRepo.findOneBy({ user_id, item_id }))
-    );
+    const result = await this.itemInventoryRepo.findOneBy({ user_id, item_id });
+    return result !== null;
   }
 
   async isInMyRoom(user_id: number, item_id: number): Promise<boolean> {
-    return null !== (await this.findOne(user_id, item_id));
+    const result1 = await this.roomRepo.findOneBy({ user_id, item_id });
+    return  result1 !== null;
   }
 
   async isValid(user_id: number, item_id: number): Promise<boolean> {
@@ -33,21 +38,15 @@ export class RoomService {
     );
   }
 
-  async findOne(user_id, item_id): Promise<any> {
-    const result = await this.roomRepo.findOneBy({ user_id, item_id });
-
-    return { result };
-  }
-
   // for controller
   async create(user_id: number, item_id: number): Promise<any> {
-    if (!this.isValid(user_id, item_id)) {
-      throw new Error('Already exist');
+    if (!(await this.isValid(user_id, item_id))) {
+      throw new ConflictException();
     }
 
     // TODO 펫이 여러마리 들어가면 안된다.
 
-    return { result: this.roomRepo.save({ user_id, item_id }) };
+    return { result: await this.roomRepo.save({ user_id, item_id }) };
   }
 
   async findAll(user_id: number) {
