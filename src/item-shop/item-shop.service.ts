@@ -53,9 +53,10 @@ export class ItemShopService {
     for(const type of types){
       const type_id = type.type_id;
       const type_name = type.type_name;
+      const temp = query.clone();
 
-      result[`${type_name}`] = await query.andWhere('it.type_id = :type_id', { type_id })
-                                          .getRawMany();
+      result[`${type_name}`] = await temp.andWhere('it.type_id = :type_id', { type_id })
+                                         .getRawMany();
     }
 
     return { result, path: process.env.PUBLIC_IMAGE_PATH };
