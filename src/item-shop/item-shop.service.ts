@@ -55,7 +55,7 @@ export class ItemShopService {
       const type_name = type.type_name;
 
       result[`${type_name}`] = await query.andWhere('it.type_id = :type_id', { type_id })
-                                           .getRawMany();
+                                          .getRawMany();
     }
 
     return { result, path: process.env.PUBLIC_IMAGE_PATH };
