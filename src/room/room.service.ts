@@ -56,7 +56,7 @@ export class RoomService {
       .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
       .select([
         'ish.item_id as item_id',
-        'ish.item_type as item_type',
+        'ish.type_id as item_type',
         'ish.item_name as item_name',
         'ish.item_path as item_path',
         'iv.pet_name as pet_name',
