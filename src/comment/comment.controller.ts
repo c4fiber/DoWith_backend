@@ -14,7 +14,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update_comment.dto';
 import { Comment } from './comment.entity';
 
-@Controller('comment')
+@Controller('user')
 export class CommentController {
     constructor(private commentService: CommentService) {}
     @Get(':owner_id/guestbook/comments')
