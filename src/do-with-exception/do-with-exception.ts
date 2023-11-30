@@ -34,6 +34,11 @@ enum DoWithErrorCode {
   FailedToDeletedOriginal = '1002',  // 이미지 압축 후 원본 파일 삭제 실패시
   FailedToResizeImage     = '1003',  // 업로드한 이미지 압축에 실패시
   NoData                  = '1004',  // 요청한 데이터가 없는 경우
+
+  // Room
+  ItemAlreadyInRoom = '409',  // 이미 펫이 존재하는 경우
+  ItemNotInInventory      = '404',  // 펫이 존재하지 않는 경우
+  PetMustBeOne      = '410',  // 펫은 하나만 존재해야 한다.
 }
 
 enum DoWithErrorMsg {
@@ -57,6 +62,11 @@ enum DoWithErrorMsg {
   FailedToDeletedOriginal = '원본 파일을 삭제하는데 실패 했습니다.',
   FailedToResizeImage     = '이미지 압축에 실패 했습니다.',
   NoData                  = '요청하신 데이터가 없습니다.',
+
+  // Room
+  ItemAlreadyInRoom = '아이템이 이미 방에 존재합니다.',
+  ItemNotInInventory      = '보유하지 않은 아이템 입니다.',
+  PetMustBeOne = '펫은 방에 한마리만 둘 수 있습니다.'
 }
 
 @Injectable()
@@ -128,5 +138,22 @@ export class DoWithExceptions {
     DoWithErrorMsg.NoData,
     DoWithErrorCode.NoData,
     HttpStatus.BAD_REQUEST,
+  );
+
+  // =============== [ Room ] ===============
+  ItemAlreadyInRoom = new DoWithException(
+    DoWithErrorMsg.ItemAlreadyInRoom,
+    DoWithErrorCode.ItemAlreadyInRoom,
+    HttpStatus.CONFLICT,
+  );
+  ItemNotInInventory = new DoWithException(
+    DoWithErrorMsg.ItemNotInInventory,
+    DoWithErrorCode.ItemNotInInventory,
+    HttpStatus.NOT_FOUND,
+  );
+  PetMustBeOne = new DoWithException(
+    DoWithErrorMsg.PetMustBeOne,
+    DoWithErrorCode.PetMustBeOne,
+    HttpStatus.CONFLICT,
   );
 }
