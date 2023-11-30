@@ -30,7 +30,7 @@ import { UserAchiModule } from './user_achi/user_achi.module';
 import { ItemInventoryModule } from './item-inventory/item-inventory.module';
 import { ItemShopModule } from './item-shop/item-shop.module';
 import { ItemTypeModule } from './item-type/item-type.module';
-import { InventoryRoomModule } from './inventory-room/inventory-room.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -78,7 +78,7 @@ import { InventoryRoomModule } from './inventory-room/inventory-room.module';
     ItemShopModule,
     ItemInventoryModule,
     ItemTypeModule,
-    InventoryRoomModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [

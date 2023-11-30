@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { InventoryRoom } from './entities/inventory-room.entity';
+import { Room } from './entities/room.entity';
 import { DataSource } from 'typeorm';
 import { ItemInventory } from 'src/item-inventory/entities/item-inventory.entity';
 import { isIn } from 'class-validator';
 
 @Injectable()
-export class InventoryRoomService {
+export class RoomService {
   constructor(
     @InjectRepository(ItemInventory)
     private readonly itemInventoryRepo: Repository<ItemInventory>,
-    @InjectRepository(InventoryRoom)
-    private readonly inventoryRoomRepo: Repository<InventoryRoom>,
+    @InjectRepository(Room)
+    private readonly roomRepo: Repository<Room>,
     private dataSource: DataSource,
   ) {}
 
@@ -34,7 +34,7 @@ export class InventoryRoomService {
   }
 
   async findOne(user_id, item_id): Promise<any> {
-    const result = await this.inventoryRoomRepo.findOneBy({ user_id, item_id });
+    const result = await this.roomRepo.findOneBy({ user_id, item_id });
 
     return { result };
   }
@@ -45,22 +45,24 @@ export class InventoryRoomService {
       throw new Error('Already exist');
     }
 
-    return { result: this.inventoryRoomRepo.save({ user_id, item_id }) };
+    return { result: this.roomRepo.save({ user_id, item_id }) };
   }
 
   async findAll(user_id: number) {
-    const results = await this.inventoryRoomRepo
+    const result = await this.roomRepo
       .createQueryBuilder('r')
-      .innerJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
+      .where('r.user_id = :user_id', { user_id })
+      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
+      .leftJoin('item_shop', 'is', 'r.item_id = is.item_id')
       .select([
-        'r.item_id    AS item_id',
-        'iv.pet_name AS pet_name',
-        'iv.pet_exp AS pet_exp'
+        'iv.pet_name as pet_name',
+        'iv.pet_exp as pet_exp',
+        'is.item_name as item_name',
+        'is.item_path as item_path',
+        'is.item_type as item_type',
       ])
-      // .where('r.user_id = :user_id', { user_id })
-      // .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
       .getMany();
-    return { results };
+    return { result };
   }
 
   async remove(user_id: number, item_id: number) {
@@ -68,7 +70,7 @@ export class InventoryRoomService {
       throw new Error('Not exist');
     }
 
-    const result = await this.inventoryRoomRepo.delete({ user_id, item_id });
+    const result = await this.roomRepo.delete({ user_id, item_id });
     return { result };
   }
 }
