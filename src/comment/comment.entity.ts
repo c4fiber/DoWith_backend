@@ -23,4 +23,8 @@ export class Comment {
 
 	@Column({ default: false })
 	is_del: boolean;
+
+	@ManyToOne(() => User, user => user.user_id)
+    @JoinColumn({ name: 'author_id' })
+    author: User;
 }

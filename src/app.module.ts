@@ -31,6 +31,7 @@ import { ItemInventoryModule } from './item-inventory/item-inventory.module';
 import { ItemShopModule } from './item-shop/item-shop.module';
 import { ItemTypeModule } from './item-type/item-type.module';
 import { RoomModule } from './room/room.module';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { RoomModule } from './room/room.module';
     //   provide: APP_INTERCEPTOR,
     //   useClass: DoWithInterceptor,
     // },
+    AppGateway,
   ],
 })
 export class AppModule implements NestModule {
