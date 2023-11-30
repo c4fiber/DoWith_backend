@@ -45,6 +45,8 @@ export class RoomService {
       throw new Error('Already exist');
     }
 
+    // TODO 펫이 여러마리 들어가면 안된다.
+
     return { result: this.roomRepo.save({ user_id, item_id }) };
   }
 
@@ -53,15 +55,15 @@ export class RoomService {
       .createQueryBuilder('r')
       .where('r.user_id = :user_id', { user_id })
       .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
-      .leftJoin('item_shop', 'is', 'r.item_id = is.item_id')
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
       .select([
         'iv.pet_name as pet_name',
         'iv.pet_exp as pet_exp',
-        'is.item_name as item_name',
-        'is.item_path as item_path',
-        'is.item_type as item_type',
+        'ish.item_name as item_name',
+        'ish.item_path as item_path',
+        'ish.item_id as item_id',
       ])
-      .getMany();
+      .getRawMany();
     return { result };
   }
 
