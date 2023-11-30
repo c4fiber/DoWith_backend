@@ -84,16 +84,18 @@ export class ItemShopService {
         throw this.doWithExceptions.NotEnoughCash;
       }
 
-      this.itemInventoryRepository.createQueryBuilder('iv')
-                                  .insert()
-                                  .values({
-                                    user_id: user_id,
-                                    item_id: item_id
-                                  })
-                                  .execute();
-
+      await this.itemInventoryRepository.createQueryBuilder('iv')
+                                        .insert()
+                                        .values({
+                                          user_id: user_id
+                                        , item_id: item_id
+                                        })
+                                        .execute();
+                                      
+      await queryRunner.commitTransaction();
       return { result };
     } catch(err) {
+      await queryRunner.rollbackTransaction();
       throw new Error(err);
     } finally {
       await queryRunner.release();
