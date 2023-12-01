@@ -24,12 +24,13 @@ enum DoWithErrorCode {
 
   // Routine
   ExceedMaxRoutines = '0200',   // 그룹당 최대 3개의 루틴이 등록 가능하다
+  AtLeastOneRoutine = '0201',
 
   // Shop
-  NotEnoughCash     = '300',    // 물건 구입 시 보유한 금액이 충분하지 않은 경우
+  NotEnoughCash     = '0300',    // 물건 구입 시 보유한 금액이 충분하지 않은 경우
 
   // Todo
-  AlreadyMadeTodos  = '400',
+  AlreadyMadeTodos  = '0400',
 
   // Utils
   NotAllowedExtension     = '1000',  // 지원하지 않는 확장자의 파일이 넘어왔을 때
@@ -54,7 +55,8 @@ enum DoWithErrorMsg {
   // Group
 
   // Routine
-  ExceedMaxRoutines = '등록할 수 있는 최대 루틴을 초과하셨습니다.',
+  ExceedMaxRoutines = '등록할 수 있는 최대 루틴을 초과 하셨습니다.',
+  AtLeastOneRoutine = '최소 한 개의 루틴을 등록하셔야 합니다.',
 
   // Shop
   NotEnoughCash     = '보유한 캐시가 부족합니다.',
@@ -105,6 +107,12 @@ export class DoWithExceptions {
   ExceedMaxRoutines = new DoWithException(
     DoWithErrorMsg.ExceedMaxRoutines,
     DoWithErrorCode.ExceedMaxRoutines,
+    HttpStatus.BAD_REQUEST,
+  );
+  
+  AtLeastOneRoutine = new DoWithException(
+    DoWithErrorMsg.AtLeastOneRoutine,
+    DoWithErrorCode.AtLeastOneRoutine,
     HttpStatus.BAD_REQUEST,
   );
 
