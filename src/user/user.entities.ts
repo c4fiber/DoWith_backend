@@ -43,6 +43,7 @@ export class User {
 
   @ManyToMany(() => User)
   @JoinTable()
+  // TODO: @JoinColumn({ name: '', referencedColumnName: '' })
   friends: User[];
 
   @OneToMany(() => Todo, (todo) => todo.user)
