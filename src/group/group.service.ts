@@ -69,7 +69,7 @@ export class GroupService {
 
       // Routine Insert
       for(const data of routs) {
-        const rout = new Routine();
+        //const rout = new Routine();
 
         // rout.grp_id = ug.grp_id;
         // rout.rout_name = data.rout_name;
@@ -79,7 +79,7 @@ export class GroupService {
         // rout.rout_end = data.rout_end;
 
         // await queryRunner.manager.save(Routine, rout);
-
+        Logger.debug(data);
         await queryRunner.manager.createQueryBuilder()
                                  .insert()
                                  .into('routine')
