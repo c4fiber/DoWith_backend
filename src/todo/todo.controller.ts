@@ -17,6 +17,7 @@ import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './todo.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/user/user.entities';
 
 @Controller('todo')
 export class TodoController {
@@ -64,9 +65,9 @@ export class TodoController {
     @Param('todo_id', ParseIntPipe) todo_id: number,
     @Body() updateTodoDto: UpdateTodoDto,
     @Request() req,
-  ): Promise<Todo> {
+  ): Promise<{ updated_todo: Todo; updated_user: User }> {
     const user = req.user;
     Logger.log(user);
-    return this.todoService.editDone(todo_id, updateTodoDto);
+    return this.todoService.editDone(todo_id, updateTodoDto, user);
   }
 }

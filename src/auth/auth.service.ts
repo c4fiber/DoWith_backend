@@ -39,7 +39,7 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  private kakaoUrl = 'https://kauth.kakao.com/oauth/token';
+  private kakaoUrl = process.env.KAKAO_URL;
 
   // 유저 아이디로 DB를 검색하여
   // lastLogin 필드를 업데이트
@@ -83,6 +83,7 @@ export class AuthService {
     const userId = user.user_id;
     const payload = { userId };
     const token = this.jwtService.sign(payload);
+    Logger.log(`💜 JWT_TOKEN: ${token}`);
     return {
       token: token,
       kakao_id: user.user_kakao_id,
