@@ -5,6 +5,7 @@ import {
   FileTypeValidator,
   FileValidator,
   Get,
+  Logger,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -39,9 +40,12 @@ export class UserController {
   }
 
   @Get('/')
-  @UseGuards(AuthGuard())
-  async getUser(@Request() req): Promise<User> {
-    return req.user;
+  @UseGuards(AuthGuard('jwt'))
+  async getUser(@Request() req): Promise<{ result }> {
+    const user: User = req.user;
+    Logger.log(`User info from jwt: ${user}`);
+    const result = user;
+    return { result };
   }
 
   @Get('/:user_id')
@@ -64,12 +68,6 @@ export class UserController {
   ): Promise<UserResponseDto> {
     return await this.usersService.getUserByName(name);
   }
-
-  //   @Post('/')
-  //   @UsePipes(ValidationPipe)
-  //   async createUser(@Body() body: UserRequestDto): Promise<UserResponseDto> {
-  //     return await this.usersService.createUser(body);
-  //   }
 
   @UseInterceptors(FileInterceptor('profile'))
   @Post('/:user_id/profile')
