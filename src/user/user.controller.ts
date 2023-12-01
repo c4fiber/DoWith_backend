@@ -13,7 +13,9 @@ import {
   Post,
   Put,
   Query,
+  Request,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -24,6 +26,8 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from './user.entities';
 
 @Controller('user')
 export class UserController {
@@ -34,8 +38,14 @@ export class UserController {
     this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
   }
 
+  @Get('/')
+  @UseGuards(AuthGuard())
+  async getUser(@Request() req): Promise<User> {
+    return req.user;
+  }
+
   @Get('/:user_id')
-  async getUser(
+  async getUserById(
     @Param('user_id', ParseIntPipe) id: number,
   ): Promise<UserResponseDto> {
     return await this.usersService.getUser(id);
