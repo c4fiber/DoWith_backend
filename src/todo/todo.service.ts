@@ -214,7 +214,7 @@ export class TodoService {
 
     const query = this.todoRepository
       .createQueryBuilder('todo')
-      .where('user_id = :id', { user_id })
+      .where('user_id = :user_id', { user_id })
       .andWhere('DATE(todo.todo_date) = DATE(:today)', { today });
 
     const [todayCnt, todayDoneCnt] = await Promise.all([

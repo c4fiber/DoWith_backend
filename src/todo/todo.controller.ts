@@ -67,7 +67,6 @@ export class TodoController {
     @Request() req,
   ): Promise<{ updated_todo: Todo; updated_user: User }> {
     const user = req.user;
-    Logger.log(user);
     return this.todoService.editDone(todo_id, updateTodoDto, user);
   }
 }
