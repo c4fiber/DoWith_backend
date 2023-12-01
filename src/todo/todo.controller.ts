@@ -9,11 +9,14 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './todo.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('todo')
 export class TodoController {
@@ -28,9 +31,7 @@ export class TodoController {
   }
 
   @Post('/user/:user_id')
-  createTodayTodo(
-    @Param('user_id') user_id: number
-  ){
+  createTodayTodo(@Param('user_id') user_id: number) {
     return this.todoService.createTodayTodo(user_id);
   }
 
@@ -58,10 +59,14 @@ export class TodoController {
   }
 
   @Patch('/:todo_id')
+  @UseGuards(AuthGuard('jwt'))
   editDone(
     @Param('todo_id', ParseIntPipe) todo_id: number,
     @Body() updateTodoDto: UpdateTodoDto,
+    @Request() req,
   ): Promise<Todo> {
+    const user = req.user;
+    Logger.log(user);
     return this.todoService.editDone(todo_id, updateTodoDto);
   }
 }
