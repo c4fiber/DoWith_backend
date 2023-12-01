@@ -251,7 +251,11 @@ export class GroupService {
       const result = await queryRunner.manager.delete(UserGroup, { user_id, grp_id });
       await queryRunner.manager.update(
           Todo
-        , { user_id, grp_id, todo_date: Raw(todo_date => `to_char(${todo_date}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`),}
+        , { 
+            user_id
+          , grp_id
+          , todo_date: Raw(todo_date => `to_char(${todo_date}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`)
+        }
         , { todo_deleted: true }
       )
 
