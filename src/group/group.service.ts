@@ -69,30 +69,16 @@ export class GroupService {
 
       // Routine Insert
       for(const data of routs) {
-        //const rout = new Routine();
+        const rout = new Routine();
 
-        // rout.grp_id = ug.grp_id;
-        // rout.rout_name = data.rout_name;
-        // rout.rout_desc = data.rout_desc;
-        // rout.rout_repeat = data.rout_repeat;
-        // rout.rout_srt = data.rout_srt;
-        // rout.rout_end = data.rout_end;
+        rout.grp_id = ug.grp_id;
+        rout.rout_name = data.rout_name;
+        rout.rout_desc = data.rout_desc;
+        rout.rout_repeat = data.rout_repeat;
+        rout.rout_srt = data.rout_srt;
+        rout.rout_end = data.rout_end;
 
-        // await queryRunner.manager.save(Routine, rout);
-        Logger.debug(data);
-        await queryRunner.manager.createQueryBuilder()
-                                 .insert()
-                                 .into('routine')
-                                 .values({
-                                    grp_id     : ug.grp_id
-                                  , rout_name  : data.rout_name
-                                  , rout_desc  : data.rout_desc
-                                  , rout_repeat: data.rout_repeat
-                                  , rout_srt   : data.rout_srt
-                                  , rout_end   : data.rout_end
-                                  
-                                 })
-                                 .execute();
+        await queryRunner.manager.save(Routine, rout);
 
         const todo = new Todo();
 
@@ -248,7 +234,9 @@ export class GroupService {
     await queryRunner.startTransaction();
 
     try{
+      // 유저 그룹에서 탈퇴
       const result = await queryRunner.manager.delete(UserGroup, { user_id, grp_id });
+      // 유저의 To-Do에서 그룹 루틴 삭제
       await queryRunner.manager.update(
           Todo
         , { 
@@ -257,8 +245,46 @@ export class GroupService {
           , todo_date: Raw(todo_date => `to_char(${todo_date}, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`)
         }
         , { todo_deleted: true }
-      )
+      );
+      
+      // 그룹에 남은 인원
+      const leftCnt = await queryRunner.manager.createQueryBuilder()
+                                               .from('group', 'g')
+                                               .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                               .where('ug.grp_id = :grp_id', { grp_id })
+                                               .getCount();
+      // 그룹 루틴 삭제
+      await queryRunner.manager.createQueryBuilder()
+                               .delete()
+                               .from('routine')
+                               .where('grp_id = :grp_id', { grp_id })
+                               .execute();
 
+      // 그룹 인원이 0명이면 그룹 삭제
+      const grpDel = await this.groupRepository.createQueryBuilder('g')
+                                               .softDelete()
+                                               .where('grp_id = :grp_id', { grp_id })
+                                               .andWhere(`0 = :leftCnt`, { leftCnt })
+                                               .setParameter('grp_id', grp_id)
+                                               .execute();
+      Logger.debug(grpDel);
+      // 그룹장 탈퇴시 다른 그룹원이 그룹장이 되도록 설정
+      if(grpDel.affected === 0){
+        // 가입 시기가 가장 오래된 1사람
+        const newOwner = await queryRunner.manager.createQueryBuilder()
+                                                  .from('user_group', 'ug')
+                                                  .where('ug.grp_id = :grp_id', { grp_id })
+                                                  .orderBy('ug.reg_at')
+                                                  .limit(1)
+                                                  .getRawOne();
+
+        // 새로운 그룹장 등록
+        await this.groupRepository.createQueryBuilder('g')
+                                  .update()
+                                  .set({ grp_owner: newOwner.user_id })
+                                  .where({ grp_id })
+                                  .execute();
+      }
       await queryRunner.commitTransaction();
 
       return { result };
