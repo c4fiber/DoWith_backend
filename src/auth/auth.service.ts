@@ -17,6 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/user.entities';
 import { Repository } from 'typeorm';
+import { SignUpDto } from './dto/singup.dto';
 
 export class KakaoTokenResponse {
   token_type: string;
@@ -32,7 +33,6 @@ export class KakaoTokenResponse {
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UserService,
     private readonly httpService: HttpService,
     private readonly doWithExceptions: DoWithExceptions,
     @InjectRepository(User)
@@ -48,6 +48,48 @@ export class AuthService {
     const result: User = await this.userRepository.findOneBy({
       user_id: userId,
     });
+
+    return { result };
+  }
+
+  // 새로운 유저 생성
+  async signup(
+    request: SignUpDto,
+  ): Promise<{ result: { user: User; token: string } }> {
+    const { user_name, user_tel, user_kakao_id } = request;
+
+    // 만약 이미 가입된 유저인 경우 예외처리
+    const found = await this.userRepository
+      .createQueryBuilder('user')
+      .select()
+      .where('user_kakao_id = :user_kakao_id', { user_kakao_id })
+      .orWhere('user_name = :user_name', { user_name })
+      .getExists();
+
+    if (found == true) {
+      throw this.doWithExceptions.UserAlreadyExists;
+    }
+
+    // 유저 엔티티 생성
+    const now = new Date();
+    const user = new User();
+
+    user.user_name = user_name;
+    user.user_tel = user_tel;
+    user.user_kakao_id = user_kakao_id;
+    user.last_login = now;
+    user.user_hp = 0;
+
+    // 토큰 발행
+    const userId = user.user_id;
+    const payload = { userId };
+    const token = this.jwtService.sign(payload);
+
+    const saveduser: User = await this.userRepository.save(user);
+    const result = {
+      user: saveduser,
+      token: token,
+    };
 
     return { result };
   }

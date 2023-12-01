@@ -22,7 +22,7 @@ export class User {
   @Column()
   user_tel: string;
 
-  @Column()
+  @Column({ unique: true })
   user_kakao_id: string;
 
   @Column({ default: 100 })

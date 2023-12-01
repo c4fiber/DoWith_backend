@@ -28,8 +28,8 @@ import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
 @Controller('user')
 export class UserController {
   constructor(
-      private readonly usersService: UserService
-    , private readonly multerConifg: MulterConfig
+    private readonly usersService: UserService,
+    private readonly multerConifg: MulterConfig,
   ) {
     this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
   }
@@ -55,11 +55,11 @@ export class UserController {
     return await this.usersService.getUserByName(name);
   }
 
-  @Post('/')
-  @UsePipes(ValidationPipe)
-  async createUser(@Body() body: UserRequestDto): Promise<UserResponseDto> {
-    return await this.usersService.createUser(body);
-  }
+  //   @Post('/')
+  //   @UsePipes(ValidationPipe)
+  //   async createUser(@Body() body: UserRequestDto): Promise<UserResponseDto> {
+  //     return await this.usersService.createUser(body);
+  //   }
 
   @UseInterceptors(FileInterceptor('profile'))
   @Post('/:user_id/profile')
