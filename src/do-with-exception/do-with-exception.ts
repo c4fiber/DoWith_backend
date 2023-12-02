@@ -27,6 +27,7 @@ enum DoWithErrorCode {
 
   // Shop
   NotEnoughCash = '300', // 물건 구입 시 보유한 금액이 충분하지 않은 경우
+  PetEvolFinished = '301', // 이미 진화가 완료된 경우
 
   // Todo
   AlreadyMadeTodos = '400',
@@ -58,6 +59,7 @@ enum DoWithErrorMsg {
 
   // Shop
   NotEnoughCash = '보유한 캐시가 부족합니다.',
+  PetEvolFinished = '이미 최종 진화가 완료되었습니다.',
 
   // Todo
   AlreadyMadeTodos = '이미 할 일이 생성되었습니다.',
@@ -112,6 +114,12 @@ export class DoWithExceptions {
   AlreadyMadeTodos = new DoWithException(
     DoWithErrorMsg.AlreadyMadeTodos,
     DoWithErrorCode.AlreadyMadeTodos,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  PetEvolFinished = new DoWithException(
+    DoWithErrorMsg.PetEvolFinished,
+    DoWithErrorCode.PetEvolFinished,
     HttpStatus.BAD_REQUEST,
   );
 

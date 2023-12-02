@@ -152,7 +152,7 @@ export class TodoService {
     });
   }
 
-  async getTodoCount(user_id: number) {
+  async getTodayCount(user_id: number) {
     const now = new Date();
     const query = this.todoRepository
       .createQueryBuilder('todo')
