@@ -14,17 +14,17 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update_comment.dto';
 import { Comment } from './comment.entity';
 
-@Controller('comment')
+@Controller('guestbook')
 export class CommentController {
     constructor(private commentService: CommentService) {}
-    @Get(':owner_id/guestbook/comments')
+    @Get(':owner_id/comment')
     findAllByOwner(
         @Param('owner_id', ParseIntPipe) owner_id: number,
     ): Promise<Comment[]> {
         return this.commentService.findAllByOwner(owner_id);
     }
 
-    @Post(':owner_id/guestbook/comments')
+    @Post(':owner_id/comment')
     create(
         @Param('owner_id', ParseIntPipe) owner_id: number,
         @Body() createCommentDto: CreateCommentDto
@@ -32,7 +32,7 @@ export class CommentController {
         return this.commentService.createComment(createCommentDto);
     }
 
-    @Put(':owner_id/guestbook/comments/:com_id')
+    @Put(':owner_id/comment/:com_id')
     update(
         @Param('com_id', ParseIntPipe) com_id: number,
         @Body() updateCommentDto: UpdateCommentDto,
@@ -40,7 +40,7 @@ export class CommentController {
         return this.commentService.updateComment(com_id, updateCommentDto);
     }
 
-    @Patch(':owner_id/guestbook/comments/:com_id')
+    @Patch(':owner_id/comment/:com_id')
     delete(
         @Param('owner_id', ParseIntPipe) owner_id: number,
         @Param('com_id', ParseIntPipe) com_id: number

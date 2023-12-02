@@ -17,33 +17,32 @@ export class RoutineService {
   ) {}
 
   async getAllRoutines(grp_id: number): Promise<any> {
-    const results = await this.routineRepository.createQueryBuilder('r')
+    const result = await this.routineRepository.createQueryBuilder('r')
                                                .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
                                                .leftJoin('days' , 'd', 'r.rout_repeat = d.rout_repeat')
                                                .where('g.grp_id = :grp_id', { grp_id })
                                                .select([
-                                                 'r.grp_id      AS grp_id',
-                                                 'r.rout_name   AS rout_name',
-                                                 'r.rout_desc   AS rout_desc',
-                                                 'r.rout_repeat AS rout_repeat',
-                                                 'r.rout_srt    AS rout_srt',
-                                                 'r.rout_end    AS rout_end',
-                                                 'd.days        AS days'
+                                                 'r.grp_id      AS grp_id'
+                                               , 'r.rout_name   AS rout_name'
+                                               , 'r.rout_desc   AS rout_desc'
+                                               , 'r.rout_repeat AS rout_repeat'
+                                               , 'r.rout_srt    AS rout_srt'
+                                               , 'r.rout_end    AS rout_end'
+                                               , 'd.days        AS days'
                                                ])
                                                .getRawMany();
 
-    return { results };
+    return { result };
   }
 
   async createRoutine(
     grp_id: number,
     createRoutineDto: CreateRoutineDto,
   ): Promise<any> {
-    const routCnt = await this.routineRepository
-      .createQueryBuilder('r')
-      .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
-      .where('g.grp_id = :grp_id', { grp_id })
-      .getCount();
+    const routCnt = await this.routineRepository.createQueryBuilder('r')
+                                                .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
+                                                .where('g.grp_id = :grp_id', { grp_id })
+                                                .getCount();
 
     // 그룹 최대 등록 개수 3개: 후에 그룹 생성시에만 루틴 만들 수 있어서 필요 없어질 예정
     if (routCnt >= 3) {
@@ -84,6 +83,8 @@ export class RoutineService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw new Error(err);
+    } finally {
+      await queryRunner.release();
     }
   }
 

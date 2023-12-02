@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from '../user/user.entities';
 import { Routine } from 'src/routine/entities/routine.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 @Entity()
 export class Todo {
@@ -17,7 +18,7 @@ export class Todo {
   @Column()
   user_id: number; // foreign key
 
-  @ManyToOne(() => Routine, { nullable: true })
+  @ManyToOne(() => Routine)
   @JoinColumn({ name: 'rout_id', referencedColumnName: 'rout_id' })
   rout_id: number; // foreign key referenced on Routine
 
@@ -27,7 +28,8 @@ export class Todo {
   @Column({ nullable: true })
   todo_desc: string;
 
-  @Column({ nullable: true, default: 0 })
+  @ManyToOne(() => Category)
+  @JoinColumn({ name: 'cat_id', referencedColumnName: 'cat_id' })
   todo_label: number;
 
   @CreateDateColumn({ type: 'date' }) // default: now()

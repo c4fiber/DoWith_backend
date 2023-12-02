@@ -27,6 +27,11 @@ import { HttpModule } from '@nestjs/axios';
 import { DaysModule } from './days/days.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { UserAchiModule } from './user_achi/user_achi.module';
+import { ItemInventoryModule } from './item-inventory/item-inventory.module';
+import { ItemShopModule } from './item-shop/item-shop.module';
+import { ItemTypeModule } from './item-type/item-type.module';
+import { RoomModule } from './room/room.module';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: [
@@ -71,6 +76,10 @@ import { UserAchiModule } from './user_achi/user_achi.module';
     DaysModule,
     AchievementsModule,
     UserAchiModule,
+    ItemShopModule,
+    ItemInventoryModule,
+    ItemTypeModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [
@@ -80,10 +89,11 @@ import { UserAchiModule } from './user_achi/user_achi.module';
       provide: APP_FILTER,
       useClass: DoWithExceptionFilter,
     },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: DoWithInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: DoWithInterceptor,
+    // },
+    AppGateway,
   ],
 })
 export class AppModule implements NestModule {

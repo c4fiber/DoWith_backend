@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Headers,
@@ -8,10 +9,14 @@ import {
   Req,
   Res,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import { SignUpDto } from './dto/singup.dto';
+import { User } from 'src/user/user.entities';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +26,14 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async login(@Headers('Authorization') token: string) {
     return await this.authService.login(token);
+  }
+
+  @Post('/singup')
+  @UsePipes(ValidationPipe)
+  async singup(
+    @Body() body: SignUpDto,
+  ): Promise<{ result: { user: User; token: string } }> {
+    return await this.authService.signup(body);
   }
 
   @Get('/')
@@ -38,8 +51,7 @@ export class AuthController {
 
     const { token, kakao_id } = await this.authService.oauth(code);
     const redirectUri = `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${kakao_id}`;
-
-    Logger.log(`Redirect;${redirectUri}`);
+    Logger.log(`redirect to ${redirectUri}`);
     return response.redirect(redirectUri);
   }
 
