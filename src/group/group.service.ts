@@ -157,8 +157,9 @@ export class GroupService {
   ): Promise<Promise<{result: Group[], total: number}>>{
     const { page, limit } = pagingOptions;
     const Count = await this.groupRepository.createQueryBuilder('g')
-                                            .select([ 'g.grp_id AS grp_id'
-                                                    , 'count(*) AS mem_cnt'])
+                                            .select([ 
+                                              'g.grp_id AS grp_id'
+                                            , 'count(*) AS mem_cnt'])
                                             .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                             .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
                                             .groupBy('g.grp_id')
