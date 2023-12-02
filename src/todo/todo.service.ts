@@ -17,10 +17,23 @@ export class TodoService {
 
   // READ
   async findAllByUser(user_id: number): Promise<Todo[]> {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1); // 어제 날짜 계산
+
     return await this.todoRepository
       .createQueryBuilder('todo')
       .where('todo.user_id = :user_id', { user_id })
-      .andWhere('todo.todo_deleted = :todo_deleted', { todo_deleted: false })
+      .andWhere(
+        'todo.todo_date = :today OR todo.todo_date >= :yesterday \
+         AND \
+         todo.todo_date < :today AND todo_done = :todo_done ',
+        {
+          today,
+          yesterday,
+          todo_done: false,
+        },
+      )
       .orderBy('todo.todo_date', 'ASC')
       .orderBy('todo.todo_id', 'ASC')
       .getMany();

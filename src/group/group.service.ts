@@ -49,6 +49,14 @@ export class GroupService {
   }
 
   async createGroupOne(createGroupDto: CreateGroupDto, routs: Array<any>): Promise<any>{
+    if(routs.length == 0){
+      throw this.doWithException.AtLeastOneRoutine;
+    }
+
+    if(routs.length > 3){
+      throw this.doWithException.ExceedMaxRoutines;
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
 
     try{
@@ -150,8 +158,9 @@ export class GroupService {
   ): Promise<Promise<{result: Group[], total: number}>>{
     const { page, limit } = pagingOptions;
     const Count = await this.groupRepository.createQueryBuilder('g')
-                                            .select([ 'g.grp_id AS grp_id'
-                                                    , 'count(*) AS mem_cnt'])
+                                            .select([ 
+                                              'g.grp_id AS grp_id'
+                                            , 'count(*) AS mem_cnt'])
                                             .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                             .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
                                             .groupBy('g.grp_id')
@@ -247,7 +256,7 @@ export class GroupService {
         }
         , { todo_deleted: true }
       );
-      
+
       // 그룹에 남은 인원
       const leftCnt = await queryRunner.manager.createQueryBuilder()
                                                .from('group', 'g')
@@ -260,7 +269,6 @@ export class GroupService {
                                .from('routine')
                                .where('grp_id = :grp_id', { grp_id })
                                .execute();
-
       // 그룹 인원이 0명이면 그룹 삭제
       const grpDel = await this.groupRepository.createQueryBuilder('g')
                                                .softDelete()
@@ -268,7 +276,6 @@ export class GroupService {
                                                .andWhere(`0 = :leftCnt`, { leftCnt })
                                                .setParameter('grp_id', grp_id)
                                                .execute();
-      Logger.debug(grpDel);
       // 그룹장 탈퇴시 다른 그룹원이 그룹장이 되도록 설정
       if(grpDel.affected === 0){
         // 가입 시기가 가장 오래된 1사람
@@ -278,7 +285,6 @@ export class GroupService {
                                                   .orderBy('ug.reg_at')
                                                   .limit(1)
                                                   .getRawOne();
-
         // 새로운 그룹장 등록
         await this.groupRepository.createQueryBuilder('g')
                                   .update()
