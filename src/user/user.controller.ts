@@ -43,31 +43,31 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   async getUser(@Request() req): Promise<{ result }> {
     const user: User = req.user;
-    Logger.log(`User info from jwt: ${user}`);
+    Logger.log(`User info from jwt: ${user.user_id}`);
     const result = user;
     return { result };
   }
 
-  @Get('/:user_id')
-  async getUserById(
-    @Param('user_id', ParseIntPipe) id: number,
-  ): Promise<UserResponseDto> {
-    return await this.usersService.getUser(id);
-  }
+  //   @Get('/:user_id')
+  //   async getUserById(
+  //     @Param('user_id', ParseIntPipe) id: number,
+  //   ): Promise<UserResponseDto> {
+  //     return await this.usersService.getUser(id);
+  //   }
 
-  @Get('/')
-  async getUserByKakakoId(
-    @Query('user_kakao_id') kakaoId: string,
-  ): Promise<UserResponseDto> {
-    return await this.usersService.getUserByKakaoId(kakaoId);
-  }
+  //   @Get('/')
+  //   async getUserByKakakoId(
+  //     @Query('user_kakao_id') kakaoId: string,
+  //   ): Promise<UserResponseDto> {
+  //     return await this.usersService.getUserByKakaoId(kakaoId);
+  //   }
 
-  @Get('/')
-  async getUserByName(
-    @Query('user_name') name: string,
-  ): Promise<UserResponseDto> {
-    return await this.usersService.getUserByName(name);
-  }
+  //   @Get('/')
+  //   async getUserByName(
+  //     @Query('user_name') name: string,
+  //   ): Promise<UserResponseDto> {
+  //     return await this.usersService.getUserByName(name);
+  //   }
 
   @UseInterceptors(FileInterceptor('profile'))
   @Post('/:user_id/profile')
