@@ -9,11 +9,15 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './todo.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/user/user.entities';
 
 @Controller('todo')
 export class TodoController {
@@ -28,10 +32,9 @@ export class TodoController {
   }
 
   @Post('/user/:user_id')
-  createTodayTodo(
-    @Param('user_id') user_id: number
-  ){
-    return this.todoService.createTodayTodo(user_id);
+  @UseGuards(AuthGuard('jwt'))
+  createTodayTodo(@Param('user_id') user_id: number, @Request() req) {
+    return this.todoService.createTodayTodo(req.user.user_id);
   }
 
   @Get('/:todo_id')
@@ -58,10 +61,19 @@ export class TodoController {
   }
 
   @Patch('/:todo_id')
+  @UseGuards(AuthGuard('jwt'))
   editDone(
     @Param('todo_id', ParseIntPipe) todo_id: number,
     @Body() updateTodoDto: UpdateTodoDto,
-  ): Promise<Todo> {
-    return this.todoService.editDone(todo_id, updateTodoDto);
+    @Request() req,
+  ): Promise<{ updated_todo: Todo; updated_user: User }> {
+    const user = req.user;
+    return this.todoService.editDone(todo_id, updateTodoDto, user);
+  }
+
+  @Get('/today/count')
+  @UseGuards(AuthGuard('jwt'))
+  getTodayCount(@Request() req) {
+    return this.todoService.getTodayCount(req.user.user_id);
   }
 }

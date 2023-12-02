@@ -22,7 +22,7 @@ export class User {
   @Column()
   user_tel: string;
 
-  @Column()
+  @Column({ unique: true })
   user_kakao_id: string;
 
   @Column({ default: 100 })
@@ -43,6 +43,7 @@ export class User {
 
   @ManyToMany(() => User)
   @JoinTable()
+  // TODO: @JoinColumn({ name: '', referencedColumnName: '' })
   friends: User[];
 
   @OneToMany(() => Todo, (todo) => todo.user)
