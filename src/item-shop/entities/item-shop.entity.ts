@@ -12,7 +12,7 @@ export class ItemShop {
   @Column()
   item_cost: number;
 
-  @Column()
+  @Column({ nullable: true })
   item_path: string;
 
   @Column()
