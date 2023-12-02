@@ -1,16 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { UserResponseDto } from 'src/user/dto/user-response.dto';
 import { User } from 'src/user/user.entities';
 import { Repository } from 'typeorm';
 import { FreindRequestDto } from './dto/friend-request.dto';
+import { UserFriend } from 'src/user_friend/entities/user_group.entity';
 
 @Injectable()
 export class FriendService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(UserFriend)
+    private readonly userFriRepo: Repository<UserFriend>,
     private readonly doWithExceptions: DoWithExceptions,
   ) {}
 
@@ -27,6 +30,8 @@ export class FriendService {
       throw this.doWithExceptions.UserNotFound;
     }
 
+    console.log(user.friends);
+
     // 친구가 없는 경우
     if (user.friends.length == 0) return [];
 
@@ -35,29 +40,29 @@ export class FriendService {
   }
 
   // 친구 추가
-  async createFriend(body: FreindRequestDto): Promise<boolean> {
-    const { user_id, friend_id } = body;
+  async createFriend(body: FreindRequestDto): Promise<{ result }> {
+    const {user_id,friend_id} = body;
+    const friendship = await this.userFriRepo.findOne({
+      select: ['status'],
+      where: [
+          {user_id, friend_id}
+        , {user_id: friend_id, friend_id: user_id}
+      ]
+    });
+
+    if(friendship){
+      Logger.debug(friendship.status);
+    }
 
     // 자기 자신과 친구 요청 예외처리
     if (user_id === friend_id) {
       throw this.doWithExceptions.SelfFriendship;
     }
 
-    const user = await this.userRepository.findOne({
-      where: { user_id: user_id },
-      relations: ['friends'],
-    });
-
-    const friend = await this.userRepository.findOne({
-      where: { user_id: friend_id },
-    });
-
-    user.friends.push(friend);
-    return this.userRepository
-      .save(user)
-      .then((user) => new UserResponseDto(user))
-      .then((_) => true)
-      .catch((_) => false);
+    const result = await this.userFriRepo.save(body);
+    Logger.debug(result);
+    
+    return { result };
   }
 
   // 친구 삭제

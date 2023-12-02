@@ -3,13 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Post,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
 import { FriendService } from './friend.service';
 import { FreindRequestDto } from './dto/friend-request.dto';
 import { UserResponseDto } from 'src/user/dto/user-response.dto';
@@ -27,7 +27,7 @@ export class FriendController {
 
   @Post('/')
   @UsePipes(ValidationPipe)
-  async createFriend(@Body() body: FreindRequestDto): Promise<boolean> {
+  async createFriend(@Body() body: FreindRequestDto): Promise<{ result }> {
     return await this.friendService.createFriend(body);
   }
 
