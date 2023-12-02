@@ -6,16 +6,16 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
-import { UserRequestDto } from 'src/user/dto/user-request.dto';
-import { UserResponseDto } from 'src/user/dto/user-response.dto';
-import { UserService } from 'src/user/user.service';
+import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { UserRequestDto } from 'src/features/user/dto/user-request.dto';
+import { UserResponseDto } from 'src/features/user/dto/user-response.dto';
+import { UserService } from 'src/features/user/user.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/user.entities';
+import { User } from 'src/features/entities/user.entities';
 import { Repository } from 'typeorm';
 import { SignUpDto } from './dto/singup.dto';
 
