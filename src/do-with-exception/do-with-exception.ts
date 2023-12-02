@@ -36,6 +36,7 @@ enum DoWithErrorCode {
   AlreadySendRequest  = '0500',
   AlreadyInFriendship = '0501',
   BlockedByFriend     = '0502',
+  BlockedByMe         = '0503',
 
   // Utils
   NotAllowedExtension     = '1000',  // 지원하지 않는 확장자의 파일이 넘어왔을 때
@@ -73,6 +74,7 @@ enum DoWithErrorMsg {
   AlreadySendRequest  = '이미 친구 요청을 보내셨습니다.',
   AlreadyInFriendship = '이미 친구 상태 입니다.',
   BlockedByFriend     = '차단 되었습니다.',
+  BlockedByMe         = '차단한 친구 입니다.',
 
   // Utils
   NotAllowedExtension     = '지원하지 않는 파일 확장자입니다.',
@@ -156,6 +158,12 @@ export class DoWithExceptions {
   BlockedByFriend = new DoWithException(
     DoWithErrorMsg.BlockedByFriend,
     DoWithErrorCode.BlockedByFriend,
+    HttpStatus.BAD_REQUEST,
+  );
+  
+  BlockedByMe = new DoWithException(
+    DoWithErrorMsg.BlockedByMe,
+    DoWithErrorCode.BlockedByMe,
     HttpStatus.BAD_REQUEST,
   );
 
