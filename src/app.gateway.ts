@@ -79,7 +79,7 @@ export class AppGateway {
     notificationData.sender_id = data.senderId.toString();
     notificationData.receiver_id = data.receiverId.toString();
     notificationData.noti_type = '1';
-    notificationData.req_type = '0';
+    notificationData.req_type = '1';
     notificationData.sub_id = '';
 
     await this.notificationService.createNotification(notificationData);
