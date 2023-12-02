@@ -16,9 +16,9 @@ export class DoWithException extends HttpException {
 enum DoWithErrorCode {
   // User
   UserAlreadyExists = '0011',
-  UserNotFound = '0012',
+  UserNotFound      = '0012',
   UserNameNotUnique = '0013',
-  SelfFriendship = '0014',
+  SelfFriendship    = '0014',
 
   // Group
 
@@ -37,6 +37,7 @@ enum DoWithErrorCode {
   AlreadyInFriendship = '0501',
   BlockedByFriend     = '0502',
   BlockedByMe         = '0503',
+  NotInFriendship     = '0504',
 
   // Utils
   NotAllowedExtension     = '1000',  // 지원하지 않는 확장자의 파일이 넘어왔을 때
@@ -47,16 +48,16 @@ enum DoWithErrorCode {
 
   // Room
   ItemAlreadyInMyRoom = '409',  // 이미 펫이 존재하는 경우
-  ItemNotInInventory      = '404',  // 펫이 존재하지 않는 경우
-  PetMustBeOne      = '410',  // 펫은 하나만 존재해야 한다.
+  ItemNotInInventory  = '404',  // 펫이 존재하지 않는 경우
+  PetMustBeOne        = '410',  // 펫은 하나만 존재해야 한다.
 }
 
 enum DoWithErrorMsg {
   // User
   UserAlreadyExists = 'User is already registerd',
-  UserNotFound = 'User not found',
+  UserNotFound      = 'User not found',
   UserNameNotUnique = 'User name is not unique',
-  SelfFriendship = 'A user cannot befriend themselves',
+  SelfFriendship    = 'A user cannot befriend themselves',
 
   // Group
 
@@ -75,6 +76,7 @@ enum DoWithErrorMsg {
   AlreadyInFriendship = '이미 친구 상태 입니다.',
   BlockedByFriend     = '차단 되었습니다.',
   BlockedByMe         = '차단한 친구 입니다.',
+  NotInFriendship     = '친구 사이가 아닙니다.',
 
   // Utils
   NotAllowedExtension     = '지원하지 않는 파일 확장자입니다.',
@@ -85,8 +87,8 @@ enum DoWithErrorMsg {
 
   // Room
   ItemAlreadyInMyRoom = '아이템이 이미 방에 존재합니다.',
-  ItemNotInInventory      = '보유하지 않은 아이템 입니다.',
-  PetMustBeOne = '펫은 방에 한마리만 둘 수 있습니다.'
+  ItemNotInInventory  = '보유하지 않은 아이템 입니다.',
+  PetMustBeOne        = '펫은 방에 한마리만 둘 수 있습니다.'
 }
 
 @Injectable()
@@ -164,6 +166,12 @@ export class DoWithExceptions {
   BlockedByMe = new DoWithException(
     DoWithErrorMsg.BlockedByMe,
     DoWithErrorCode.BlockedByMe,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  NotInFriendship = new DoWithException(
+    DoWithErrorMsg.NotInFriendship,
+    DoWithErrorCode.NotInFriendship,
     HttpStatus.BAD_REQUEST,
   );
 

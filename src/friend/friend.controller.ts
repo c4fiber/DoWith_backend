@@ -19,7 +19,7 @@ export class FriendController {
   constructor(private readonly friendService: FriendService) {}
 
   @Get('/:user_id')
-  async getFriends(@Param('user_id') firends: number): Promise<{ result }>{
+  async getFriends(@Param('user_id') firends: number): Promise<{ result, total }>{
     return await this.friendService.getFriends(firends);
   }
 
@@ -30,7 +30,7 @@ export class FriendController {
   }
 
   @Delete('/')
-  async deleteFriend(@Body() body: FreindRequestDto): Promise<boolean> {
+  async deleteFriend(@Body() body: FreindRequestDto): Promise<{ result }>{
     return await this.friendService.deleteFriend(body);
   }
 }

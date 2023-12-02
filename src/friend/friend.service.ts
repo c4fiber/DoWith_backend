@@ -29,7 +29,7 @@ export class FriendService {
    * @param user_id 친구 목록 가지고 있는 user_id
    * @returns 
    */
-  async getFriends(user_id: number): Promise<{ result }>{
+  async getFriends(user_id: number): Promise<{ result, total }>{
     const firends = await this.userFriRepo.createQueryBuilder('uf')
                                           .select([
                                             `CASE WHEN user_id = :user_id
@@ -56,7 +56,7 @@ export class FriendService {
                                       .orderBy('u.total_exp', 'DESC')
                                       .getRawMany();
 
-    return { result };
+    return { result, total: result.length };
   }
 
   /**
@@ -153,22 +153,26 @@ export class FriendService {
   }
 
   // 친구 삭제
-  async deleteFriend(body: FreindRequestDto): Promise<boolean> {
+  async deleteFriend(body: FreindRequestDto): Promise<{ result }> {
     const { user_id, friend_id } = body;
     // 자기 자신과 친구 요청 예외처리
     if (user_id === friend_id) {
       throw this.doWithExceptions.SelfFriendship;
     }
 
-    const user = await this.userRepo.findOne({
-      where: { user_id: user_id },
-      relations: ['friends'],
-    });
+    const res1 = await this.userFriRepo.createQueryBuilder()
+                                       .delete()
+                                       .where('user_id = :user_id', { user_id })
+                                       .execute();
+    const res2 = await this.userFriRepo.createQueryBuilder()
+                                       .delete()
+                                       .where('user_id = :friend_id', { friend_id })
+                                       .execute();
+                                       
+    if(res1.affected === 0 && res2.affected === 0){
+      throw this.doWithExceptions.NotInFriendship;
+    }
 
-    user.friends = user.friends.filter((friend) => friend.user_id != friend_id);
-    return await this.userRepo
-      .save(user)
-      .then((_) => true)
-      .catch((_) => false);
+    return { result: res1.affected === 1 ? res1 : res2 };
   }
 }
