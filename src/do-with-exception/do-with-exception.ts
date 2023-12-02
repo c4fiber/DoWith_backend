@@ -16,9 +16,9 @@ export class DoWithException extends HttpException {
 enum DoWithErrorCode {
   // User
   UserAlreadyExists = '0011',
-  UserNotFound = '0012',
+  UserNotFound      = '0012',
   UserNameNotUnique = '0013',
-  SelfFriendship = '0014',
+  SelfFriendship    = '0014',
 
   // Group
 
@@ -33,6 +33,13 @@ enum DoWithErrorCode {
   // Todo
   AlreadyMadeTodos  = '0400',
 
+  // Friend
+  AlreadySendRequest  = '0500',
+  AlreadyInFriendship = '0501',
+  BlockedByFriend     = '0502',
+  BlockedByMe         = '0503',
+  NotInFriendship     = '0504',
+
   // Utils
   NotAllowedExtension = '1000', // 지원하지 않는 확장자의 파일이 넘어왔을 때
   ThereIsNoFile = '1001', // 파일 업로드 모듈 이용시 요청에 파일을 보내지 않았을 때
@@ -41,17 +48,17 @@ enum DoWithErrorCode {
   NoData = '1004', // 요청한 데이터가 없는 경우
 
   // Room
-  ItemAlreadyInMyRoom = '409', // 이미 펫이 존재하는 경우
-  ItemNotInInventory = '404', // 펫이 존재하지 않는 경우
-  PetMustBeOne = '410', // 펫은 하나만 존재해야 한다.
+  ItemAlreadyInMyRoom = '409',  // 이미 펫이 존재하는 경우
+  ItemNotInInventory  = '404',  // 펫이 존재하지 않는 경우
+  PetMustBeOne        = '410',  // 펫은 하나만 존재해야 한다.
 }
 
 enum DoWithErrorMsg {
   // User
   UserAlreadyExists = 'User is already registerd',
-  UserNotFound = 'User not found',
+  UserNotFound      = 'User not found',
   UserNameNotUnique = 'User name is not unique',
-  SelfFriendship = 'A user cannot befriend themselves',
+  SelfFriendship    = 'A user cannot befriend themselves',
 
   // Group
 
@@ -66,6 +73,13 @@ enum DoWithErrorMsg {
   // Todo
   AlreadyMadeTodos = '이미 할 일이 생성되었습니다.',
 
+  // Friend
+  AlreadySendRequest  = '이미 친구 요청을 보내셨습니다.',
+  AlreadyInFriendship = '이미 친구 상태 입니다.',
+  BlockedByFriend     = '차단 되었습니다.',
+  BlockedByMe         = '차단한 친구 입니다.',
+  NotInFriendship     = '친구 사이가 아닙니다.',
+
   // Utils
   NotAllowedExtension = '지원하지 않는 파일 확장자입니다.',
   ThereIsNoFile = '파일을 업로드 하지 않았습니다.',
@@ -75,8 +89,8 @@ enum DoWithErrorMsg {
 
   // Room
   ItemAlreadyInMyRoom = '아이템이 이미 방에 존재합니다.',
-  ItemNotInInventory = '보유하지 않은 아이템 입니다.',
-  PetMustBeOne = '펫은 방에 한마리만 둘 수 있습니다.',
+  ItemNotInInventory  = '보유하지 않은 아이템 입니다.',
+  PetMustBeOne        = '펫은 방에 한마리만 둘 수 있습니다.'
 }
 
 @Injectable()
@@ -135,6 +149,37 @@ export class DoWithExceptions {
   NotEnoughCash = new DoWithException(
     DoWithErrorMsg.NotEnoughCash,
     DoWithErrorCode.NotEnoughCash,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  // =============== [ Friend ] ===============
+  AlreadySendRequest = new DoWithException(
+    DoWithErrorMsg.AlreadySendRequest,
+    DoWithErrorCode.AlreadySendRequest,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  AlreadyInFriendship = new DoWithException(
+    DoWithErrorMsg.AlreadyInFriendship,
+    DoWithErrorCode.AlreadyInFriendship,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  BlockedByFriend = new DoWithException(
+    DoWithErrorMsg.BlockedByFriend,
+    DoWithErrorCode.BlockedByFriend,
+    HttpStatus.BAD_REQUEST,
+  );
+  
+  BlockedByMe = new DoWithException(
+    DoWithErrorMsg.BlockedByMe,
+    DoWithErrorCode.BlockedByMe,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  NotInFriendship = new DoWithException(
+    DoWithErrorMsg.NotInFriendship,
+    DoWithErrorCode.NotInFriendship,
     HttpStatus.BAD_REQUEST,
   );
 

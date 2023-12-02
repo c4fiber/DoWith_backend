@@ -41,13 +41,17 @@ export class TodoService {
     // return await this.todoRepository.findBy({ user_id, todo_deleted: false });
   }
 
-  async createTodayTodo(user_id: number) {
-    /**
-     * 1. 마지막 로그인 일자 갱신
-     * 2. 연속 로그인 갱신
-     * 3. 누적 로그인 갱신
-     * 4. Routine에서 만들어지는 To-Do 생성
-     */
+  /**
+   * 오늘의 To-Do 생성기 
+   * @param user_id
+   * @description 유저가 가입한 그룹의 루틴이 개인의 To-Do에 반영됩니다.
+   *              1. 마지막 로그인 일자 갱신
+   *              2. 연속 로그인 갱신
+   *              3. 누적 로그인 갱신
+   *              4. Routine에서 만들어지는 To-Do 생성
+   * @returns 
+   */
+  async createTodayTodo(user_id: number){
     const queryRunner = this.dataSource.createQueryRunner();
     // 마지막 로그인 유저 정보
     const user = await queryRunner.manager
@@ -75,15 +79,14 @@ export class TodoService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      // 3. 연속 로그인 증가
-      const result = await queryRunner.manager
-        .createQueryBuilder()
-        .update('user')
-        .set({ login_cnt: () => '"login_cnt" + 1' })
-        .where({ user_id })
-        .execute();
-      if (result.affected === 0) {
-        throw this.doWithExceptions.UserNotFound;
+      // 2. 연속 로그인 증가
+      const result = await queryRunner.manager.createQueryBuilder()
+                               .update('user')
+                               .set({ login_cnt: () => '"login_cnt" + 1' })
+                               .where({ user_id })
+                               .execute();
+      if(result.affected === 0){
+        throw this.doWithExceptions.UserNotFound;  
       }
       // 3. 누적 로그인 증가
       const test = await queryRunner.manager
