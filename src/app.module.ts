@@ -5,8 +5,6 @@ import { TodoModule } from './features/todo/todo.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { DoWithMiddlewareMiddleware } from 'src/utils/do-with-middleware/do-with-middleware.middleware';
-import { DoWithExceptionFilterModule } from './utils/do-with-exception-filter/do-with-exception-filter.module';
-import { DoWithExceptionModule } from './utils/do-with-exception/do-with-exception.module';
 import { UserModule } from './features/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './features/group/group.module';
@@ -19,7 +17,6 @@ import { join } from 'path';
 import { FriendModule } from './features/friend/friend.module';
 import { CategoryModule } from './features/category/category.module';
 import { UtilsModule } from './utils/utils.module';
-import { DoWithInterceptorModule } from './utils/do-with-interceptor/do-with-interceptor.module';
 import { DoWithInterceptor } from './utils/do-with-interceptor/do-with-Interceptor';
 import { HttpModule } from '@nestjs/axios';
 import { AchievementsModule } from './features/achievements/achievements.module';
@@ -53,9 +50,6 @@ import { EntitiesModule } from './entities/entities.module';
       rootPath: join(__dirname, '..', 'public'),
     }),
     // Common Module
-    DoWithExceptionModule,
-    DoWithExceptionFilterModule,
-    DoWithInterceptorModule,
     UtilsModule,
     // Fixed Table
     CategoryModule,
