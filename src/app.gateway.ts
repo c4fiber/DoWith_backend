@@ -7,6 +7,7 @@ import { TodoService } from './todo/todo.service';
 import { UserService } from './user/user.service';
 import { GroupService } from './group/group.service';
 import { CreateNotificationDto } from './notification/dto/createNotification.dto';
+import { Comment } from './comment/comment.entity';
 
 @WebSocketGateway()
 export class AppGateway {
@@ -21,10 +22,22 @@ export class AppGateway {
 
 	async handleConnection(client: Socket) {
 		const socketId = client.id;
-		const userId = client.handshake.query.id;
+		let userId = client.handshake.query.id;
 
+		if (Array.isArray(userId)) {
+			userId = userId[0];
+		}
 		// UserService를 통해 데이터베이스에 socketId 업데이트
-		await this.userService.updateSocketId(userId, socketId);
+		const userIdInt = parseInt(userId, 10); // 두 번째 인자 10은 10진수를 의미
+
+		// 변환된 userId가 유효한 숫자인지 확인
+		if (!isNaN(userIdInt)) {
+			// UserService를 통해 데이터베이스에 socketId 업데이트
+			await this.userService.updateSocketId(userIdInt, socketId);
+		} else {
+			// 유효하지 않은 userId 처리
+			console.error('Invalid userId:', userId);
+		}
 	}
 
   @SubscribeMessage('friendRequest')
@@ -108,7 +121,7 @@ export class AppGateway {
 
             // 해당 to-do를 공유하는 사용자들에게 알림 전송
             try {
-                this.server.to(member.socketId).emit('confirmRequest', {
+                this.server.to(member.socket_id).emit('confirmRequest', {
                     message: `${member.user_name}이 ${todo.todo_name}에 대한 인증을 요청했습니다.`,
                     senderId: data.userId,
                     todoId: data.todoId,
@@ -147,7 +160,7 @@ export class AppGateway {
     await this.notificationService.createNotification(notificationData);
     // 해당 to-do를 공유하는 사용자들에게 알림 전송
 		try {
-			this.server.to(receiver.socketId).emit('confirmResponse', {
+			this.server.to(receiver.socket_id).emit('confirmResponse', {
 					message: `${sender.user_name}이 ${todo.todo_name}에 대한 인증을 완료하였습니다.`,
 					userId: data.userId,
 					todoId: data.todoId });
@@ -156,8 +169,29 @@ export class AppGateway {
 		}
   }
 
-  @SubscribeMessage('newComment')
-  async handleNewComment(@MessageBody() data: {userId: number, ownerId: number}, @ConnectedSocket() client: Socket) {
+  // @SubscribeMessage('newComment')
+  // async handleNewComment(@MessageBody() data: {userId: number, ownerId: number}, @ConnectedSocket() client: Socket) {
 
-  }
+  // }
+	async notifyComment(comment: Comment) {
+		const author = await this.userService.getUser( comment.author_id );
+		if (!author) {
+			return;
+		}
+
+		const receiver = await this.userService.getUser( comment.owner_id );
+		if (!receiver) {
+			return;
+		}
+
+		try {
+			this.server.to(receiver.socket_id).emit('newComment', {
+				message: `${author.user_name}이 방명록에 댓글을 남겼습니다.`,
+				userId: author.user_id,
+				comId: comment.com_id,
+			})
+		} catch (error) {
+			console.error(`Error sending notification to user ${receiver.user_id}:`, error);
+		}
+	}
 }

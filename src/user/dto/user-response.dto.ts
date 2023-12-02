@@ -17,11 +17,15 @@ export class UserResponseDto {
   @IsNotEmpty()
   user_hp: number;
 
+  @IsNotEmpty()
+  socket_id: string;
+
   constructor(user: User) {
     this.user_id = user.user_id;
     this.user_name = user.user_name;
     this.user_tel = user.user_tel;
     this.user_kakao_id = user.user_kakao_id;
     this.user_hp = user.user_hp;
+    this.socket_id = user.socket_id;
   }
 }
