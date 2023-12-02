@@ -12,7 +12,7 @@ import {
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update_comment.dto';
-import { Comment } from '../entities/comment.entity';
+import { Comment } from '../../entities/comment.entity';
 
 @Controller('guestbook')
 export class CommentController {

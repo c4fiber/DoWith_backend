@@ -1,5 +1,5 @@
-import { ItemShop } from "src/features/entities/item-shop.entity";
-import { User } from "src/features/entities/user.entities";
+import { ItemShop } from "src/entities/item-shop.entity";
+import { User } from "src/entities/user.entities";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 
 @Entity()

@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entities';
-import { Routine } from 'src/features/entities/routine.entity';
-import { Category } from 'src/features/entities/category.entity';
+import { Routine } from 'src/entities/routine.entity';
+import { Category } from 'src/entities/category.entity';
 
 @Entity()
 export class Todo {

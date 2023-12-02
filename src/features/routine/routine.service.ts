@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CreateRoutineDto } from './dto/create-routine.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Routine } from '../entities/routine.entity';
+import { Routine } from '../../entities/routine.entity';
 import { DataSource, Repository } from 'typeorm';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
-import { Group } from 'src/features/entities/group.entity';
-import { Todo } from 'src/features/entities/todo.entity';
+import { Group } from 'src/entities/group.entity';
+import { Todo } from 'src/entities/todo.entity';
 
 @Injectable()
 export class RoutineService {

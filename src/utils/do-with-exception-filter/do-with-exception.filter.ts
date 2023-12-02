@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { DoWithException } from 'src/utils/do-with-exception/do-with-exception';
-import { doWithError } from 'src/features/entities/error.entity';
+import { doWithError } from 'src/entities/error.entity';
 import { DataSource } from 'typeorm';
 
 @Catch()

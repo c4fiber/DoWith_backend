@@ -12,9 +12,9 @@ import { Room } from './room.entity';
 import { Routine } from './routine.entity';
 import { Todo } from './todo.entity';
 import { User } from './user.entities';
-import { UserGroup } from 'src/features/entities/user_group.entity';
+import { UserGroup } from 'src/entities/user_group.entity';
 import { UserAchi } from './user_achi.entity';
-import { UserFriend } from 'src/features/entities/user_friend.entity';
+import { UserFriend } from 'src/entities/user_friend.entity';
 import { Achievements } from './achievements.entity';
 
 @Module({

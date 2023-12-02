@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ItemShop } from '../entities/item-shop.entity';
+import { ItemShop } from '../../entities/item-shop.entity';
 import { DataSource, Repository } from 'typeorm';
-import { ItemType } from 'src/features/entities/item-type.entity';
-import { User } from 'src/features/entities/user.entities';
+import { ItemType } from 'src/entities/item-type.entity';
+import { User } from 'src/entities/user.entities';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
-import { ItemInventory } from 'src/features/entities/item-inventory.entity';
+import { ItemInventory } from 'src/entities/item-inventory.entity';
 
 @Injectable()
 export class ItemShopService {

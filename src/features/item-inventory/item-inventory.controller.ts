@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ItemInventoryService } from './item-inventory.service';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/features/entities/user.entities';
+import { User } from 'src/entities/user.entities';
 
 @Controller('item-inventory')
 export class ItemInventoryController {

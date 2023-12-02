@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Room } from '../entities/room.entity';
+import { Room } from '../../entities/room.entity';
 import { DataSource } from 'typeorm';
-import { ItemInventory } from 'src/features/entities/item-inventory.entity';
+import { ItemInventory } from 'src/entities/item-inventory.entity';
 import { isIn } from 'class-validator';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
 

@@ -1,4 +1,4 @@
-import { ItemType } from "src/features/entities/item-type.entity";
+import { ItemType } from "src/entities/item-type.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

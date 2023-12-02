@@ -3,8 +3,8 @@ import { FriendController } from './friend.controller';
 import { FriendService } from './friend.service';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/features/entities/user.entities';
-import { UserFriend } from 'src/features/entities/user_friend.entity';
+import { User } from 'src/entities/user.entities';
+import { UserFriend } from 'src/entities/user_friend.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, UserFriend])],

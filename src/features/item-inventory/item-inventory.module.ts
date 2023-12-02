@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ItemInventory } from '../entities/item-inventory.entity';
+import { ItemInventory } from '../../entities/item-inventory.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemInventoryController } from './item-inventory.controller';
 import { ItemInventoryService } from './item-inventory.service';
-import { ItemShop } from 'src/features/entities/item-shop.entity';
+import { ItemShop } from 'src/entities/item-shop.entity';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
 
 @Module({

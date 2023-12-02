@@ -1,5 +1,5 @@
-import { Category } from 'src/features/entities/category.entity';
-import { User } from 'src/features/entities/user.entities';
+import { Category } from 'src/entities/category.entity';
+import { User } from 'src/entities/user.entities';
 import { Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('group')

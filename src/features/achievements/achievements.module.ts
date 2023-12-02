@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Achievements } from '../entities/achievements.entity';
+import { Achievements } from '../../entities/achievements.entity';
 import { AchievementsService } from './achievements.service';
 import { AchievementsController } from './achievements.controller';
-import { UserAchi } from 'src/features/entities/user_achi.entity';
+import { UserAchi } from 'src/entities/user_achi.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Achievements, UserAchi])],

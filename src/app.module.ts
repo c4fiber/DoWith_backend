@@ -27,7 +27,7 @@ import { ItemInventoryModule } from './features/item-inventory/item-inventory.mo
 import { ItemShopModule } from './features/item-shop/item-shop.module';
 import { RoomModule } from './features/room/room.module';
 import { AppGateway } from './app.gateway';
-import { EntitiesModule } from './features/entities/entities.module';
+import { EntitiesModule } from './entities/entities.module';
 
 @Module({
   imports: [

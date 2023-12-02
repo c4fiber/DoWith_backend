@@ -1,5 +1,5 @@
-import { Days } from "src/features/entities/days.entity";
-import { Group } from "src/features/entities/group.entity";
+import { Days } from "src/entities/days.entity";
+import { Group } from "src/entities/group.entity";
 import { Column, Entity, CreateDateColumn, ManyToOne, DeleteDateColumn, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('routine')

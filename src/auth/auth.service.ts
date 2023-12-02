@@ -15,7 +15,7 @@ import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/features/entities/user.entities';
+import { User } from 'src/entities/user.entities';
 import { Repository } from 'typeorm';
 import { SignUpDto } from './dto/singup.dto';
 

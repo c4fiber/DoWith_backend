@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Group } from '../entities/group.entity';
+import { Group } from '../../entities/group.entity';
 import { DataSource, Raw, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
-import { UserGroup } from 'src/features/entities/user_group.entity';
-import { Todo } from 'src/features/entities/todo.entity';
+import { UserGroup } from 'src/entities/user_group.entity';
+import { Todo } from 'src/entities/todo.entity';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
-import { Routine } from 'src/features/entities/routine.entity';
+import { Routine } from 'src/entities/routine.entity';
 import * as sharp from 'sharp'
 import * as fs from 'fs/promises'
 import * as path from 'path';

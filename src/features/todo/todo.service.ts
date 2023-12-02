@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { Todo } from '../entities/todo.entity';
+import { Todo } from '../../entities/todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
-import { User } from 'src/features/entities/user.entities';
+import { User } from 'src/entities/user.entities';
 
 @Injectable()
 export class TodoService {

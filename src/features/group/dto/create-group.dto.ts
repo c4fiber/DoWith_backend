@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { Category } from "src/features/entities/category.entity";
+import { Category } from "src/entities/category.entity";
 
 export class CreateGroupDto {
   @IsNotEmpty()

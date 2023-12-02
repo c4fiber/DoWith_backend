@@ -15,9 +15,9 @@ import {
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { Todo } from '../entities/todo.entity';
+import { Todo } from '../../entities/todo.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/features/entities/user.entities';
+import { User } from 'src/entities/user.entities';
 
 @Controller('todo')
 export class TodoController {
