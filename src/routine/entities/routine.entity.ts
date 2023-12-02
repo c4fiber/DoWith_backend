@@ -17,7 +17,7 @@ export class Routine {
   @Column({nullable: true})
   rout_desc: string;
 
-  @ManyToOne(() => Days)
+  @ManyToOne(() => Days, { nullable: false })
   @JoinColumn({ name: 'rout_repeat', referencedColumnName: 'rout_repeat' })
   rout_repeat: string;
 

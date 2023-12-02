@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn } from "typeorm";
+import { CreateDateColumn, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class UserGroup {
@@ -7,4 +7,7 @@ export class UserGroup {
 
   @PrimaryColumn()
   grp_id: number;
+
+  @CreateDateColumn()
+  reg_at: Date;
 }
