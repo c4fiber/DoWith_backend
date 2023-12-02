@@ -170,7 +170,7 @@ export class TodoService {
     const query = this.todoRepository
       .createQueryBuilder('todo')
       .where('user_id = :user_id', { user_id })
-      .andWhere('DATE(todo.todo_date) = DATE(:now)', { today: now });
+      .andWhere('DATE(todo.todo_date) = DATE(:today)', { today: now });
 
     // 기존 오늘자 투두, 오늘 완료된 투두
     const [todo_today, todo_today_done] = await Promise.all([
@@ -179,6 +179,7 @@ export class TodoService {
     ]);
 
     const result = { todo_today, todo_today_done };
+    Logger.log(`today: ${todo_today}, ${todo_today_done}`);
     return { result };
   }
 
