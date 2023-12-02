@@ -19,10 +19,8 @@ export class FriendController {
   constructor(private readonly friendService: FriendService) {}
 
   @Get('/:user_id')
-  async getFriends(
-    @Param('user_id', ParseIntPipe) id: number,
-  ): Promise<UserResponseDto[]> {
-    return await this.friendService.getFriends(id);
+  async getFriends(@Param('user_id') firends: number): Promise<{ result }>{
+    return await this.friendService.getFriends(firends);
   }
 
   @Post('/')

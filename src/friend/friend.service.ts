@@ -6,6 +6,7 @@ import { User } from 'src/user/user.entities';
 import { Repository } from 'typeorm';
 import { FreindRequestDto } from './dto/friend-request.dto';
 import { UserFriend } from 'src/user_friend/entities/user_group.entity';
+import { getIdsFromItems } from 'src/utils/paging/PagingOptions';
 
 enum FriendStatus{
     FRIEND    = '00'
@@ -17,40 +18,52 @@ enum FriendStatus{
 export class FriendService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userRepo: Repository<User>,
     @InjectRepository(UserFriend)
     private readonly userFriRepo: Repository<UserFriend>,
     private readonly doWithExceptions: DoWithExceptions,
   ) {}
 
-  // TODO: 예외처리들..
-  // 친구 조회
-  async getFriends(id: number): Promise<UserResponseDto[]> {
-    const user: User = await this.userRepository.findOne({
-      where: { user_id: id },
-      relations: ['friends'],
-    });
+  /**
+   * 친구 목록 조회
+   * @param user_id 친구 목록 가지고 있는 user_id
+   * @returns 
+   */
+  async getFriends(user_id: number): Promise<{ result }>{
+    const firends = await this.userFriRepo.createQueryBuilder('uf')
+                                          .select([
+                                            `CASE WHEN user_id = :user_id
+                                                  THEN friend_id
+                                                  ELSE user_id
+                                              END AS user_id`
+                                          ])
+                                          .setParameter('user_id', user_id)
+                                          .where('friend_id = :user_id', { user_id })
+                                          .orWhere('user_id = :user_id', { user_id })
+                                          .getRawMany();
+    const frinedIds = getIdsFromItems(firends, 'user_id');
+    const result = await this.userRepo.createQueryBuilder('u')
+                                      .select([
+                                        'u.user_id   AS user_id'
+                                      , 'u.user_name AS user_name'
+                                      , 'u.total_exp AS total_exp'
+                                      , 'iv.pet_name AS pet_name'
+                                      ])
+                                      .leftJoin('item_inventory', 'iv', 'u.user_id = iv.user_id')
+                                      .leftJoin('item_shop'     , 'ish', 'iv.item_id = ish.item_id')
+                                      .where('u.user_id IN (:...frinedIds)', { frinedIds })
+                                      .andWhere('ish.type_id = 1')
+                                      .orderBy('u.total_exp', 'DESC')
+                                      .getRawMany();
 
-    // 유저가 없는 경우
-    if (user == null) {
-      throw this.doWithExceptions.UserNotFound;
-    }
-
-    console.log(user.friends);
-
-    // 친구가 없는 경우
-    if (user.friends.length == 0) return [];
-
-    // 결과 리턴
-    return user.friends.map((friend) => new UserResponseDto(friend));
+    return { result };
   }
 
   /**
    * 친구 추가
    * @param body  Response Body
-   * @description 1. 상대방과 나의 관계
-   *              2. 나와 상대방의 관계
-   *              3.
+   * @description 1. 상대방과 나의 관계 확인
+   *              2. 나와 상대방의 관계 확인
    * @returns Promise<{result}>}
    */
   async createFriend(body: FreindRequestDto): Promise<{ result }> {
@@ -101,7 +114,7 @@ export class FriendService {
     if(mySide){
       // 2. 내가 상대방을 차단한 경우
       if(mySide.status == FriendStatus.BLOCKED){
-        throw this.doWithExceptions.BlockedByFriend;
+        throw this.doWithExceptions.BlockedByMe;
       }
 
       // 2. 이미 친구라면 요청 종료
@@ -147,13 +160,13 @@ export class FriendService {
       throw this.doWithExceptions.SelfFriendship;
     }
 
-    const user = await this.userRepository.findOne({
+    const user = await this.userRepo.findOne({
       where: { user_id: user_id },
       relations: ['friends'],
     });
 
     user.friends = user.friends.filter((friend) => friend.user_id != friend_id);
-    return await this.userRepository
+    return await this.userRepo
       .save(user)
       .then((_) => true)
       .catch((_) => false);

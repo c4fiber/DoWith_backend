@@ -32,6 +32,9 @@ export class User {
   user_cash: number;
 
   @Column({ default: 0 })
+  total_exp: number;
+
+  @Column({ default: 0 })
   login_cnt: number;
 
   @Column({ default: 0 })
