@@ -32,6 +32,11 @@ enum DoWithErrorCode {
   // Todo
   AlreadyMadeTodos  = '0400',
 
+  // Friend
+  AlreadySendRequest  = '0500',
+  AlreadyInFriendship = '0501',
+  BlockedByFriend     = '0502',
+
   // Utils
   NotAllowedExtension     = '1000',  // 지원하지 않는 확장자의 파일이 넘어왔을 때
   ThereIsNoFile           = '1001',  // 파일 업로드 모듈 이용시 요청에 파일을 보내지 않았을 때
@@ -63,6 +68,11 @@ enum DoWithErrorMsg {
 
   // Todo
   AlreadyMadeTodos  = '이미 할 일이 생성되었습니다.',
+
+  // Friend
+  AlreadySendRequest  = '이미 친구 요청을 보내셨습니다.',
+  AlreadyInFriendship = '이미 친구 상태 입니다.',
+  BlockedByFriend     = '차단 되었습니다.',
 
   // Utils
   NotAllowedExtension     = '지원하지 않는 파일 확장자입니다.',
@@ -127,6 +137,25 @@ export class DoWithExceptions {
   NotEnoughCash = new DoWithException(
     DoWithErrorMsg.NotEnoughCash,
     DoWithErrorCode.NotEnoughCash,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  // =============== [ Friend ] ===============
+  AlreadySendRequest = new DoWithException(
+    DoWithErrorMsg.AlreadySendRequest,
+    DoWithErrorCode.AlreadySendRequest,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  AlreadyInFriendship = new DoWithException(
+    DoWithErrorMsg.AlreadyInFriendship,
+    DoWithErrorCode.AlreadyInFriendship,
+    HttpStatus.BAD_REQUEST,
+  );
+
+  BlockedByFriend = new DoWithException(
+    DoWithErrorMsg.BlockedByFriend,
+    DoWithErrorCode.BlockedByFriend,
     HttpStatus.BAD_REQUEST,
   );
 
