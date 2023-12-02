@@ -1,14 +1,7 @@
 import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from "@nestjs/common";
 import { Observable, map } from "rxjs";
 import { DoWithExceptions } from "src/do-with-exception/do-with-exception";
-
-enum HttpMethod {
-  GET    = 'GET',
-  PUT    = 'PUT',
-  POST   = 'POST',
-  PATCH  = 'PATCH',
-  DELETE = 'DELETE'
-}
+import { HttpMethod } from "src/enums/HttpMethod.enum";
 
 @Injectable()
 export class DoWithInterceptor implements NestInterceptor{

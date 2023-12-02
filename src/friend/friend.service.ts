@@ -1,19 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
-import { UserResponseDto } from 'src/user/dto/user-response.dto';
 import { User } from 'src/user/user.entities';
 import { Repository } from 'typeorm';
 import { FreindRequestDto } from './dto/friend-request.dto';
 import { UserFriend } from 'src/user_friend/entities/user_group.entity';
 import { getIdsFromItems } from 'src/utils/paging/PagingOptions';
+import { FriendStatus } from 'src/enums/FriendStatus.enum';
 
-enum FriendStatus{
-    FRIEND    = '00'
-  , REQUESTED = '01'
-  , REJECTED  = '10'
-  , BLOCKED   = '11'
-}
 @Injectable()
 export class FriendService {
   constructor(
@@ -168,7 +162,7 @@ export class FriendService {
                                        .delete()
                                        .where('user_id = :friend_id', { friend_id })
                                        .execute();
-                                       
+
     if(res1.affected === 0 && res2.affected === 0){
       throw this.doWithExceptions.NotInFriendship;
     }
