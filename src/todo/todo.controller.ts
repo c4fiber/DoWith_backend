@@ -32,8 +32,9 @@ export class TodoController {
   }
 
   @Post('/user/:user_id')
-  createTodayTodo(@Param('user_id') user_id: number) {
-    return this.todoService.createTodayTodo(user_id);
+  @UseGuards(AuthGuard('jwt'))
+  createTodayTodo(@Param('user_id') user_id: number, @Request() req) {
+    return this.todoService.createTodayTodo(req.user.user_id);
   }
 
   @Get('/:todo_id')
@@ -68,5 +69,11 @@ export class TodoController {
   ): Promise<{ updated_todo: Todo; updated_user: User }> {
     const user = req.user;
     return this.todoService.editDone(todo_id, updateTodoDto, user);
+  }
+
+  @Get('/today/count')
+  @UseGuards(AuthGuard('jwt'))
+  getTodayCount(@Request() req) {
+    return this.todoService.getTodayCount(req.user.user_id);
   }
 }

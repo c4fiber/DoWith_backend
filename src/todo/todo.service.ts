@@ -152,6 +152,23 @@ export class TodoService {
     });
   }
 
+  async getTodoCount(user_id: number) {
+    const now = new Date();
+    const query = this.todoRepository
+      .createQueryBuilder('todo')
+      .where('user_id = :user_id', { user_id })
+      .andWhere('DATE(todo.todo_date) = DATE(:now)', { today: now });
+
+    // 기존 오늘자 투두, 오늘 완료된 투두
+    const [todo_today, todo_today_done] = await Promise.all([
+      query.getCount(),
+      query.clone().andWhere('todo_done = true').getCount(),
+    ]);
+
+    const result = { todo_today, todo_today_done };
+    return { result };
+  }
+
   // CREATE
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
     const todo = new Todo();
@@ -217,19 +234,22 @@ export class TodoService {
       .where('user_id = :user_id', { user_id })
       .andWhere('DATE(todo.todo_date) = DATE(:today)', { today });
 
+    // 기존 오늘자 투두, 오늘 완료된 투두
     const [todayCnt, todayDoneCnt] = await Promise.all([
       query.getCount(),
       query.clone().andWhere('todo_done = true').getCount(),
     ]);
 
+    // TODO: fix
     const newDoneCnt = todayDoneCnt + (isDone ? 1 : -1);
-    const achieveRate = todayCnt > 0 ? newDoneCnt / (todayCnt + 1) : 0;
+    const achieveRate = (newDoneCnt / todayCnt) * 100;
 
     const addHp = achieveRate >= 90 ? 10 : -10; // 유저 HP
     let addCash = this.getCashAmount(isDone, isGroup, todayDoneCnt);
     // let addPetExp = this.getPetExp(isGroup, todayDoneCnt);
 
     const manager: EntityManager = this.dataSource.manager;
+    const queryRunner = this.dataSource.createQueryRunner();
 
     return await manager.transaction(async (manager) => {
       // update todo
