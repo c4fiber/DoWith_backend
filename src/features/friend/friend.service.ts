@@ -146,7 +146,12 @@ export class FriendService {
     return { result };
   }
 
-  // 친구 삭제
+  /**
+   * 친구 삭제 함수
+   * @discription 양방향으로 삭제
+   * @param body 
+   * @returns 
+   */
   async deleteFriend(body: FreindRequestDto): Promise<{ result }> {
     const { user_id, friend_id } = body;
     // 자기 자신과 친구 요청 예외처리

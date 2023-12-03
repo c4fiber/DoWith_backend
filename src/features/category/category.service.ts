@@ -7,12 +7,12 @@ import { Repository } from 'typeorm';
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>,
+    private readonly catRepo: Repository<Category>,
     private readonly logger: Logger
   ) {}
 
   getAllCategories() {
-    const result = this.categoryRepository.find({});
+    const result = this.catRepo.find({});
 
     return { result };
   }
