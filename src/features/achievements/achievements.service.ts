@@ -10,7 +10,7 @@ export class AchievementsService {
     private readonly userAchiRepo: Repository<UserAchi>
   ){}
 
-  async getUserAchievements(user_id: number){
+  async getUserAchievements(user_id: number): Promise<{ result: any[], total}>{
     const result = await this.userAchiRepo.createQueryBuilder('ua')
                                           .select([
                                             'ac.achi_name AS achi_name'
@@ -22,10 +22,10 @@ export class AchievementsService {
                                           .where('ua.user_id = :user_id', { user_id })
                                           .getRawMany();
 
-    return { result };
+    return { result, total: result.length };
   }
 
-  async createAchievement(user_id: number, achi_id: number){
+  async createAchievement(user_id: number, achi_id: number): Promise<{ result }>{
     const result = await this.userAchiRepo.save({ user_id, achi_id });
 
     return { result };

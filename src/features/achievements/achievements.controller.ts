@@ -10,7 +10,7 @@ export class AchievementsController {
   @Get('/:user_id')
   getUserAchievements(
     @Param('user_id') user_id: number
-  ){
+  ): Promise<{ result: any[], total}>{
     return this.achiService.getUserAchievements(user_id);
   }
 
@@ -18,7 +18,7 @@ export class AchievementsController {
   createAchievement(
     @Param('user_id') user_id: number,
     @Param('achi_id') achi_id: number
-  ){
+  ): Promise<{ result }>{
     return this.achiService.createAchievement(user_id, achi_id);
   }
 }
