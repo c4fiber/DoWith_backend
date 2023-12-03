@@ -12,7 +12,7 @@ import {
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/createNotification.dto';
 import { UpdateNotificationDto } from './dto/updateNotification.dto';
-import { Notification } from './notification.entity';
+import { Notification } from 'src/entities/notification.entity';
 
 @Controller('notification')
 export class NotificationController {
