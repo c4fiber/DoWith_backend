@@ -10,19 +10,33 @@ export class AnnouncementService {
     private readonly annoRepo: Repository<Announcement>
   ){}
 
-  async getAllAnnouncements(): Promise<{ result }>{ 
+  async getAllAnnouncements(): Promise<{ result: any[] }>{ 
     const result = await this.annoRepo.find({
       select: [
         'anno_id'
       , 'title'
-      , 'content'
-      , 'anno_img'
       , 'reg_at'
       ],
       order: { reg_at: 'DESC' }
     });
 
     Logger.debug(result);
+
+    return { result };
+  }
+
+  async getAnnouncementDetail(anno_id: number): Promise<{ result }> {
+    const result = await this.annoRepo.findOne({
+      select: [
+        'title'
+      , 'content'
+      , 'anno_img'
+      , 'reg_at'
+      ],
+      where: {
+        anno_id
+      }
+    });
 
     return { result };
   }
