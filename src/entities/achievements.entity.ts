@@ -10,7 +10,7 @@ export class Achievements {
   ache_name: string;
 
   @Column()
-  ache_decs: string;
+  ache_desc: string;
 
   @Column({ default: false })
   is_hidden: boolean;
