@@ -1,6 +1,13 @@
-import { ItemShop } from "src/entities/item-shop.entity";
-import { User } from "src/entities/user.entities";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { ItemShop } from './item-shop.entity';
+import { User } from './user.entities';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+} from 'typeorm';
 
 @Entity()
 export class Room {

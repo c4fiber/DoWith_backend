@@ -5,6 +5,7 @@ import { DataSource, Raw, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/entities/user_group.entity';
 import { Todo } from 'src/entities/todo.entity';
+import { User } from 'src/entities/user.entities';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
 import { Routine } from 'src/entities/routine.entity';
 import * as sharp from 'sharp'
@@ -498,5 +499,14 @@ export class GroupService {
     const result = await this.grpRepo.softDelete({grp_id}); 
     
     return { result };
+  }
+
+  async findUsersByGroupId(groupId: number): Promise<User[]> {
+    const group = await this.groupRepository.findOne({
+      where: { grp_id: groupId },
+      relations: ['users'],
+    });
+
+    return group ? group.users : [];
   }
 }

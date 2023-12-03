@@ -64,11 +64,11 @@ export class TodoController {
   @UseGuards(AuthGuard('jwt'))
   editDone(
     @Param('todo_id', ParseIntPipe) todo_id: number,
-    @Body() updateTodoDto: UpdateTodoDto,
+    @Body('todo_done') todo_done: boolean,
     @Request() req,
-  ): Promise<{ updated_todo: Todo; updated_user: User }> {
+  ) {
     const user = req.user;
-    return this.todoService.editDone(todo_id, updateTodoDto, user);
+    return this.todoService.editDone(todo_id, todo_done, user);
   }
 
   @Get('/today/count')

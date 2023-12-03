@@ -4,6 +4,7 @@ import { DataSource, EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
 import { ItemShop } from 'src/entities/item-shop.entity';
+import { Room } from 'src/entities/room.entity';
 
 @Injectable()
 export class ItemInventoryService {
@@ -18,6 +19,30 @@ export class ItemInventoryService {
 
   EVOLUTION_THRESHOLD: string = '03';
 
+  async getMyMainPet(user_id: number) {
+    const result = await this.dataSource
+      .getRepository(Room)
+      .createQueryBuilder('r')
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
+      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
+      .where('r.user_id = :user_id', { user_id: user_id })
+      .select([
+        'ish.item_id as item_id',
+        'ish.type_id as item_type',
+        'ish.item_name as item_name',
+        'ish.item_path as item_path',
+        'iv.pet_name as pet_name',
+        'iv.pet_exp as pet_exp',
+      ])
+      .getRawOne();
+
+    if (result == null) {
+      throw this.doWithExceptions.NoData;
+    }
+
+    return { result };
+  }
+
   async evolveMyPet(user_id: number, item_id: number): Promise<{ result }> {
     const { pet_name, pet_item_name } = await this.itemInventoryRepository
       .createQueryBuilder('iv')
@@ -26,8 +51,6 @@ export class ItemInventoryService {
       .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
       .select(['iv.pet_name as pet_name', 'ish.item_name as pet_item_name'])
       .getRawOne();
-
-    // Logger.log(`??? ${rtn}`);
 
     const [pet_type, pet_level] = pet_item_name.split('_');
 

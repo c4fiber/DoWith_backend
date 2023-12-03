@@ -63,4 +63,7 @@ export class User {
 
   @DeleteDateColumn()
   del_at: Date;
+
+  @Column({nullable: true})
+  socket_id: string;
 }

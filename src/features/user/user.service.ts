@@ -124,4 +124,15 @@ export class UserService {
 
     return users.map((user) => new UserResponseDto(user));
   }
+
+  async updateSocketId(user_id: number, socket_id: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { user_id }});
+    if (!user) {
+      return false;
+    }
+
+    user.socket_id = socket_id;
+    await this.userRepository.save(user);
+    return true;
+  }
 }
