@@ -6,6 +6,12 @@ import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { ItemShop } from 'src/item-shop/entities/item-shop.entity';
 import { Room } from 'src/room/entities/room.entity';
 
+enum PetLevel  {
+    lv1 = '01',
+    lv2 = '02',
+    lv3 = '03',
+}
+
 @Injectable()
 export class ItemInventoryService {
   constructor(
@@ -17,7 +23,6 @@ export class ItemInventoryService {
     private readonly dataSource: DataSource,
   ) {}
 
-  EVOLUTION_THRESHOLD: string = '03';
 
   async getMyMainPet(user_id: number) {
     const result = await this.dataSource
@@ -54,7 +59,7 @@ export class ItemInventoryService {
 
     const [pet_type, pet_level] = pet_item_name.split('_');
 
-    if (pet_level == this.EVOLUTION_THRESHOLD) {
+    if (pet_level == PetLevel.lv3) {
       // 펫이 이미 진화를 완료함
       throw this.doWithExceptions.PetEvolFinished;
     }

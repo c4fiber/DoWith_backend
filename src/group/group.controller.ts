@@ -5,6 +5,7 @@ import {
   Get,
   Logger,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Request,
@@ -124,11 +125,11 @@ export class GroupController {
   @Patch('/user/:todo_id/approve')
   @UseGuards(AuthGuard('jwt'))
   updateTodoDone(
-    @Param('todo_id') todo_id: number,
+    @Param('todo_id', ParseIntPipe) todo_id: number,
     @Request() req,
   ): Promise<any> {
     const user = req.user;
-    return this.groupService.updateTodoDone(todo_id, user.user_id);
+    return this.groupService.updateTodoDone(todo_id);
   }
 
   // 그룹 삭제 (인원수가 0이되면 삭제)

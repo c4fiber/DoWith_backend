@@ -9,6 +9,8 @@ import { User } from 'src/user/user.entities';
 import { ItemInventory } from 'src/item-inventory/entities/item-inventory.entity';
 import { Room } from 'src/room/entities/room.entity';
 
+
+
 @Injectable()
 export class TodoService {
   constructor(
@@ -20,14 +22,7 @@ export class TodoService {
 
   FIRST_TODO_REWARD: number = 100;
   NORAML_TODO_REWARD: number = 10;
-  GROUP_TODO_REWARD: number = 25;
   NORMAL_TODO_DAYLIMIT: number = 10;
-
-  PET_LV1: string = '01';
-  PET_LV2: string = '02';
-  PET_LV3: string = '03';
-  PET_LV1_EXP: number = 1000;
-  PET_LV2_EXP: number = 2000;
 
   // READ
   async findAllByUser(user_id: number): Promise<Todo[]> {
@@ -269,7 +264,7 @@ export class TodoService {
 
       // 2. 투두 관련 리워드 계산 & 유저 업데이트
       // 투두 시간 가져오기
-      const { todo_date } = await this.getTodoDate(queryRunner, todo_id);
+      const todo_date = await this.getTodoDate(queryRunner, todo_id);
       if (todo_date == null) {
         // 투두가 없음
         throw this.doWithExceptions.NoData;
@@ -349,8 +344,8 @@ export class TodoService {
   private async getTodoDate(queryRunner: QueryRunner, todo_id: number) {
     const todo = await queryRunner.manager
       .createQueryBuilder(Todo, 't')
-      .select(['t.todo_date'])
-      .where('t.todo_id = :todo_id', { todo_id: todo_id })
+      .select(['todo_date'])
+      .where('t.todo_id = :todo_id', { todo_id })
       .getRawOne();
 
     return todo ? todo.todo_date : null;

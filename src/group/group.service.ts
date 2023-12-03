@@ -15,6 +15,14 @@ import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 import { Room } from 'src/room/entities/room.entity';
 import { User } from 'src/user/user.entities';
 import { ItemInventory } from 'src/item-inventory/entities/item-inventory.entity';
+import { ItemShop } from 'src/item-shop/entities/item-shop.entity';
+
+// TODO: item-inventory.service.ts 와 공유
+enum PetLevel  {
+    lv1 = '01',
+    lv2 = '02',
+    lv3 = '03',
+}
 
 @Injectable()
 export class GroupService {
@@ -31,9 +39,6 @@ export class GroupService {
   GROUP_TODO_REWARD: number = 25;
   PET_EXP_REWARD: number = 10;
 
-  PET_LV1: string = '01';
-  PET_LV2: string = '02';
-  PET_LV3: string = '03';
   PET_LV1_EXP: number = 1000;
   PET_LV2_EXP: number = 2000;
 
@@ -481,13 +486,7 @@ export class GroupService {
     }
   }
 
-  async updateTodoDone(todo_id: number, user_id: number): Promise<any> {
-    // const result = await this.todoRepository
-    //   .createQueryBuilder('t')
-    //   .update({ todo_done: true })
-    //   .where({ todo_id })
-    //   .execute();
-
+  async updateTodoDone(todo_id: number): Promise<any> {
     const today: Date = new Date();
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -501,7 +500,7 @@ export class GroupService {
         .set({
           todo_done: true,
         })
-        .where('todo_id = :id', { id: todo_id })
+        .where({ todo_id })
         .execute();
 
       if (updatedTodo.affected === 0) {
@@ -512,25 +511,26 @@ export class GroupService {
 
       // 2. 투두 관련 리워드 계산 & 유저 업데이트
       // 투두 시간 가져오기
-      const { todo_date } = await this.getTodoDate(queryRunner, todo_id);
-      if (todo_date == null) {
+      const todo = await this.getTodoDateAndUserId(queryRunner, todo_id);
+      if (todo === null) {
         // 투두가 없음
         throw this.doWithException.NoData;
       }
 
+      const {todo_date, user_id} = todo;
+
       // 지난 날짜 투두는 제외
       if (this.isPastTodo(todo_date)) {
         const result = await queryRunner.manager
-          .createQueryBuilder(User, 'u')
-          .leftJoin('todo', 't', 't.user_id = u.user_id')
+          .createQueryBuilder(Todo, 't')
+          .leftJoin('user', 'u', 'u.user_id = t.user_id')
           .select([
             'u.user_id as user_id',
             'u.user_cash as user_cash',
             't.todo_id as todo_id',
             't.todo_done as todo_done',
           ])
-          .where('u.user_id = :user_id', { user_id })
-          .andWhere('t.todo_id = :todo_id', { todo_id })
+          .where('t.todo_id = :todo_id', { todo_id })
           .getRawOne();
 
         return { result };
@@ -585,7 +585,7 @@ export class GroupService {
           pet_exp: () => 'pet_exp + :exp',
         })
         .where('user_id = :user_id', { user_id: user_id, exp: petExp })
-        .andWhere('item_id = :item_id', { item_id: item_id })
+        .andWhere({ item_id })
         .execute();
 
       if (updateExp.affected === 0) {
@@ -597,13 +597,13 @@ export class GroupService {
       const [pet_type, pet_level] = item_name.split('_');
 
       if (
-        (pet_level === this.PET_LV1 && pet_exp >= this.PET_LV1_EXP) ||
-        (pet_level === this.PET_LV2 && pet_exp >= this.PET_LV2_EXP)
+        (pet_level === PetLevel.lv1 && pet_exp >= this.PET_LV1_EXP) ||
+        (pet_level === PetLevel.lv2 && pet_exp >= this.PET_LV2_EXP)
       ) {
         // 펫 진화 부분
         const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;
-        const next_pet: ItemInventory = await this.dataSource
-          .createQueryBuilder(ItemInventory, 'iv')
+        const next_pet: ItemShop = await this.dataSource
+          .createQueryBuilder(ItemShop, 'ish')
           .select()
           .where('item_name = :item_name', { item_name: next_pet_name })
           .getOne();
@@ -707,14 +707,15 @@ export class GroupService {
    * @param todo_id
    * @returns null if no todo exists
    */
-  private async getTodoDate(queryRunner: QueryRunner, todo_id: number) {
-    const todo = await queryRunner.manager
-      .createQueryBuilder(Todo, 't')
-      .select(['t.todo_date'])
-      .where('t.todo_id = :todo_id', { todo_id: todo_id })
+  private async getTodoDateAndUserId(queryRunner: QueryRunner, todo_id: number) {
+    const result = await queryRunner.manager
+      .getRepository(Todo)
+      .createQueryBuilder()
+      .select(['todo_date', 'user_id'])
+      .where({ todo_id })
       .getRawOne();
 
-    return todo ? todo.todo_date : null;
+    return result;
   }
 
   /**
