@@ -23,7 +23,7 @@ export class AppGateway {
 
 	async handleConnection(client: Socket) {
 		const socketId = client.id;
-		let userId = client.handshake.query.id;
+		let userId = client.handshake.query['user_id'];
 
 		if (Array.isArray(userId)) {
 			userId = userId[0];
