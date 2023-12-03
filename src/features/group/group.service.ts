@@ -14,21 +14,7 @@ import * as path from 'path';
 
 import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 import { Room } from 'src/entities/room.entity';
-
-enum PetLevel  {
-  lv1 = '01',
-  lv2 = '02',
-  lv3 = '03',
-}
-
-enum Reward {
-  FIRST_TODO_REWARD = 100,
-  GROUP_TODO_REWARD = 25,
-  PET_EXP_REWARD = 10,
-
-  PET_LV1_EXP = 1000,
-  PET_LV2_EXP = 2000,
-}
+import { Reward } from 'src/enums/Reward.enum';
 
 @Injectable()
 export class GroupService {
@@ -560,7 +546,7 @@ export class GroupService {
 
     return group ? group.users : [];
   }
-
+  
   /**
    * 날짜가 과거인지 확인
    * @param todo_date
@@ -574,7 +560,7 @@ export class GroupService {
   }
 
   /**
-   * 투두 날짜 반환
+   * 투두 날짜 반환 (2023.12.04 사용중x)
    * @param queryRunner
    * @param todo_id
    * @returns null if no todo exists
@@ -591,7 +577,7 @@ export class GroupService {
   }
 
   /**
-   * 유저의 Room에 있는 펫을 가져옵니다.
+   * 유저의 Room에 있는 펫을 가져옵니다. (2023.12.04 사용중x)
    * @param user_id
    * @returns
    */
@@ -633,7 +619,7 @@ export class GroupService {
   }
 
   /**
-   * 펫 경험치 계산
+   * 펫 경험치 계산 (2023.12.04 사용중x)
    * @param todo_done
    * @returns
    */

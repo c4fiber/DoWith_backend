@@ -5,12 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
 import { ItemShop } from 'src/entities/item-shop.entity';
 import { Room } from 'src/entities/room.entity';
-
-enum PetLevel  {
-    lv1 = '01',
-    lv2 = '02',
-    lv3 = '03',
-}
+import { PetLevel } from 'src/enums/PetLevel.enum';
 
 @Injectable()
 export class ItemInventoryService {
