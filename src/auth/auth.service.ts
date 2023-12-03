@@ -7,9 +7,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
-import { UserRequestDto } from 'src/features/user/dto/user-request.dto';
-import { UserResponseDto } from 'src/features/user/dto/user-response.dto';
-import { UserService } from 'src/features/user/user.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
@@ -80,6 +77,9 @@ export class AuthService {
     user.last_login = now;
     user.user_hp = 0;
 
+    // 펫 기본펫으로 (iv, r)
+    // 펫 이름
+
     // 토큰 발행
     const userId = user.user_id;
     const payload = { userId };
@@ -130,6 +130,13 @@ export class AuthService {
       token: token,
       kakao_id: user.user_kakao_id,
     };
+  }
+
+  async isUserNameUnique(user_name: string) {
+    const result = ! await this.userRepository.createQueryBuilder()
+                                    .where({ user_name })
+                                    .getExists();
+    return { result };
   }
 
   // === Helpers === //

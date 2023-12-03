@@ -28,6 +28,11 @@ export class AuthController {
     return await this.authService.login(token);
   }
 
+  @Get('/valid')
+  async isUserNameUnique(@Body('user_name') user_name: string) {
+    return await this.authService.isUserNameUnique(user_name);
+  }
+
   @Post('/singup')
   @UsePipes(ValidationPipe)
   async singup(
