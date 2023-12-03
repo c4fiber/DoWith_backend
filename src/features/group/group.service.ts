@@ -289,8 +289,8 @@ export class GroupService {
    * @description 1. 유저가 그룹에서 탈퇴
    *              2. 유저의 To-Do에서 그룹을 통해 생성된 To-Do 제거
    *              3. 그룹에 남은 인원이 없다면 그룹 삭제
-   *              4. 가입 시기가 가장 오래된 사람이 그룹장이 된다.
-   *              5.
+   *              4. 가입 시기가 가장 오래된 사람이 그룹장이 된다. - 3번이 미수행된 경우
+   *              5. 그룹에 해당하는 루틴 삭제 - 3번이 수행된 경우
    * @param grp_id 나갈 그룹
    * @param user_id 나가는 유저
    * @returns 
@@ -369,20 +369,20 @@ export class GroupService {
    */
   async getMemberTodoInGroup(grp_id: number, rout_id: number): Promise<{ result, path}>{
     const result = await this.grpRepo.createQueryBuilder('g')
-                             .select([
-                               't.user_id   AS user_id'
-                             , 't.todo_img  AS todo_img'
-                             , 't.todo_done AS todo_done'
-                             , 'u.user_name AS user_name'
-                             ])
-                             .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
-                             .leftJoin('routine', 'r', 't.grp_id = r.grp_id AND t.rout_id = r.rout_id')
-                             .leftJoin('user'   , 'u', 'u.user_id = t.user_id')
-                             .where('t.todo_img IS NOT NULL')
-                             .andWhere('g.grp_id = :grp_id', { grp_id })
-                             .andWhere('r.rout_id = :rout_id', { rout_id })
-                             .orderBy('t.todo_id')
-                             .getRawMany();
+                                     .select([
+                                       't.user_id   AS user_id'
+                                     , 't.todo_img  AS todo_img'
+                                     , 't.todo_done AS todo_done'
+                                     , 'u.user_name AS user_name'
+                                     ])
+                                     .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
+                                     .leftJoin('routine', 'r', 't.grp_id = r.grp_id AND t.rout_id = r.rout_id')
+                                     .leftJoin('user'   , 'u', 'u.user_id = t.user_id')
+                                     .where('t.todo_img IS NOT NULL')
+                                     .andWhere('g.grp_id = :grp_id', { grp_id })
+                                     .andWhere('r.rout_id = :rout_id', { rout_id })
+                                     .orderBy('t.todo_id')
+                                     .getRawMany();
 
     return { result, path: process.env.IMAGE_PATH } ;
   }
