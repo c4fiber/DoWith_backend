@@ -34,6 +34,9 @@ import { RoomModule } from './room/room.module';
 import { AppGateway } from './app.gateway';
 import { UserFriendModule } from './user_friend/user_friend.module';
 import { NotificationModule } from './notification/notification.module';
+import { TodoService } from './todo/todo.service';
+import { UserService } from './user/user.service';
+import { GroupService } from './group/group.service';
 
 @Module({
   imports: [
@@ -89,6 +92,9 @@ import { NotificationModule } from './notification/notification.module';
   controllers: [AppController],
   providers: [
     AppService,
+    TodoService,
+    UserService,
+    GroupService,
     Logger,
     {
       provide: APP_FILTER,
