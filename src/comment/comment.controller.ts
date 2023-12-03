@@ -13,10 +13,13 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update_comment.dto';
 import { Comment } from './comment.entity';
+import { AppGateway } from 'src/app.gateway';
 
 @Controller('guestbook')
 export class CommentController {
-    constructor(private commentService: CommentService) {}
+    constructor(
+        private commentService: CommentService,
+        private appGateWay: AppGateway) {}
     @Get(':owner_id/comment')
     findAllByOwner(
         @Param('owner_id', ParseIntPipe) owner_id: number,
@@ -25,15 +28,19 @@ export class CommentController {
     }
 
     @Post(':owner_id/comment')
-    create(
+    async createComment(
         @Param('owner_id', ParseIntPipe) owner_id: number,
         @Body() createCommentDto: CreateCommentDto
     ): Promise<Comment> {
-        return this.commentService.createComment(createCommentDto);
+        const newComment = await this.commentService.createComment(createCommentDto);
+        
+        this.appGateWay.notifyComment(newComment);
+
+        return newComment;
     }
 
     @Put(':owner_id/comment/:com_id')
-    update(
+    updateComment(
         @Param('com_id', ParseIntPipe) com_id: number,
         @Body() updateCommentDto: UpdateCommentDto,
     ): Promise<Comment> {
@@ -41,7 +48,7 @@ export class CommentController {
     }
 
     @Patch(':owner_id/comment/:com_id')
-    delete(
+    deleteComment(
         @Param('owner_id', ParseIntPipe) owner_id: number,
         @Param('com_id', ParseIntPipe) com_id: number
     ): Promise<Comment> {
