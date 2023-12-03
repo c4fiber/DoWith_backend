@@ -533,6 +533,7 @@ export class GroupService {
           .where('t.todo_id = :todo_id', { todo_id })
           .getRawOne();
 
+        await queryRunner.commitTransaction();
         return { result };
       }
 

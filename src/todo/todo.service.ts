@@ -278,6 +278,7 @@ export class TodoService {
           todo_id,
         );
 
+        await queryRunner.commitTransaction();
         return { result };
       }
 
