@@ -15,6 +15,9 @@ import * as path from 'path';
 import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 import { Room } from 'src/entities/room.entity';
 import { Reward } from 'src/enums/Reward.enum';
+import { ItemInventory } from 'src/entities/item-inventory.entity';
+import { PetLevel } from 'src/enums/PetLevel.enum';
+import { ItemShop } from 'src/entities/item-shop.entity';
 
 @Injectable()
 export class GroupService {
@@ -519,13 +522,197 @@ export class GroupService {
    * @returns 
    */
   async updateTodoDone(todo_id: number): Promise<any>{
-    const result = await this.todoRepo.createQueryBuilder('t')
-                                      .update({ todo_done: true })
-                                      .where({ todo_id })
-                                      .execute();
-     
-    return { result };
+
+    const today: Date = new Date();
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+    // 1. 투두 업데이트
+    const updatedTodo = await queryRunner.manager.createQueryBuilder()
+                                                 .update(Todo)
+                                                 .set({
+                                                  todo_done: true,
+                                                 })
+                                                 .where({ todo_id })
+                                                 .execute();
+
+    if (updatedTodo.affected === 0) {
+      // 투두가 없음
+      Logger.log('Todo data does not exist');
+      throw this.dwExcept.NoData;
+    }
+
+    // 2. 투두 관련 리워드 계산 & 유저 업데이트
+    // 투두 시간 가져오기
+    const todo = await this.getTodoDateAndUserId(queryRunner, todo_id);
+    if (todo === null) {
+      // 투두가 없음
+      throw this.dwExcept.NoData;
+    }
+
+    const {todo_date, user_id} = todo;
+
+    // 지난 날짜 투두는 제외
+    if (this.isPastTodo(todo_date)) {
+      const result = await queryRunner.manager.createQueryBuilder(Todo, 't')
+                                              .leftJoin('user', 'u', 'u.user_id = t.user_id')
+                                              .select([
+                                                'u.user_id as user_id',
+                                                'u.user_cash as user_cash',
+                                                't.todo_id as todo_id',
+                                                't.todo_done as todo_done',
+                                              ])
+                                              .where('t.todo_id = :todo_id', { todo_id })
+                                              .getRawOne();
+
+      await queryRunner.commitTransaction();
+      return { result };
+    }
+
+    // 기존 오늘 완료된 투두 개수
+    const todayDoneCnt = await this.todoRepo.createQueryBuilder('todo')
+                                            .where('user_id = :user_id', { user_id })
+                                            .andWhere('DATE(todo.todo_date) = DATE(:today)', { today })
+                                            .andWhere('todo_done = true')
+                                            .getCount();
+
+    const cash = this.calculateCash(true, todayDoneCnt);
+    const userUpdated = await queryRunner.manager.createQueryBuilder()
+                                                  .update(User)
+                                                  .set({
+                                                    user_cash: () => 'user_cash + :cash',
+                                                  })
+                                                  .where('user_id = :id', { id: user_id, cash: cash })
+                                                  .execute();
+
+    if (userUpdated.affected === 0) {
+      Logger.log('User data does not exist');
+      throw this.dwExcept.NoData;
+    }
+
+    // 2. 그룹인 경우 메인으로 설정된 유저 펫 경험치 업데이트
+    const main_pet = await this.getUserMainPet(queryRunner, user_id);
+    if (main_pet == null) {
+      // 펫이 존재하지 않음
+      throw this.dwExcept.NoData;
+    }
+
+    /**
+      'ish.item_id as item_id',
+      'ish.type_id as item_type',
+      'ish.item_name as item_name',
+      'ish.item_path as item_path',
+      'iv.pet_name as pet_name',
+      'iv.pet_exp as pet_exp',
+    */
+    const { item_id, item_name, pet_name, pet_exp } = main_pet;
+    const petExp = this.calculatePetExp(true);
+    let pet_item_id = item_id;
+
+    const updateExp = await queryRunner.manager.createQueryBuilder()
+                                               .update(ItemInventory)
+                                               .set({
+                                                pet_exp: () => 'pet_exp + :exp',
+                                               })
+                                               .where('user_id = :user_id', {
+                                                user_id: user_id, exp: petExp
+                                               })
+                                               .andWhere({ item_id })
+                                               .execute();
+
+    if (updateExp.affected === 0) {
+      Logger.log('Pet data does not exist');
+      throw this.dwExcept.NoData;
+    }
+
+    // 3. 펫 진화가 필요한 경우 진화
+    const [pet_type, pet_level] = item_name.split('_');
+
+    if ((pet_level === PetLevel.lv1 && pet_exp >= PetLevelExp.lv1) ||
+        (pet_level === PetLevel.lv2 && pet_exp >= PetLevelExp.lv2)) {
+
+        // 펫 진화
+        const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;
+        const next_pet: ItemShop = await this.dataSource.createQueryBuilder(ItemShop, 'ish')
+                                                        .select()
+                                                        .where('item_name = :item_name', {
+                                                          item_name: next_pet_name
+                                                        })
+                                                        .getOne();
+
+        if (next_pet == null) {
+          throw this.dwExcept.NoData;
+        }
+
+        pet_item_id = next_pet.item_id; // 진화된 경우
+
+        // 인벤토리에 새 펫 배치
+        await this.dataSource.createQueryBuilder()
+                             .insert()
+                             .into(ItemInventory)
+                             .values([
+                               {
+                                 user_id: user_id,
+                                 item_id: next_pet.item_id,
+                                 pet_name: pet_name,
+                                 pet_exp: 0, // 경험치는 다시 0으로
+                               },
+                             ])
+                             .execute();
+
+        // 메인 룸에 배치 [삭제 후 삽입]
+        await this.dataSource.createQueryBuilder(Room, 'r')
+                             .delete()
+                             .where('user_id = :user_id', { user_id })
+                             .andWhere('item_id = :item_id', { item_id })
+                             .execute();
+
+        await this.dataSource.createQueryBuilder()
+                             .insert()
+                             .into(Room)
+                             .values([
+                               {
+                                 user_id: user_id,
+                                 item_id: next_pet.item_id,
+                               },
+                             ])
+                             .execute();
+      }
+  
+      // 업데이트 결과 반환
+      const result = await queryRunner.manager.createQueryBuilder(User, 'u')
+                                              .leftJoin('todo', 't', 't.user_id = u.user_id')
+                                              .leftJoin(
+                                                'item_inventory',
+                                                'iv',
+                                                'iv.user_id = u.user_id AND iv.item_id = :pet_item_id',
+                                              )
+                                              .select([
+                                                'u.user_id as user_id',
+                                                'u.user_cash as user_cash',
+                                                't.todo_id as todo_id',
+                                                't.todo_done as todo_done',
+                                                'iv.item_id as item_id',
+                                                'iv.pet_exp as pet_exp',
+                                              ])
+                                              .where('u.user_id = :user_id', { user_id, pet_item_id })
+                                              .andWhere('t.todo_id = :todo_id', { todo_id })
+                                              .getRawOne();
+
+      await queryRunner.commitTransaction();
+      return { result };
+      
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new Error(error);
+      
+    } finally {
+      await queryRunner.release();
+    }
   }
+    
 
   /**
    * 그룹 삭제 함수 (2023.12.03 사용중x)
@@ -560,10 +747,10 @@ export class GroupService {
   }
 
   /**
-   * 투두 날짜 반환 (2023.12.04 사용중x)
+   * 투두 날짜 및 유저 아이디를 반환합니다.
    * @param queryRunner
    * @param todo_id
-   * @returns null if no todo exists
+   * @returns
    */
   private async getTodoDateAndUserId(queryRunner: QueryRunner, todo_id: number) {
     const result = await queryRunner.manager
@@ -577,7 +764,7 @@ export class GroupService {
   }
 
   /**
-   * 유저의 Room에 있는 펫을 가져옵니다. (2023.12.04 사용중x)
+   * 유저의 Room에 있는 펫을 가져옵니다.
    * @param user_id
    * @returns
    */
@@ -619,7 +806,7 @@ export class GroupService {
   }
 
   /**
-   * 펫 경험치 계산 (2023.12.04 사용중x)
+   * 펫 경험치 계산
    * @param todo_done
    * @returns
    */
