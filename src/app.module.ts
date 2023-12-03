@@ -33,6 +33,7 @@ import { ItemTypeModule } from './item-type/item-type.module';
 import { RoomModule } from './room/room.module';
 import { AppGateway } from './app.gateway';
 import { UserFriendModule } from './user_friend/user_friend.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { UserFriendModule } from './user_friend/user_friend.module';
     ErrorLogModule,
     ItemInventoryModule,
     RoomModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [
@@ -96,7 +98,7 @@ import { UserFriendModule } from './user_friend/user_friend.module';
     //   provide: APP_INTERCEPTOR,
     //   useClass: DoWithInterceptor,
     // },
-    AppGateway,
+    // AppGateway,
   ],
 })
 export class AppModule implements NestModule {

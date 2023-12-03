@@ -11,4 +11,4 @@ import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
   providers: [NotificationService, DoWithExceptions],
   exports: [NotificationService],
 })
-export class CommentModule {}
+export class NotificationModule {}
