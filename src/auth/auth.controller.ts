@@ -28,7 +28,7 @@ export class AuthController {
     return await this.authService.login(token);
   }
 
-  @Get('/valid')
+  @Post('/valid')
   async isUserNameUnique(@Body('user_name') user_name: string) {
     return await this.authService.isUserNameUnique(user_name);
   }
