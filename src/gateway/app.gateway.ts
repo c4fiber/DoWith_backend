@@ -2,12 +2,12 @@
 
 import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { NotificationService } from './notification/notification.service';
-import { TodoService } from './todo/todo.service';
-import { UserService } from './user/user.service';
-import { GroupService } from './group/group.service';
-import { CreateNotificationDto } from './notification/dto/createNotification.dto';
-import { Comment } from './comment/comment.entity';
+import { NotificationService } from '../notification/notification.service';
+import { TodoService } from '../todo/todo.service';
+import { UserService } from '../user/user.service';
+import { GroupService } from '../group/group.service';
+import { CreateNotificationDto } from '../notification/dto/createNotification.dto';
+import { Comment } from '../comment/comment.entity';
 
 @WebSocketGateway()
 export class AppGateway {
@@ -18,7 +18,8 @@ export class AppGateway {
     private userService: UserService,
     private todoService: TodoService,
     private groupService: GroupService,
-    private notificationService : NotificationService,) {}
+    private notificationService: NotificationService,
+    ) {}
 
 	async handleConnection(client: Socket) {
 		const socketId = client.id;

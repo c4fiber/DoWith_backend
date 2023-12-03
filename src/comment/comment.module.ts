@@ -4,10 +4,10 @@ import { CommentService } from './comment.service';
 import { Comment } from './comment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
-import { AppGateway } from 'src/app.gateway';
+import { GatewayModule } from 'src/gateway/gateway.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment]), AppGateway],
+  imports: [TypeOrmModule.forFeature([Comment]), GatewayModule],
   controllers: [CommentController],
   providers: [CommentService, DoWithExceptions],
   exports: [CommentService],

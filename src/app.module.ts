@@ -31,12 +31,13 @@ import { ItemInventoryModule } from './item-inventory/item-inventory.module';
 import { ItemShopModule } from './item-shop/item-shop.module';
 import { ItemTypeModule } from './item-type/item-type.module';
 import { RoomModule } from './room/room.module';
-import { AppGateway } from './app.gateway';
+import { AppGateway } from './gateway/app.gateway';
 import { UserFriendModule } from './user_friend/user_friend.module';
 import { NotificationModule } from './notification/notification.module';
 import { TodoService } from './todo/todo.service';
 import { UserService } from './user/user.service';
 import { GroupService } from './group/group.service';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -77,21 +78,21 @@ import { GroupService } from './group/group.service';
     ItemShopModule,
     AchievementsModule,
     // API Module
+    UserModule,
     TodoModule,
     GroupModule,
     RoutineModule,
-    UserModule,
     AuthModule,
+    NotificationModule,
     FriendModule,
     CommentModule,
     ErrorLogModule,
     ItemInventoryModule,
     RoomModule,
-    NotificationModule,
+    GatewayModule,
   ],
   controllers: [AppController],
   providers: [
-    AppGateway,
     AppService,
     Logger,
     {
@@ -103,7 +104,6 @@ import { GroupService } from './group/group.service';
     //   useClass: DoWithInterceptor,
     // },
   ],
-  exports: [AppGateway]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
