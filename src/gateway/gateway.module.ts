@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AppGateway } from "./app.gateway";
-import { UserModule } from 'src/user/user.module';
-import { GroupModule } from 'src/group/group.module';
-import { TodoModule } from 'src/todo/todo.module';
 import { NotificationModule } from 'src/notification/notification.module';
+import { UserModule } from 'src/features/user/user.module';
+import { GroupModule } from 'src/features/group/group.module';
+import { TodoModule } from 'src/features/todo/todo.module';
 
 @Module({
     imports: [UserModule, GroupModule, TodoModule, NotificationModule],
