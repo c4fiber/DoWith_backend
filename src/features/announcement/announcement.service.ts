@@ -10,7 +10,7 @@ export class AnnouncementService {
     private readonly annoRepo: Repository<Announcement>
   ){}
 
-  async getAllAnnouncements(): Promise<{ result: any[] }>{ 
+  async getAllAnnouncements(): Promise<{ result: any[], total: number }>{ 
     const result = await this.annoRepo.find({
       select: [
         'anno_id'
@@ -20,7 +20,7 @@ export class AnnouncementService {
       order: { reg_at: 'DESC' }
     });
 
-    return { result };
+    return { result, total: result.length };
   }
 
   async getAnnouncementDetail(anno_id: number): Promise<{ result }> {
