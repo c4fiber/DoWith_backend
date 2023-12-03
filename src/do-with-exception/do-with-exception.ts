@@ -51,6 +51,7 @@ enum DoWithErrorCode {
   ItemAlreadyInMyRoom = '409',  // 이미 펫이 존재하는 경우
   ItemNotInInventory  = '404',  // 펫이 존재하지 않는 경우
   PetMustBeOne        = '410',  // 펫은 하나만 존재해야 한다.
+  FailedToUpdateMyRoom = '411', // 방을 업데이트 하는데 실패했을 때
 }
 
 enum DoWithErrorMsg {
@@ -90,7 +91,8 @@ enum DoWithErrorMsg {
   // Room
   ItemAlreadyInMyRoom = '아이템이 이미 방에 존재합니다.',
   ItemNotInInventory  = '보유하지 않은 아이템 입니다.',
-  PetMustBeOne        = '펫은 방에 한마리만 둘 수 있습니다.'
+  PetMustBeOne        = '펫은 방에 한마리만 둘 수 있습니다.',
+  FailedToUpdateMyRoom = '방을 업데이트 하는데 실패했습니다.',
 }
 
 @Injectable()
@@ -229,5 +231,10 @@ export class DoWithExceptions {
     DoWithErrorMsg.PetMustBeOne,
     DoWithErrorCode.PetMustBeOne,
     HttpStatus.CONFLICT,
+  );
+  FailedToUpdateMyRoom = new DoWithException(
+    DoWithErrorMsg.FailedToUpdateMyRoom,
+    DoWithErrorCode.FailedToUpdateMyRoom,
+    HttpStatus.INTERNAL_SERVER_ERROR,
   );
 }

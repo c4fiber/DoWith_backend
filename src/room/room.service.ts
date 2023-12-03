@@ -34,12 +34,12 @@ export class RoomService {
   }
 
   async overlap(user_id: number, items: number[]): Promise<any> {
-    // 기존의 room아이템 모두 삭제
-    await this.roomRepo.delete({ user_id });
-
-    // 새로운 room아이템 추가
+    
     const result = this.dataSource.manager
       .transaction(async (manager) => {
+        // 기존의 room아이템 모두 삭제
+        await this.roomRepo.delete({ user_id });
+
         for (const item_id of items) {
           if (!(await this.isInInventory(user_id, item_id))) {
             throw this.doWithException.ItemNotInInventory;
@@ -53,9 +53,10 @@ export class RoomService {
         }
       })
       .catch((err) => {
-        throw new InternalServerErrorException(
-          '데이터를 삽입하는 과정에서 문제가 발생했습니다.',
-        );
+        throw new DoWithExceptions().FailedToUpdateMyRoom;
+      })
+      .finally(() => {
+        this.dataSource.manager.release();
       });
 
     return { result };
