@@ -152,4 +152,9 @@ export class DoWithExceptions {
     DoWithErrorCode.PetMustBeOne,
     HttpStatus.CONFLICT,
   );
+  FailedToUpdateMyRoom = new DoWithException(
+    DoWithErrorMsg.FailedToUpdateMyRoom,
+    DoWithErrorCode.FailedToUpdateMyRoom,
+    HttpStatus.INTERNAL_SERVER_ERROR,
+  );
 }
