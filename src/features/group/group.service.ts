@@ -559,10 +559,10 @@ export class GroupService {
       const result = await queryRunner.manager.createQueryBuilder(Todo, 't')
                                               .leftJoin('user', 'u', 'u.user_id = t.user_id')
                                               .select([
-                                                  'u.user_id as user_id',
-                                                  'u.user_cash as user_cash',
-                                                  't.todo_id as todo_id',
-                                                  't.todo_done as todo_done',
+                                                'u.user_id as user_id',
+                                                'u.user_cash as user_cash',
+                                                't.todo_id as todo_id',
+                                                't.todo_done as todo_done',
                                               ])
                                               .where('t.todo_id = :todo_id', { todo_id })
                                               .getRawOne();
@@ -573,16 +573,16 @@ export class GroupService {
 
     // 기존 오늘 완료된 투두 개수
     const todayDoneCnt = await this.todoRepo.createQueryBuilder('todo')
-                                          .where('user_id = :user_id', { user_id })
-                                              .andWhere('DATE(todo.todo_date) = DATE(:today)', { today })
-                                              .andWhere('todo_done = true')
-                                              .getCount();
+                                            .where('user_id = :user_id', { user_id })
+                                            .andWhere('DATE(todo.todo_date) = DATE(:today)', { today })
+                                            .andWhere('todo_done = true')
+                                            .getCount();
 
     const cash = this.calculateCash(true, todayDoneCnt);
     const userUpdated = await queryRunner.manager.createQueryBuilder()
                                                   .update(User)
                                                   .set({
-                                                  user_cash: () => 'user_cash + :cash',
+                                                    user_cash: () => 'user_cash + :cash',
                                                   })
                                                   .where('user_id = :id', { id: user_id, cash: cash })
                                                   .execute();
@@ -614,9 +614,11 @@ export class GroupService {
     const updateExp = await queryRunner.manager.createQueryBuilder()
                                                .update(ItemInventory)
                                                .set({
-                                                 pet_exp: () => 'pet_exp + :exp',
+                                                pet_exp: () => 'pet_exp + :exp',
                                                })
-                                               .where('user_id = :user_id', { user_id: user_id, exp: petExp })
+                                               .where('user_id = :user_id', {
+                                                user_id: user_id, exp: petExp
+                                               })
                                                .andWhere({ item_id })
                                                .execute();
 
