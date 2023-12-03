@@ -169,6 +169,7 @@ export class AppGateway {
 					message: `${sender.user_name}이 ${todo.todo_name}에 대한 인증을 완료하였습니다.`,
 					senderId: data.userId,
           senderName: sender.user_name,
+          receiverId: receiver.user_id,
 					todoId: data.todoId,
           totoName: todo.todo_name, });
 		} catch (error) {

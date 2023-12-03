@@ -5,7 +5,7 @@ import { Notification } from './notification.entity';
 import { User } from '../user/user.entities';
 import { Todo } from 'src/todo/todo.entity';
 import { CreateNotificationDto } from './dto/createNotification.dto';
-import { UpdateNotificationDto } from './dto/UpdateNotification.dto';
+import { UpdateNotificationDto } from './dto/updateNotification.dto';
 
 @Injectable()
 export class NotificationService {
