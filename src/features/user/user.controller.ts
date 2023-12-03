@@ -101,13 +101,6 @@ export class UserController {
     return await this.usersService.deleteUser(id);
   }
 
-  @Delete('/')
-  async deleteUserByKakaoId(
-    @Query('user_kakao_id') kakao_id: string,
-  ): Promise<void> {
-    return await this.usersService.deleteUserByKakaoId(kakao_id);
-  }
-
   @Post('/contacts')
   @UsePipes(ValidationPipe)
   async getUsersByContacts(
