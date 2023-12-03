@@ -17,7 +17,6 @@ export class AchievementsService {
                                           , 'ac.achi_desc AS achi_desc'
                                           , 'ac.is_hidden AS is_hidden'
                                           , 'ac.achi_img  AS achi_img'
-                                          , 'ac.achi_id'
                                           ])
                                           .leftJoin('achievements', 'ac', 'ua.achi_id = ac.achi_id')
                                           .where('ua.user_id = :user_id', { user_id })
