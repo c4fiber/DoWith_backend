@@ -14,6 +14,7 @@ import { Todo } from 'src/todo/todo.entity';
       UtilsModule
   ],
   controllers: [GroupController],
-  providers: [ GroupService, DoWithExceptions, MulterConfig]
+  providers: [ GroupService, DoWithExceptions, MulterConfig],
+  exports: [GroupService],
 })
 export class GroupModule {}

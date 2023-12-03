@@ -17,7 +17,7 @@ export class AppGateway {
   constructor(
     private notificationService : NotificationService,
     private userService: UserService,
-    private todoService : TodoService,
+    private todoService: TodoService,
     private groupService: GroupService) {}
 
 	async handleConnection(client: Socket) {

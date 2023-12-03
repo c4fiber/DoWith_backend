@@ -91,6 +91,7 @@ import { GroupService } from './group/group.service';
   ],
   controllers: [AppController],
   providers: [
+    AppGateway,
     AppService,
     TodoService,
     UserService,
@@ -104,7 +105,6 @@ import { GroupService } from './group/group.service';
     //   provide: APP_INTERCEPTOR,
     //   useClass: DoWithInterceptor,
     // },
-    AppGateway,
   ],
 })
 export class AppModule implements NestModule {
