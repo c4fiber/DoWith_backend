@@ -20,8 +20,6 @@ export class AnnouncementService {
       order: { reg_at: 'DESC' }
     });
 
-    Logger.debug(result);
-
     return { result };
   }
 
