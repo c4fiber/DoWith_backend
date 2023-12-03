@@ -15,10 +15,10 @@ export class AppGateway {
   server: Server;
 
   constructor(
-    private notificationService : NotificationService,
     private userService: UserService,
     private todoService: TodoService,
-    private groupService: GroupService) {}
+    private groupService: GroupService,
+    private notificationService : NotificationService,) {}
 
 	async handleConnection(client: Socket) {
 		const socketId = client.id;
