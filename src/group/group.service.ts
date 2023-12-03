@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
-import { DataSource, Raw, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Raw, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/user_group/entities/user_group.entity';
 import { Todo } from 'src/todo/todo.entity';
@@ -487,6 +487,7 @@ export class GroupService {
     //   .update({ todo_done: true })
     //   .where({ todo_id })
     //   .execute();
+
     const today: Date = new Date();
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -511,11 +512,29 @@ export class GroupService {
 
       // 2. 투두 관련 리워드 계산 & 유저 업데이트
       // 투두 시간 가져오기
-      const { todo_date } = await this.todoRepository
-        .createQueryBuilder()
-        .select(['grp_id', 'todo_date'])
-        .where('todo_id = :todo_id', { todo_id: todo_id })
-        .getRawOne();
+      const { todo_date } = await this.getTodoDate(queryRunner, todo_id);
+      if (todo_date == null) {
+        // 투두가 없음
+        throw this.doWithException.NoData;
+      }
+
+      // 지난 날짜 투두는 제외
+      if (this.isPastTodo(todo_date)) {
+        const result = await queryRunner.manager
+          .createQueryBuilder(User, 'u')
+          .leftJoin('todo', 't', 't.user_id = u.user_id')
+          .select([
+            'u.user_id as user_id',
+            'u.user_cash as user_cash',
+            't.todo_id as todo_id',
+            't.todo_done as todo_done',
+          ])
+          .where('u.user_id = :user_id', { user_id })
+          .andWhere('t.todo_id = :todo_id', { todo_id })
+          .getRawOne();
+
+        return { result };
+      }
 
       // 기존 오늘 완료된 투두 개수
       const todayDoneCnt = await this.todoRepository
@@ -525,7 +544,7 @@ export class GroupService {
         .andWhere('todo_done = true')
         .getCount();
 
-      const cash = this.calculateCash(true, todo_date, todayDoneCnt);
+      const cash = this.calculateCash(true, todayDoneCnt);
       const userUpdated = await queryRunner.manager
         .createQueryBuilder()
         .update(User)
@@ -541,7 +560,7 @@ export class GroupService {
       }
 
       // 2. 그룹인 경우 메인으로 설정된 유저 펫 경험치 업데이트
-      const main_pet = await this.getUserMainPet(user_id);
+      const main_pet = await this.getUserMainPet(queryRunner, user_id);
       if (main_pet == null) {
         // 펫이 존재하지 않음
         throw this.doWithException.NoData;
@@ -556,7 +575,7 @@ export class GroupService {
             'iv.pet_exp as pet_exp',
         */
       const { item_id, item_name, pet_name, pet_exp } = main_pet;
-      const petExp = this.calculatePetExp(true, todo_date);
+      const petExp = this.calculatePetExp(true);
       let pet_item_id = item_id;
 
       const updateExp = await queryRunner.manager
@@ -668,14 +687,43 @@ export class GroupService {
     return { result };
   }
 
-  // === Helpers === //
+  // * ========= Helpers ========== * //
+
+  /**
+   * 날짜가 과거인지 확인
+   * @param todo_date
+   * @returns
+   */
+  private isPastTodo(todo_date: Date): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    todo_date.setHours(0, 0, 0, 0);
+    return todo_date < today;
+  }
+
+  /**
+   * 투두 날짜 반환
+   * @param queryRunner
+   * @param todo_id
+   * @returns null if no todo exists
+   */
+  private async getTodoDate(queryRunner: QueryRunner, todo_id: number) {
+    const todo = await queryRunner.manager
+      .createQueryBuilder(Todo, 't')
+      .select(['t.todo_date'])
+      .where('t.todo_id = :todo_id', { todo_id: todo_id })
+      .getRawOne();
+
+    return todo ? todo.todo_date : null;
+  }
+
   /**
    * 유저의 Room에 있는 펫을 가져옵니다.
    * @param user_id
    * @returns
    */
-  private async getUserMainPet(user_id: number) {
-    return await this.dataSource
+  private async getUserMainPet(queryRunner: QueryRunner, user_id: number) {
+    return await queryRunner.manager
       .getRepository(Room)
       .createQueryBuilder('r')
       .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
@@ -695,24 +743,11 @@ export class GroupService {
   /**
    * 유저 캐시 보상 계산
    * @param todo_done
-   * @param todo_group
    * @param todo_date
    * @param todayDoneCnt
    * @returns
    */
-  private calculateCash(
-    todo_done: boolean,
-    todo_date: Date,
-    todayDoneCnt: number,
-  ) {
-    const today = new Date();
-    todo_date.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    if (todo_date < today) {
-      // 지난 날짜 투두는 제외
-      return 0;
-    }
-
+  private calculateCash(todo_done: boolean, todayDoneCnt: number) {
     if (
       (todo_done && todayDoneCnt === 0) ||
       (!todo_done && todayDoneCnt === 1)
@@ -727,18 +762,9 @@ export class GroupService {
   /**
    * 펫 경험치 계산
    * @param todo_done
-   * @param todo_date
    * @returns
    */
-  private calculatePetExp(todo_done: boolean, todo_date: Date) {
-    const today = new Date();
-    todo_date.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    if (todo_date < today) {
-      // 지난 날짜 투두는 제외
-      return 0;
-    }
-
+  private calculatePetExp(todo_done: boolean) {
     return this.PET_EXP_REWARD * (todo_done ? 1 : -1);
   }
 }
