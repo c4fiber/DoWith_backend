@@ -26,14 +26,15 @@ export enum DoWithErrorCode {
   NotInFriendship     = '0504',
 
   // Utils
-  NotAllowedExtension = '1000', // 지원하지 않는 확장자의 파일이 넘어왔을 때
-  ThereIsNoFile = '1001', // 파일 업로드 모듈 이용시 요청에 파일을 보내지 않았을 때
+  NotAllowedExtension     = '1000', // 지원하지 않는 확장자의 파일이 넘어왔을 때
+  ThereIsNoFile           = '1001', // 파일 업로드 모듈 이용시 요청에 파일을 보내지 않았을 때
   FailedToDeletedOriginal = '1002', // 이미지 압축 후 원본 파일 삭제 실패시
-  FailedToResizeImage = '1003', // 업로드한 이미지 압축에 실패시
-  NoData = '1004', // 요청한 데이터가 없는 경우
+  FailedToResizeImage     = '1003', // 업로드한 이미지 압축에 실패시
+  NoData                  = '1004', // 요청한 데이터가 없는 경우
 
   // Room
-  ItemAlreadyInMyRoom = '409',  // 이미 펫이 존재하는 경우
-  ItemNotInInventory  = '404',  // 펫이 존재하지 않는 경우
-  PetMustBeOne        = '410',  // 펫은 하나만 존재해야 한다.
+  ItemAlreadyInMyRoom  = '409',  // 이미 펫이 존재하는 경우
+  ItemNotInInventory   = '404',  // 펫이 존재하지 않는 경우
+  PetMustBeOne         = '410',  // 펫은 하나만 존재해야 한다.
+  FailedToUpdateMyRoom = '411', // 방을 업데이트 하는데 실패했을 때
 }

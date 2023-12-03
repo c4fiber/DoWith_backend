@@ -33,7 +33,8 @@ export enum DoWithErrorMsg {
   NoData = '요청하신 데이터가 없습니다.',
 
   // Room
-  ItemAlreadyInMyRoom = '아이템이 이미 방에 존재합니다.',
-  ItemNotInInventory  = '보유하지 않은 아이템 입니다.',
-  PetMustBeOne        = '펫은 방에 한마리만 둘 수 있습니다.'
+  ItemAlreadyInMyRoom  = '아이템이 이미 방에 존재합니다.',
+  ItemNotInInventory   = '보유하지 않은 아이템 입니다.',
+  PetMustBeOne         = '펫은 방에 한마리만 둘 수 있습니다.',
+  FailedToUpdateMyRoom = '방을 업데이트 하는데 실패했습니다.',
 }
