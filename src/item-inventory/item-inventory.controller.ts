@@ -17,6 +17,11 @@ import { User } from 'src/user/user.entities';
 export class ItemInventoryController {
   constructor(private readonly itemInventoryService: ItemInventoryService) {}
 
+  @Get('/:user_id/pet')
+  getMyMainPet(@Param('user_id', ParseIntPipe) user_id: number) {
+    return this.itemInventoryService.getMyMainPet(user_id);
+  }
+
   @Post('/:user_id/pet/:item_id')
   // @UseGuards(AuthGuard('jwt'))
   evolveMyPet(
