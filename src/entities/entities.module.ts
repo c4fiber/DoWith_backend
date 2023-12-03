@@ -16,6 +16,7 @@ import { UserGroup } from 'src/entities/user_group.entity';
 import { UserAchi } from './user_achi.entity';
 import { UserFriend } from 'src/entities/user_friend.entity';
 import { Achievements } from './achievements.entity';
+import { Announcement } from './announcement.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
@@ -36,6 +37,7 @@ import { Achievements } from './achievements.entity';
     , UserAchi
     , UserFriend
     , UserGroup
+    , Announcement
   ])]
 })
 export class EntitiesModule {}

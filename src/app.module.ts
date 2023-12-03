@@ -26,6 +26,7 @@ import { RoomModule } from './features/room/room.module';
 import { AppGateway } from './app.gateway';
 import { EntitiesModule } from './entities/entities.module';
 import { NotificationModule } from './notification/notification.module';
+import { AnnouncementModule } from './features/announcement/announcement.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { NotificationModule } from './notification/notification.module';
     RoomModule,
     EntitiesModule,
     NotificationModule,
+    AnnouncementModule,
   ],
   controllers: [AppController],
   providers: [
