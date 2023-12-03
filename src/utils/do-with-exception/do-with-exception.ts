@@ -38,6 +38,11 @@ export class DoWithExceptions {
     DoWithErrorMsg.SelfFriendship,
     HttpStatus.BAD_REQUEST,
   );
+  FailToSignUp = new DoWithException(
+    DoWithErrorMsg.FailToSignUp,
+    DoWithErrorCode.FailToSignUp,
+    HttpStatus.BAD_REQUEST,
+  );
 
   // =============== [ Group ] ===============
 

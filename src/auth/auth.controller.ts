@@ -33,11 +33,9 @@ export class AuthController {
     return await this.authService.isUserNameUnique(user_name);
   }
 
-  @Post('/singup')
+  @Post('/signup')
   @UsePipes(ValidationPipe)
-  async singup(
-    @Body() body: SignUpDto,
-  ): Promise<{ result: { user: User; token: string } }> {
+  async singup(@Body() body: SignUpDto) {
     return await this.authService.signup(body);
   }
 

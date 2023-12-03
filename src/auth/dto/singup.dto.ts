@@ -9,4 +9,7 @@ export class SignUpDto {
 
   @IsNotEmpty()
   user_kakao_id: string;
+
+  @IsNotEmpty()
+  user_pet_name: string;
 }
