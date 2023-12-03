@@ -1,43 +1,32 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TodoModule } from './todo/todo.module';
+import { TodoModule } from './features/todo/todo.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { DoWithMiddlewareMiddleware } from 'src/do-with-middleware/do-with-middleware.middleware';
-import { DoWithExceptionFilterModule } from './do-with-exception-filter/do-with-exception-filter.module';
-import { DoWithExceptionModule } from './do-with-exception/do-with-exception.module';
-import { UserModule } from './user/user.module';
+import { DoWithMiddlewareMiddleware } from 'src/utils/do-with-middleware/do-with-middleware.middleware';
+import { UserModule } from './features/user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { GroupModule } from './group/group.module';
-import { RoutineModule } from './routine/routine.module';
-import { CommentModule } from './comment/comment.module';
+import { GroupModule } from './features/group/group.module';
+import { RoutineModule } from './features/routine/routine.module';
+import { CommentModule } from './features/comment/comment.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { DoWithExceptionFilter } from './do-with-exception-filter/do-with-exception.filter';
+import { DoWithExceptionFilter } from './utils/do-with-exception-filter/do-with-exception.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { FriendModule } from './friend/friend.module';
-import { CategoryModule } from './category/category.module';
-import { UserGroupModule } from './user_group/user_group.module';
+import { FriendModule } from './features/friend/friend.module';
+import { CategoryModule } from './features/category/category.module';
 import { UtilsModule } from './utils/utils.module';
-import { DoWithInterceptorModule } from './do-with-interceptor/do-with-interceptor.module';
-import { DoWithInterceptor } from './do-with-interceptor/do-with-Interceptor';
-import { ErrorLogModule } from './error-log/error-log.module';
+import { DoWithInterceptor } from './utils/do-with-interceptor/do-with-Interceptor';
 import { HttpModule } from '@nestjs/axios';
-import { DaysModule } from './days/days.module';
-import { AchievementsModule } from './achievements/achievements.module';
-import { UserAchiModule } from './user_achi/user_achi.module';
-import { ItemInventoryModule } from './item-inventory/item-inventory.module';
-import { ItemShopModule } from './item-shop/item-shop.module';
-import { ItemTypeModule } from './item-type/item-type.module';
-import { RoomModule } from './room/room.module';
-import { AppGateway } from './gateway/app.gateway';
-import { UserFriendModule } from './user_friend/user_friend.module';
 import { NotificationModule } from './notification/notification.module';
-import { TodoService } from './todo/todo.service';
-import { UserService } from './user/user.service';
-import { GroupService } from './group/group.service';
 import { GatewayModule } from './gateway/gateway.module';
+import { AchievementsModule } from './features/achievements/achievements.module';
+import { ItemInventoryModule } from './features/item-inventory/item-inventory.module';
+import { ItemShopModule } from './features/item-shop/item-shop.module';
+import { RoomModule } from './features/room/room.module';
+import { EntitiesModule } from './entities/entities.module';
+import { AnnouncementModule } from './features/announcement/announcement.module';
 
 @Module({
   imports: [
@@ -63,18 +52,9 @@ import { GatewayModule } from './gateway/gateway.module';
       rootPath: join(__dirname, '..', 'public'),
     }),
     // Common Module
-    DoWithExceptionModule,
-    DoWithExceptionFilterModule,
-    DoWithInterceptorModule,
     UtilsModule,
-    // Junction Table
-    UserAchiModule,
-    UserGroupModule,
-    UserFriendModule,
     // Fixed Table
-    DaysModule,
     CategoryModule,
-    ItemTypeModule,
     ItemShopModule,
     AchievementsModule,
     // API Module
@@ -86,10 +66,12 @@ import { GatewayModule } from './gateway/gateway.module';
     NotificationModule,
     FriendModule,
     CommentModule,
-    ErrorLogModule,
     ItemInventoryModule,
     RoomModule,
     GatewayModule,
+    EntitiesModule,
+    NotificationModule,
+    AnnouncementModule,
   ],
   controllers: [AppController],
   providers: [

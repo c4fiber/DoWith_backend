@@ -1,5 +1,5 @@
 import { ExecutionContext, HttpStatus, createParamDecorator } from "@nestjs/common";
-import { DoWithException } from "src/do-with-exception/do-with-exception";
+import { DoWithException } from "src/utils/do-with-exception/do-with-exception";
 import { SelectQueryBuilder } from "typeorm";
 
 export const PagingOptions = createParamDecorator(
