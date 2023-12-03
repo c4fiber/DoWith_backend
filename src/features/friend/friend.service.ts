@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
 import { User } from 'src/entities/user.entities';
@@ -32,8 +32,8 @@ export class FriendService {
                                               END AS user_id`
                                           ])
                                           .setParameter('user_id', user_id)
-                                          .where('friend_id = :user_id', { user_id })
-                                          .orWhere('user_id = :user_id', { user_id })
+                                          .where('(friend_id = :user_id OR user_id = :user_id)', { user_id })
+                                          .andWhere('status = :status', { status: FriendStatus.FRIEND })
                                           .getRawMany();
     const frinedIds = getIdsFromItems(firends, 'user_id');
     const result = await this.userRepo.createQueryBuilder('u')
