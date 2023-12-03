@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from '../../entities/group.entity';
-import { DataSource, Raw, Repository, Transaction } from 'typeorm';
+import { DataSource, QueryRunner, Raw, Repository, Transaction } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/entities/user_group.entity';
 import { Todo } from 'src/entities/todo.entity';
@@ -13,6 +13,22 @@ import * as fs from 'fs/promises'
 import * as path from 'path';
 
 import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
+import { Room } from 'src/entities/room.entity';
+
+enum PetLevel  {
+  lv1 = '01',
+  lv2 = '02',
+  lv3 = '03',
+}
+
+enum Reward {
+  FIRST_TODO_REWARD = 100,
+  GROUP_TODO_REWARD = 25,
+  PET_EXP_REWARD = 10,
+
+  PET_LV1_EXP = 1000,
+  PET_LV2_EXP = 2000,
+}
 
 @Injectable()
 export class GroupService {
@@ -543,5 +559,85 @@ export class GroupService {
     });
 
     return group ? group.users : [];
+  }
+
+  /**
+   * 날짜가 과거인지 확인
+   * @param todo_date
+   * @returns
+   */
+  private isPastTodo(todo_date: Date): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    todo_date.setHours(0, 0, 0, 0);
+    return todo_date < today;
+  }
+
+  /**
+   * 투두 날짜 반환
+   * @param queryRunner
+   * @param todo_id
+   * @returns null if no todo exists
+   */
+  private async getTodoDateAndUserId(queryRunner: QueryRunner, todo_id: number) {
+    const result = await queryRunner.manager
+      .getRepository(Todo)
+      .createQueryBuilder()
+      .select(['todo_date', 'user_id'])
+      .where({ todo_id })
+      .getRawOne();
+
+    return result;
+  }
+
+  /**
+   * 유저의 Room에 있는 펫을 가져옵니다.
+   * @param user_id
+   * @returns
+   */
+  private async getUserMainPet(queryRunner: QueryRunner, user_id: number) {
+    return await queryRunner.manager
+      .getRepository(Room)
+      .createQueryBuilder('r')
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
+      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
+      .where('r.user_id = :user_id', { user_id: user_id })
+      .select([
+        'ish.item_id as item_id',
+        'ish.type_id as item_type',
+        'ish.item_name as item_name',
+        'ish.item_path as item_path',
+        'iv.pet_name as pet_name',
+        'iv.pet_exp as pet_exp',
+      ])
+      .getRawOne();
+  }
+
+  /**
+   * 유저 캐시 보상 계산
+   * @param todo_done
+   * @param todo_date
+   * @param todayDoneCnt
+   * @returns
+   */
+  private calculateCash(todo_done: boolean, todayDoneCnt: number) {
+    if (
+      (todo_done && todayDoneCnt === 0) ||
+      (!todo_done && todayDoneCnt === 1)
+    ) {
+      // 투두를 완료 체크한 경우 (첫 번째 투두 체크 또는 마지막 투두 체크해제)
+      return Reward.FIRST_TODO_REWARD * (todo_done ? 1 : -1);
+    }
+    // 기본 캐시 계산
+    return Reward.GROUP_TODO_REWARD * (todo_done ? 1 : -1);
+  }
+
+  /**
+   * 펫 경험치 계산
+   * @param todo_done
+   * @returns
+   */
+  private calculatePetExp(todo_done: boolean) {
+    return Reward.PET_EXP_REWARD * (todo_done ? 1 : -1);
   }
 }
