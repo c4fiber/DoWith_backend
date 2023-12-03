@@ -93,9 +93,6 @@ import { GroupService } from './group/group.service';
   providers: [
     AppGateway,
     AppService,
-    TodoService,
-    UserService,
-    GroupService,
     Logger,
     {
       provide: APP_FILTER,
@@ -106,6 +103,7 @@ import { GroupService } from './group/group.service';
     //   useClass: DoWithInterceptor,
     // },
   ],
+  exports: [AppGateway]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
