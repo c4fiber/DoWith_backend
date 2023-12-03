@@ -25,6 +25,7 @@ import { ItemShopModule } from './features/item-shop/item-shop.module';
 import { RoomModule } from './features/room/room.module';
 import { AppGateway } from './app.gateway';
 import { EntitiesModule } from './entities/entities.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { EntitiesModule } from './entities/entities.module';
     ItemInventoryModule,
     RoomModule,
     EntitiesModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [
@@ -79,7 +81,7 @@ import { EntitiesModule } from './entities/entities.module';
     //   provide: APP_INTERCEPTOR,
     //   useClass: DoWithInterceptor,
     // },
-    AppGateway,
+    // AppGateway,
   ],
 })
 export class AppModule implements NestModule {
