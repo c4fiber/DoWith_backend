@@ -502,7 +502,7 @@ export class GroupService {
   }
 
   async findUsersByGroupId(groupId: number): Promise<User[]> {
-    const group = await this.groupRepository.findOne({
+    const group = await this.grpRepo.findOne({
       where: { grp_id: groupId },
       relations: ['users'],
     });
