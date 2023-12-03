@@ -8,7 +8,6 @@ import { UserService } from './user/user.service';
 import { GroupService } from './group/group.service';
 import { CreateNotificationDto } from './notification/dto/createNotification.dto';
 import { Comment } from './comment/comment.entity';
-import { send } from 'process';
 
 @WebSocketGateway()
 export class AppGateway {

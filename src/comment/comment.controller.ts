@@ -13,13 +13,13 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update_comment.dto';
 import { Comment } from './comment.entity';
-// import { AppGateway } from 'src/app.gateway';
+import { AppGateway } from 'src/app.gateway';
 
 @Controller('guestbook')
 export class CommentController {
     constructor(
         private commentService: CommentService,
-        // private appGateWay: AppGateway
+        private appGateWay: AppGateway
         ) {}
     @Get(':owner_id/comment')
     findAllByOwner(
@@ -35,7 +35,7 @@ export class CommentController {
     ): Promise<Comment> {
         const newComment = await this.commentService.createComment(createCommentDto);
         
-        // this.appGateWay.notifyComment(newComment);
+        this.appGateWay.notifyComment(newComment);
 
         return newComment;
     }

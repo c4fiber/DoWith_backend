@@ -98,7 +98,7 @@ import { NotificationModule } from './notification/notification.module';
     //   provide: APP_INTERCEPTOR,
     //   useClass: DoWithInterceptor,
     // },
-    // AppGateway,
+    AppGateway,
   ],
 })
 export class AppModule implements NestModule {
