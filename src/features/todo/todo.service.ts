@@ -14,7 +14,7 @@ export class TodoService {
   constructor(
     @InjectRepository(Todo)
     private readonly todoRepository: Repository<Todo>,
-    private readonly doWithExceptions: DoWithExceptions,
+    private readonly dwExcept: DoWithExceptions,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -83,7 +83,7 @@ export class TodoService {
     if (user) {
       // 1. 오늘 로그인 날짜로 최신화
       await newLastLogin.execute();
-      throw this.doWithExceptions.AlreadyMadeTodos;
+      throw this.dwExcept.AlreadyMadeTodos;
     }
 
     try {
@@ -97,7 +97,7 @@ export class TodoService {
                                      .where({ user_id })
                                      .execute();
       if(result.affected === 0){
-        throw this.doWithExceptions.UserNotFound;  
+        throw this.dwExcept.UserNotFound;  
       }
       // 3. 누적 로그인 증가
       const test = await qr.manager.createQueryBuilder()
@@ -252,7 +252,7 @@ export class TodoService {
 
     if (todo_date == null) {
       // 투두가 없음
-      throw this.doWithExceptions.NoData;
+      throw this.dwExcept.NoData;
     }
 
     const todo_group = grp_id != null;
@@ -283,7 +283,7 @@ export class TodoService {
       if (updatedTodo.affected === 0) {
         // 투두가 없음
         Logger.log('Todo data does not exist');
-        throw this.doWithExceptions.NoData;
+        throw this.dwExcept.NoData;
       }
 
       // 2. 투두 관련 리워드 계산 & 유저 업데이트
@@ -304,7 +304,7 @@ export class TodoService {
 
       if (userUpdated.affected === 0) {
         Logger.log('User data does not exist');
-        throw this.doWithExceptions.NoData;
+        throw this.dwExcept.NoData;
       }
 
       // TODO: 그룹으로 옮기기
@@ -313,7 +313,7 @@ export class TodoService {
         const main_pet = await this.getUserMainPet(user_id);
         // 펫이 존재하지 않음
         if (main_pet == null) {
-          throw this.doWithExceptions.NoData;
+          throw this.dwExcept.NoData;
         }
 
         /**
@@ -339,7 +339,7 @@ export class TodoService {
 
         if (updateExp.affected === 0) {
           Logger.log('Pet data does not exist');
-          throw this.doWithExceptions.NoData;
+          throw this.dwExcept.NoData;
         }
 
         // 3. 펫 진화가 필요한 경우 진화
@@ -358,7 +358,7 @@ export class TodoService {
         //     .getOne();
 
         //   if (next_pet == null) {
-        //     throw this.doWithExceptions.NoData;
+        //     throw this.dwExcept.NoData;
         //   }
 
         //   // 인벤토리에 새 펫 배치

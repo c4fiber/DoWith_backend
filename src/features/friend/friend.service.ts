@@ -15,7 +15,7 @@ export class FriendService {
     private readonly userRepo: Repository<User>,
     @InjectRepository(UserFriend)
     private readonly userFriRepo: Repository<UserFriend>,
-    private readonly doWithExceptions: DoWithExceptions,
+    private readonly dwExcept: DoWithExceptions,
   ) {}
 
   /**
@@ -64,7 +64,7 @@ export class FriendService {
     const { user_id, friend_id } = body;
 
     if(user_id === friend_id){
-      throw this.doWithExceptions.SelfFriendship;
+      throw this.dwExcept.SelfFriendship;
     }
 
     const otherSide = await this.userFriRepo.findOne({
@@ -77,12 +77,12 @@ export class FriendService {
     if(otherSide){
       // 1. 상대가 나를 차단한 경우
       if(otherSide.status == FriendStatus.BLOCKED){
-        throw this.doWithExceptions.BlockedByFriend;
+        throw this.dwExcept.BlockedByFriend;
       }
 
       // 1. 이미 친구라면 요청 종료
       if(otherSide.status == FriendStatus.FRIEND){
-        throw this.doWithExceptions.AlreadyInFriendship;
+        throw this.dwExcept.AlreadyInFriendship;
       }
 
       // 1. 상대방이 요청을 보냈다면 친구 관계로 변경 후 종료
@@ -108,17 +108,17 @@ export class FriendService {
     if(mySide){
       // 2. 내가 상대방을 차단한 경우
       if(mySide.status == FriendStatus.BLOCKED){
-        throw this.doWithExceptions.BlockedByMe;
+        throw this.dwExcept.BlockedByMe;
       }
 
       // 2. 이미 친구라면 요청 종료
       if(mySide.status == FriendStatus.FRIEND){
-        throw this.doWithExceptions.AlreadyInFriendship;
+        throw this.dwExcept.AlreadyInFriendship;
       }
 
       // 2. 이미 요청을 보낸 상태인 경우
       if(mySide.status == FriendStatus.REQUESTED){
-        throw this.doWithExceptions.AlreadySendRequest;
+        throw this.dwExcept.AlreadySendRequest;
       }
 
       // 2. 요청은 보냈으나 거절 당한 경우
@@ -151,7 +151,7 @@ export class FriendService {
     const { user_id, friend_id } = body;
     // 자기 자신과 친구 요청 예외처리
     if (user_id === friend_id) {
-      throw this.doWithExceptions.SelfFriendship;
+      throw this.dwExcept.SelfFriendship;
     }
 
     const res1 = await this.userFriRepo.createQueryBuilder()
@@ -164,7 +164,7 @@ export class FriendService {
                                        .execute();
 
     if(res1.affected === 0 && res2.affected === 0){
-      throw this.doWithExceptions.NotInFriendship;
+      throw this.dwExcept.NotInFriendship;
     }
 
     return { result: res1.affected === 1 ? res1 : res2 };

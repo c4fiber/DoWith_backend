@@ -18,7 +18,7 @@ export class ItemShopService {
     private readonly itemInvenRepo: Repository<ItemInventory>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-    private readonly doWithExceptions: DoWithExceptions,
+    private readonly dwExcept: DoWithExceptions,
     private readonly dataSource: DataSource
   ){}
 
@@ -98,7 +98,7 @@ export class ItemShopService {
                                         .andWhere(`user_cash - ${item_cost.item_cost} >= 0`)
                                         .execute();
       if(result.affected === 0){
-        throw this.doWithExceptions.NotEnoughCash;
+        throw this.dwExcept.NotEnoughCash;
       }
       // 2. 유저 인벤토리에 구입한 아이템 추가
       await this.itemInvenRepo.createQueryBuilder('iv')

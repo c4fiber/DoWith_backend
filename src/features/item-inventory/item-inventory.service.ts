@@ -13,7 +13,7 @@ export class ItemInventoryService {
     private readonly itemInventoryRepository: Repository<ItemInventory>,
     @InjectRepository(ItemShop)
     private readonly itemShopRespository: Repository<ItemShop>,
-    private readonly doWithExceptions: DoWithExceptions,
+    private readonly dwExcept: DoWithExceptions,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -37,7 +37,7 @@ export class ItemInventoryService {
       .getRawOne();
 
     if (result == null) {
-      throw this.doWithExceptions.NoData;
+      throw this.dwExcept.NoData;
     }
 
     return { result };
@@ -56,7 +56,7 @@ export class ItemInventoryService {
 
     if (pet_level == this.EVOLUTION_THRESHOLD) {
       // 펫이 이미 진화를 완료함
-      throw this.doWithExceptions.PetEvolFinished;
+      throw this.dwExcept.PetEvolFinished;
     }
 
     const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;
@@ -65,7 +65,7 @@ export class ItemInventoryService {
     });
 
     if (next_pet == null) {
-      throw this.doWithExceptions.NoData;
+      throw this.dwExcept.NoData;
     }
 
     const result = await this.itemInventoryRepository
