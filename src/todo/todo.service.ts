@@ -6,6 +6,8 @@ import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { DoWithExceptions } from 'src/do-with-exception/do-with-exception';
 import { User } from 'src/user/user.entities';
+import { ItemInventory } from 'src/item-inventory/entities/item-inventory.entity';
+import { Room } from 'src/room/entities/room.entity';
 
 @Injectable()
 export class TodoService {
@@ -15,6 +17,17 @@ export class TodoService {
     private readonly doWithExceptions: DoWithExceptions,
     private readonly dataSource: DataSource,
   ) {}
+
+  FIRST_TODO_REWARD: number = 100;
+  NORAML_TODO_REWARD: number = 10;
+  GROUP_TODO_REWARD: number = 25;
+  NORMAL_TODO_DAYLIMIT: number = 10;
+
+  PET_LV1: string = '01';
+  PET_LV2: string = '02';
+  PET_LV3: string = '03';
+  PET_LV1_EXP: number = 1000;
+  PET_LV2_EXP: number = 2000;
 
   // READ
   async findAllByUser(user_id: number): Promise<Todo[]> {
@@ -170,7 +183,7 @@ export class TodoService {
     const query = this.todoRepository
       .createQueryBuilder('todo')
       .where('user_id = :user_id', { user_id })
-      .andWhere('DATE(todo.todo_date) = DATE(:now)', { today: now });
+      .andWhere('DATE(todo.todo_date) = DATE(:today)', { today: now });
 
     // 기존 오늘자 투두, 오늘 완료된 투두
     const [todo_today, todo_today_done] = await Promise.all([
@@ -179,6 +192,7 @@ export class TodoService {
     ]);
 
     const result = { todo_today, todo_today_done };
+    Logger.log(`today: ${todo_today}, ${todo_today_done}`);
     return { result };
   }
 
@@ -229,110 +243,287 @@ export class TodoService {
   }
 
   // 투두 완료상태 변경
-  async editDone(
-    todo_id: number,
-    dto: UpdateTodoDto,
-    user: User,
-  ): Promise<{ updated_todo: Todo; updated_user: User }> {
-    const todo = await this.todoRepository.findOneBy({ todo_id });
-
+  async editDone(todo_id: number, todo_done: boolean, user: User) {
     const today: Date = new Date();
     const { user_id } = user;
 
-    const isGroup = todo.grp_id != null;
-    const isDone = dto.todo_done == true;
+    const { grp_id, todo_date } = await this.todoRepository
+      .createQueryBuilder()
+      .select(['grp_id', 'todo_date'])
+      .where('todo_id = :todo_id', { todo_id: todo_id })
+      .andWhere('user_id = :user_id', { user_id: user_id })
+      .getRawOne();
 
-    const query = this.todoRepository
-      .createQueryBuilder('todo')
-      .where('user_id = :user_id', { user_id })
-      .andWhere('DATE(todo.todo_date) = DATE(:today)', { today });
+    if (todo_date == null) {
+      // 투두가 없음
+      throw this.doWithExceptions.NoData;
+    }
 
-    // 기존 오늘자 투두, 오늘 완료된 투두
-    const [todayCnt, todayDoneCnt] = await Promise.all([
-      query.getCount(),
-      query.clone().andWhere('todo_done = true').getCount(),
-    ]);
+    const todo_group = grp_id != null;
 
-    // TODO: fix
-    const newDoneCnt = todayDoneCnt + (isDone ? 1 : -1);
-    const achieveRate = (newDoneCnt / todayCnt) * 100;
-
-    const addHp = achieveRate >= 90 ? 10 : -10; // 유저 HP
-    let addCash = this.getCashAmount(isDone, isGroup, todayDoneCnt);
-    // let addPetExp = this.getPetExp(isGroup, todayDoneCnt);
-
-    const manager: EntityManager = this.dataSource.manager;
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    return await manager.transaction(async (manager) => {
-      // update todo
-      await manager.update(
-        Todo,
-        { todo_id: todo.todo_id },
-        { todo_done: isDone },
-      );
+    try {
+      // 기존 오늘 완료된 투두
+      const todayDoneCnt = await this.todoRepository
+        .createQueryBuilder('todo')
+        .where('user_id = :user_id', { user_id })
+        .andWhere('DATE(todo.todo_date) = DATE(:today)', { today })
+        .andWhere('todo_done = true')
+        .getCount();
 
-      // update user
-      const user = await manager.findOneBy(User, {
-        user_id: todo.user_id,
-      });
+      // 1. 투두 업데이트
+      const updatedTodo = await queryRunner.manager
+        .createQueryBuilder()
+        .update(Todo)
+        .set({
+          todo_done: todo_done,
+        })
+        .where('todo_id = :id', { id: todo_id })
+        .execute();
 
-      // 유저가 없는 경우
-      if (user == null) {
-        throw this.doWithExceptions.UserNotFound;
+      if (updatedTodo.affected === 0) {
+        // 투두가 없음
+        Logger.log('Todo data does not exist');
+        throw this.doWithExceptions.NoData;
       }
 
-      const { user_cash, user_hp } = user;
-      const result = await manager.update(
-        User,
-        { user_id: todo.user_id },
-        {
-          // 1. 그룹&개인: 캐시 업데이트
-          user_cash: user_cash + addCash,
-          // 2. 그룹&개인: HP 업데이트
-          user_hp: user_hp + addHp,
-          // 3. 그룹만: 펫 경험치 업데이트
-        },
+      // 2. 투두 관련 리워드 계산 & 유저 업데이트
+      const cash = this.calculateCash(
+        todo_done,
+        todo_group,
+        todo_date,
+        todayDoneCnt,
       );
+      const userUpdated = await queryRunner.manager
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          user_cash: () => 'user_cash + :cash',
+        })
+        .where('user_id = :id', { id: user_id, cash: cash })
+        .execute();
 
-      // 유저 테이블에 업데이트가 되지 않은 경우
-      if (result.affected == 0) {
-        throw this.doWithExceptions.UserNotFound;
-      } else {
-        // 업데이트된 데이터 반환
-        const updatedTodo = await manager.findOneBy(Todo, { todo_id: todo_id });
-        const updatedUser = await manager.findOneBy(User, { user_id: user_id });
-        return {
-          updated_todo: updatedTodo,
-          updated_user: updatedUser,
-        };
+      if (userUpdated.affected === 0) {
+        Logger.log('User data does not exist');
+        throw this.doWithExceptions.NoData;
       }
-    });
+
+      // TODO: 그룹으로 옮기기
+      // 2. 그룹인 경우 메인으로 설정된 유저 펫 경험치 업데이트
+      if (todo_group) {
+        const main_pet = await this.getUserMainPet(user_id);
+        // 펫이 존재하지 않음
+        if (main_pet == null) {
+          throw this.doWithExceptions.NoData;
+        }
+
+        /**
+            'ish.item_id as item_id',
+            'ish.type_id as item_type',
+            'ish.item_name as item_name',
+            'ish.item_path as item_path',
+            'iv.pet_name as pet_name',
+            'iv.pet_exp as pet_exp',
+        */
+        const { item_id, item_name, pet_name, pet_exp } = main_pet;
+        const petExp = this.calculatePetExp(todo_done, todo_date);
+
+        const updateExp = await queryRunner.manager
+          .createQueryBuilder()
+          .update(ItemInventory)
+          .set({
+            pet_exp: () => 'pet_exp + :exp',
+          })
+          .where('user_id = :user_id', { user_id: user_id, exp: petExp })
+          .andWhere('item_id = :item_id', { item_id: item_id })
+          .execute();
+
+        if (updateExp.affected === 0) {
+          Logger.log('Pet data does not exist');
+          throw this.doWithExceptions.NoData;
+        }
+
+        // 3. 펫 진화가 필요한 경우 진화
+        // const [pet_type, pet_level] = item_name.split('_');
+
+        // if (
+        //   (pet_level === this.PET_LV1 && pet_exp >= this.PET_LV1_EXP) ||
+        //   (pet_level === this.PET_LV2 && pet_exp >= this.PET_LV2_EXP)
+        // ) {
+        //   // 펫 진화 부분
+        //   const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;
+        //   const next_pet: ItemInventory = await this.dataSource
+        //     .createQueryBuilder(ItemInventory, 'iv')
+        //     .select()
+        //     .where('item_name = :item_name', { item_name: next_pet_name })
+        //     .getOne();
+
+        //   if (next_pet == null) {
+        //     throw this.doWithExceptions.NoData;
+        //   }
+
+        //   // 인벤토리에 새 펫 배치
+        //   await this.dataSource
+        //     .createQueryBuilder()
+        //     .insert()
+        //     .into(ItemInventory)
+        //     .values([
+        //       {
+        //         user_id: user_id,
+        //         item_id: next_pet.item_id,
+        //         pet_name: pet_name,
+        //         pet_exp: 0, // 경험치는 다시 0으로
+        //       },
+        //     ])
+        //     .execute();
+
+        //   // 메인 룸에 배치 [삭제 후 삽입]
+        //   await this.dataSource
+        //     .createQueryBuilder(Room, 'r')
+        //     .delete()
+        //     .where('user_id = :user_id', { user_id })
+        //     .andWhere('item_id = :item_id', { item_id })
+        //     .execute();
+
+        //   await this.dataSource
+        //     .createQueryBuilder()
+        //     .insert()
+        //     .into(Room)
+        //     .values([
+        //       {
+        //         user_id: user_id,
+        //         item_id: next_pet.item_id,
+        //       },
+        //     ])
+        //     .execute();
+        // }
+      }
+
+      // 업데이트 결과 반환
+      const result = await queryRunner.manager
+        .createQueryBuilder(User, 'u')
+        .leftJoin('todo', 't', 't.user_id = u.user_id')
+        .leftJoin(
+          'item_inventory',
+          'iv',
+          //   'iv.user_id = u.user_id AND iv.item_id = :item_id',
+          'iv.user_id = u.user_id',
+        )
+        .select([
+          'u.user_id as user_id',
+          'u.user_cash as user_cash',
+          't.todo_id as todo_id',
+          't.todo_done as todo_done',
+          'iv.item_id as item_id',
+          'iv.pet_exp as pet_exp',
+        ])
+        .where('u.user_id = :user_id', { user_id: user_id })
+        .andWhere('t.todo_id = :todo_id', { todo_id: todo_id })
+        .getRawOne();
+
+      await queryRunner.commitTransaction();
+      return { result };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new Error(error);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   // === Helpers === //
-  private getCashAmount(
-    isDone: boolean,
-    isGroup: boolean,
+  /**
+   * 유저의 Room에 있는 펫을 가져옵니다.
+   * @param user_id
+   * @returns
+   */
+  private async getUserMainPet(user_id: number) {
+    return await this.dataSource
+      .getRepository(Room)
+      .createQueryBuilder('r')
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
+      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
+      .where('r.user_id = :user_id', { user_id: user_id })
+      .select([
+        'ish.item_id as item_id',
+        'ish.type_id as item_type',
+        'ish.item_name as item_name',
+        'ish.item_path as item_path',
+        'iv.pet_name as pet_name',
+        'iv.pet_exp as pet_exp',
+      ])
+      .getRawOne();
+  }
+
+  /**
+   * 유저의 펫을 진화시킵니다.
+   * @param user_id
+   * @param pet_name 펫 이름 ex. 귀염둥이
+   * @param pet_type 펫 아이템 이름 ex. 구미호
+   * @param pet_level 펫 레벨 ex. '03'
+   * @returns
+   */
+  private async evolveUserMainPet(
+    user_id: number,
+    pet_name: string,
+    pet_type: string,
+    pet_level: string,
+  ) {}
+
+  /**
+   * 유저 캐시 보상 계산
+   * @param todo_done
+   * @param todo_group
+   * @param todo_date
+   * @param todayDoneCnt
+   * @returns
+   */
+  private calculateCash(
+    todo_done: boolean,
+    todo_group: boolean,
+    todo_date: Date,
     todayDoneCnt: number,
   ) {
-    if ((isDone && todayDoneCnt === 0) || (!isDone && todayDoneCnt === 1)) {
+    const today = new Date();
+    todo_date.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    if (todo_date < today) {
+      // 지난 날짜 투두는 제외
+      return 0;
+    }
+
+    if (
+      (todo_done && todayDoneCnt === 0) ||
+      (!todo_done && todayDoneCnt === 1)
+    ) {
       // 투두를 완료 체크한 경우 (첫 번째 투두 체크 또는 마지막 투두 체크해제)
-      return isDone ? 100 : -100;
-    } else if (!isGroup && todayDoneCnt >= 10) {
+      return todo_done ? 100 : -100;
+    } else if (!todo_group && todayDoneCnt >= 10) {
       // 개인 투두는 10개까지 제한
       return 0;
     }
     // 기본 캐시 계산
-    return isGroup ? (isDone ? 25 : -25) : isDone ? 10 : -10;
+    return todo_group ? (todo_done ? 25 : -25) : todo_done ? 10 : -10;
   }
 
-  private getPetExp(isGroup: boolean, todayDoneCnt: number) {
-    if (isGroup && todayDoneCnt >= 50) {
-      // 개인은 하루 최대 50개까지 제한
+  /**
+   * 펫 경험치 계산
+   * @param todo_done
+   * @param todo_date
+   * @returns
+   */
+  private calculatePetExp(todo_done: boolean, todo_date: Date) {
+    const today = new Date();
+    todo_date.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    if (todo_date < today) {
+      // 지난 날짜 투두는 제외
       return 0;
     }
-    // 개인이면 5, 그룹이면 10
-    return isGroup ? 5 : 10;
+
+    return todo_done ? 10 : -10;
   }
 }
