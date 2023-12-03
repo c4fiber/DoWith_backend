@@ -31,34 +31,6 @@ export class UserService {
     return await this.userRepository.findOneBy({ user_kakao_id: kakao_id });
   }
 
-  // 새로운 유저 생성
-  async createUser(request: UserRequestDto): Promise<UserResponseDto> {
-    const { user_name, user_tel, user_kakao_id } = request;
-
-    // 만약 이미 가입된 유저인 경우 예외처리
-    if ((await this.getUserByKakaoId(user_kakao_id)) != null) {
-      throw this.doWithException.UserAlreadyExists;
-    }
-
-    // 중복 닉네임 예외처리
-    if ((await this.getUserByName(user_name)) != null) {
-      throw this.doWithException.UserNameNotUnique;
-    }
-
-    // 유저 엔티티 생성
-    const now = new Date();
-    const user = new User();
-
-    user.user_name = user_name;
-    user.user_tel = user_tel;
-    user.user_kakao_id = user_kakao_id;
-    user.last_login = now;
-    user.user_hp = 0;
-
-    await this.userRepository.save(user);
-    return new UserResponseDto(user);
-  }
-
   // 유저 수정
   async updateUser(id: number, request: UserRequestDto): Promise<boolean> {
     // 만약 중복된 이름일 경우 예외 반환

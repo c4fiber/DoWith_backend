@@ -5,6 +5,7 @@ import {
   FileTypeValidator,
   FileValidator,
   Get,
+  Logger,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -13,7 +14,9 @@ import {
   Post,
   Put,
   Query,
+  Request,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -24,42 +27,47 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from './user.entities';
 
 @Controller('user')
 export class UserController {
   constructor(
-      private readonly usersService: UserService
-    , private readonly multerConifg: MulterConfig
+    private readonly usersService: UserService,
+    private readonly multerConifg: MulterConfig,
   ) {
     this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
   }
 
-  @Get('/:user_id')
-  async getUser(
-    @Param('user_id', ParseIntPipe) id: number,
-  ): Promise<UserResponseDto> {
-    return await this.usersService.getUser(id);
-  }
-
   @Get('/')
-  async getUserByKakakoId(
-    @Query('user_kakao_id') kakaoId: string,
-  ): Promise<UserResponseDto> {
-    return await this.usersService.getUserByKakaoId(kakaoId);
+  @UseGuards(AuthGuard('jwt'))
+  async getUser(@Request() req): Promise<{ result }> {
+    const user: User = req.user;
+    Logger.log(`User info from jwt: ${user.user_id}`);
+    const result = user;
+    return { result };
   }
 
-  @Get('/')
-  async getUserByName(
-    @Query('user_name') name: string,
-  ): Promise<UserResponseDto> {
-    return await this.usersService.getUserByName(name);
-  }
+  //   @Get('/:user_id')
+  //   async getUserById(
+  //     @Param('user_id', ParseIntPipe) id: number,
+  //   ): Promise<UserResponseDto> {
+  //     return await this.usersService.getUser(id);
+  //   }
 
-  @Post('/')
-  @UsePipes(ValidationPipe)
-  async createUser(@Body() body: UserRequestDto): Promise<UserResponseDto> {
-    return await this.usersService.createUser(body);
-  }
+  //   @Get('/')
+  //   async getUserByKakakoId(
+  //     @Query('user_kakao_id') kakaoId: string,
+  //   ): Promise<UserResponseDto> {
+  //     return await this.usersService.getUserByKakaoId(kakaoId);
+  //   }
+
+  //   @Get('/')
+  //   async getUserByName(
+  //     @Query('user_name') name: string,
+  //   ): Promise<UserResponseDto> {
+  //     return await this.usersService.getUserByName(name);
+  //   }
 
   @UseInterceptors(FileInterceptor('profile'))
   @Post('/:user_id/profile')
