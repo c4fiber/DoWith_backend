@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Request,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -47,9 +48,7 @@ export class GroupController {
 
   // 그룹 상세조회
   @Get('/:grp_id')
-  getGroupOne(
-    @Param('grp_id') grp_id: number,
-  ): Promise<{
+  getGroupOne(@Param('grp_id') grp_id: number): Promise<{
     result: {
       grp_detail: Group;
       rout_detail: Array<any>;
@@ -123,9 +122,13 @@ export class GroupController {
 
   // 그룹원 할 일 인증 승인
   @Patch('/user/:todo_id/approve')
-  //   @UseGuards(AuthGuard('jwt'))
-  updateTodoDone(@Param('todo_id') todo_id: number): Promise<any> {
-    return this.groupService.updateTodoDone(todo_id);
+  @UseGuards(AuthGuard('jwt'))
+  updateTodoDone(
+    @Param('todo_id') todo_id: number,
+    @Request() req,
+  ): Promise<any> {
+    const user = req.user;
+    return this.groupService.updateTodoDone(todo_id, user.user_id);
   }
 
   // 그룹 삭제 (인원수가 0이되면 삭제)
