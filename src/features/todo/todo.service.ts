@@ -8,6 +8,7 @@ import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception'
 import { User } from 'src/entities/user.entities';
 import { Room } from 'src/entities/room.entity';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
+import { Reward } from 'src/enums/Reward.enum';
 
 
 
@@ -20,9 +21,6 @@ export class TodoService {
     private readonly dataSource: DataSource,
   ) {}
 
-  FIRST_TODO_REWARD: number = 100;
-  NORAML_TODO_REWARD: number = 10;
-  NORMAL_TODO_DAYLIMIT: number = 10;
 
   // READ
   async findAllByUser(user_id: number): Promise<Todo[]> {
@@ -318,7 +316,6 @@ export class TodoService {
     }
   }
 
-  // * ========= Helpers ========== * //
 
   /**
    * 날짜가 과거인지 확인
@@ -388,11 +385,11 @@ export class TodoService {
     ) {
       // 투두를 완료 체크한 경우 (첫 번째 투두 체크 또는 마지막 투두 체크해제)
       return todo_done ? 100 : -100;
-    } else if (todayDoneCnt >= 10) {
-      // 개인 투두는 10개까지 제한
+    } else if (todo_done && todayDoneCnt >= 10) {
+      // 개인 투두 달성 보상은 10개까지 제한
       return 0;
     }
     // 기본 캐시 계산
-    return this.NORAML_TODO_REWARD * (todo_done ? 1 : -1);
+    return Reward.NORAML_TODO_REWARD * (todo_done ? 1 : -1);
   }
 }
