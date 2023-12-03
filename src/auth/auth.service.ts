@@ -133,9 +133,11 @@ export class AuthService {
   }
 
   async isUserNameUnique(user_name: string) {
-    const result = ! await this.userRepository.createQueryBuilder()
+    const user = await this.userRepository.createQueryBuilder()
                                     .where({ user_name })
-                                    .getExists();
+                                    .select(['user_id'])
+                                    .getRawOne();
+    const result = user == null;
     return { result };
   }
 
