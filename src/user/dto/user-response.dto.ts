@@ -18,6 +18,9 @@ export class UserResponseDto {
   user_hp: number;
 
   @IsNotEmpty()
+  socket_id: string;
+
+  @IsNotEmpty()
   user_cash: number;
 
   @IsNotEmpty()
@@ -35,6 +38,7 @@ export class UserResponseDto {
     this.user_tel = user.user_tel;
     this.user_kakao_id = user.user_kakao_id;
     this.user_hp = user.user_hp;
+    this.socket_id = user.socket_id;
     this.user_cash = user.user_cash;
     this.login_cnt = user.login_cnt;
     this.login_seq = user.login_seq;

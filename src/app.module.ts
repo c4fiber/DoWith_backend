@@ -32,6 +32,8 @@ import { ItemShopModule } from './item-shop/item-shop.module';
 import { ItemTypeModule } from './item-type/item-type.module';
 import { RoomModule } from './room/room.module';
 import { AppGateway } from './app.gateway';
+import { UserFriendModule } from './user_friend/user_friend.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -61,7 +63,16 @@ import { AppGateway } from './app.gateway';
     DoWithExceptionFilterModule,
     DoWithInterceptorModule,
     UtilsModule,
-
+    // Junction Table
+    UserAchiModule,
+    UserGroupModule,
+    UserFriendModule,
+    // Fixed Table
+    DaysModule,
+    CategoryModule,
+    ItemTypeModule,
+    ItemShopModule,
+    AchievementsModule,
     // API Module
     TodoModule,
     GroupModule,
@@ -69,17 +80,11 @@ import { AppGateway } from './app.gateway';
     UserModule,
     AuthModule,
     FriendModule,
-    CategoryModule,
-    UserGroupModule,
     CommentModule,
     ErrorLogModule,
-    DaysModule,
-    AchievementsModule,
-    UserAchiModule,
-    ItemShopModule,
     ItemInventoryModule,
-    ItemTypeModule,
     RoomModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [
@@ -93,7 +98,7 @@ import { AppGateway } from './app.gateway';
     //   provide: APP_INTERCEPTOR,
     //   useClass: DoWithInterceptor,
     // },
-    AppGateway,
+    // AppGateway,
   ],
 })
 export class AppModule implements NestModule {

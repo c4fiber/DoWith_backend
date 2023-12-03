@@ -1,26 +1,25 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from '../user/user.entities';
 
-@Entity()
-export class Comment {
+@Entity('notification')
+export class Notification {
 	@PrimaryGeneratedColumn()
 	noti_id: number;
 
 	@Column()
-	receiver_id: number;
+	receiver_id: string;
 
 	@Column()
-	sender_id: number;
+	sender_id: string;
 
 	@Column()
-	noti_type : number;
+	noti_type : string;
 
     @Column()
-    req_type : number;
+    req_type : string;
 
 	@Column()
 	noti_time: Date;
 
 	@Column()
-	sub_id: number;
+	sub_id: string;
 }
