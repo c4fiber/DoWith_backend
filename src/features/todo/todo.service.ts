@@ -65,22 +65,20 @@ export class TodoService {
    * @returns 
    */
   async createTodayTodo(user_id: number){
-    const queryRunner = this.dataSource.createQueryRunner();
+    const qr = this.dataSource.createQueryRunner();
     // 마지막 로그인 유저 정보
-    const user = await queryRunner.manager
-      .createQueryBuilder()
-      .from('user', 'u')
-      .where('u.user_id = :user_id', { user_id })
-      .andWhere(
-        `to_char(u.last_login, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`,
-      )
-      .getRawOne();
+    const user = await qr.manager.createQueryBuilder()
+                                 .from('user', 'u')
+                                 .where('u.user_id = :user_id', { user_id })
+                                 .andWhere(
+                                   `to_char(u.last_login, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`,
+                                 )
+                                 .getRawOne();
     // 1. 마지막 로그인 일자 갱신 쿼리 (실행 x)
-    const newLastLogin = queryRunner.manager
-      .createQueryBuilder()
-      .update('user')
-      .set({ last_login: () => 'now()' })
-      .where('user_id = :user_id', { user_id });
+    const newLastLogin = qr.manager.createQueryBuilder()
+                                   .update('user')
+                                   .set({ last_login: () => 'now()' })
+                                   .where('user_id = :user_id', { user_id });
     // 이미 todo 생성했을 경우
     if (user) {
       // 1. 오늘 로그인 날짜로 최신화
@@ -89,88 +87,83 @@ export class TodoService {
     }
 
     try {
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
+      await qr.connect();
+      await qr.startTransaction();
 
       // 2. 연속 로그인 증가
-      const result = await queryRunner.manager.createQueryBuilder()
-                               .update('user')
-                               .set({ login_cnt: () => '"login_cnt" + 1' })
-                               .where({ user_id })
-                               .execute();
+      const result = await qr.manager.createQueryBuilder()
+                                     .update('user')
+                                     .set({ login_cnt: () => '"login_cnt" + 1' })
+                                     .where({ user_id })
+                                     .execute();
       if(result.affected === 0){
         throw this.doWithExceptions.UserNotFound;  
       }
       // 3. 누적 로그인 증가
-      const test = await queryRunner.manager
-        .createQueryBuilder()
-        .update('user')
-        .set({
-          login_seq:
-            () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
-                                                             THEN "login_seq" + 1 
-                                                             ELSE 1
-                                                         END`,
-        })
-        .where({ user_id })
-        .execute();
+      const test = await qr.manager.createQueryBuilder()
+                                   .update('user')
+                                   .set({
+                                     login_seq:
+                                       () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
+                                                   THEN "login_seq" + 1 
+                                                   ELSE 1
+                                               END`,
+                                   })
+                                   .where({ user_id })
+                                   .execute();
       // 1. 오늘 로그인 날짜로 최신화
       await newLastLogin.execute();
       // 4. todo 생성기 - 유저가 가입한 그룹 리스트
-      const subQuery = await queryRunner.manager
-        .createQueryBuilder()
-        .select(['g.grp_id AS grp_id'])
-        .from('group', 'g')
-        .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-        .where('ug.user_id = :user_id', { user_id })
-        .getQuery();
+      const subQuery = await qr.manager.createQueryBuilder()
+                                       .select(['g.grp_id AS grp_id'])
+                                       .from('group', 'g')
+                                       .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                       .where('ug.user_id = :user_id', { user_id })
+                                       .getQuery();
       // 4. todo 생성기 - 가입한 그룹에서 오늘 요일에 해당하는 루틴 리스트
-      const todos = await queryRunner.manager
-        .createQueryBuilder()
-        .select([
-          `${user_id}  AS user_id`,
-          'r.rout_name AS todo_name',
-          'r.rout_desc AS todo_desc',
-          'g.cat_id    AS todo_label',
-          'r.rout_srt  AS todo_start',
-          'r.rout_end  AS todo_end',
-          'r.grp_id    AS grp_id',
-          'r.rout_id   AS rout_id',
-        ])
-        .from('routine', 'r')
-        .leftJoin('days', 'd', 'r.rout_repeat = d.rout_repeat')
-        .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
-        .where(`r.grp_id IN (${subQuery})`, { user_id })
-        .andWhere(`to_char(now(), 'dy') = ANY(d.days)`)
-        .getRawMany();
+      const todos = await qr.manager.createQueryBuilder()
+                                    .select([
+                                      `${user_id}  AS user_id`
+                                    , 'r.rout_name AS todo_name'
+                                    , 'r.rout_desc AS todo_desc'
+                                    , 'g.cat_id    AS todo_label'
+                                    , 'r.rout_srt  AS todo_start'
+                                    , 'r.rout_end  AS todo_end'
+                                    , 'r.grp_id    AS grp_id'
+                                    , 'r.rout_id   AS rout_id'
+                                    ])
+                                    .from('routine', 'r')
+                                    .leftJoin('days', 'd', 'r.rout_repeat = d.rout_repeat')
+                                    .leftJoin('group', 'g', 'g.grp_id = r.grp_id')
+                                    .where(`r.grp_id IN (${subQuery})`, { user_id })
+                                    .andWhere(`to_char(now(), 'dy') = ANY(d.days)`)
+                                    .getRawMany();
 
       for (const todo of todos) {
         // 4. todo 생성기 - 루틴 리스트를 To-Do로 삽입
-        const res = await queryRunner.manager
-          .createQueryBuilder()
-          .insert()
-          .into('todo')
-          .values({
-            user_id: user_id,
-            todo_name: todo.todo_name,
-            todo_desc: todo.todo_desc,
-            todo_label: todo.todo_label,
-            todo_start: todo.todo_start,
-            todo_end: todo.todo_end,
-            grp_id: todo.grp_id,
-            rout_id: todo.rout_id,
-          })
-          .execute();
+        const res = await qr.manager.createQueryBuilder()
+                                    .insert()
+                                    .into('todo')
+                                    .values({
+                                      user_id   : user_id
+                                    , todo_name : todo.todo_name
+                                    , todo_desc : todo.todo_desc
+                                    , todo_label: todo.todo_label
+                                    , todo_start: todo.todo_start
+                                    , todo_end  : todo.todo_end
+                                    , grp_id    : todo.grp_id
+                                    , rout_id   : todo.rout_id
+                                    })
+                                    .execute();
       }
 
-      await queryRunner.commitTransaction();
-
+      await qr.commitTransaction();
       return { result };
     } catch (err) {
-      await queryRunner.rollbackTransaction();
+      await qr.rollbackTransaction();
       throw new Error(err);
     } finally {
-      await queryRunner.release();
+      await qr.release();
     }
   }
 
