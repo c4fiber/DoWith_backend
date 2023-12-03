@@ -43,7 +43,8 @@ export class FriendService {
                                       , 'u.total_exp AS total_exp'
                                       , 'iv.pet_name AS pet_name'
                                       ])
-                                      .leftJoin('item_inventory', 'iv', 'u.user_id = iv.user_id')
+                                      .innerJoin('room'         , 'r'  , 'u.user_id = r.user_id')
+                                      .leftJoin('item_inventory', 'iv' , 'u.user_id = iv.user_id AND r.item_id = iv.item_id')
                                       .leftJoin('item_shop'     , 'ish', 'iv.item_id = ish.item_id')
                                       .where('u.user_id IN (:...frinedIds)', { frinedIds })
                                       .andWhere('ish.type_id = 1')
