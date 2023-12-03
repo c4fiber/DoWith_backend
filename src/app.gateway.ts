@@ -8,6 +8,7 @@ import { UserService } from './user/user.service';
 import { GroupService } from './group/group.service';
 import { CreateNotificationDto } from './notification/dto/createNotification.dto';
 import { Comment } from './comment/comment.entity';
+import { send } from 'process';
 
 @WebSocketGateway()
 export class AppGateway {
@@ -61,6 +62,7 @@ export class AppGateway {
 			this.server.to(receiver.socket_id).emit('friendRequest', { 
 					message: `${sender.user_name}이 친구 요청을 보냈습니다.`,
 					senderId: data.senderId,
+          senderName: sender.user_name,
 					receiverId: data.receiverId }) ;
 		} catch (error) {
 			console.error(`Error sending notification to user ${receiver.user_id}:`, error);
@@ -88,6 +90,7 @@ export class AppGateway {
     	this.server.to(receiver.socket_id).emit('friendResponse', {
         message: `${sender.user_name}이 친구 요청을 수락하였습니다.`,
         senderId: data.senderId,
+        senderName: sender.user_name,
         receiverId: data.receiverId });
 		} catch (error) {
 			console.error(`Error sending notification to user ${receiver.user_id}:`, error);
@@ -124,7 +127,9 @@ export class AppGateway {
                 this.server.to(member.socket_id).emit('confirmRequest', {
                     message: `${member.user_name}이 ${todo.todo_name}에 대한 인증을 요청했습니다.`,
                     senderId: data.userId,
-                    todoId: data.todoId,
+                    senderName: sender.user_name,
+                    todoId: todo.todo_id,
+                    totoName: todo.todo_name,
                     photoUrl: data.photoUrl
                 });
             } catch (error) {
@@ -162,8 +167,10 @@ export class AppGateway {
 		try {
 			this.server.to(receiver.socket_id).emit('confirmResponse', {
 					message: `${sender.user_name}이 ${todo.todo_name}에 대한 인증을 완료하였습니다.`,
-					userId: data.userId,
-					todoId: data.todoId });
+					senderId: data.userId,
+          senderName: sender.user_name,
+					todoId: data.todoId,
+          totoName: todo.todo_name, });
 		} catch (error) {
 			console.error(`Error sending notification to user ${receiver.user_id}:`, error);
 		}
@@ -187,7 +194,8 @@ export class AppGateway {
 		try {
 			this.server.to(receiver.socket_id).emit('newComment', {
 				message: `${author.user_name}이 방명록에 댓글을 남겼습니다.`,
-				userId: author.user_id,
+				authorId: author.user_id,
+        authorName: author.user_name,
 				comId: comment.com_id,
 			})
 		} catch (error) {
