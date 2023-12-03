@@ -43,7 +43,7 @@ export class GroupController {
   getAllMyGroups(
       @Param('user_id') user_id: number
     , @PagingOptions() pagingOptions: { page: number; limit: number }
-  ): Promise<Promise<{result: Group[], total: number}>>{
+  ){ //: Promise<Promise<{result: Group[], total: number}>>
     return this.groupService.getAllMyGroups(user_id, pagingOptions);
   }
 

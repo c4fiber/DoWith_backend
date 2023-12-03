@@ -17,22 +17,30 @@ import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
 export class GroupService {
   constructor(
     @InjectRepository(Group)
-    private readonly groupRepository: Repository<Group>,
+    private readonly grpRepo: Repository<Group>,
     @InjectRepository(Todo)
-    private readonly todoRepository: Repository<Todo>,
-    private readonly doWithException: DoWithExceptions,
+    private readonly todoRepo: Repository<Todo>,
+    private readonly dwExcept: DoWithExceptions,
     private dataSource: DataSource
   ){}
 
+  /**
+   * 모든 그룹 조회하는 함수
+   * @description 서버에 등록된 모든 그룹을 조회한다.
+   * @param pagingOptions 페이징 처리할 때 queryString에서 page와 보여질 개수 인자 값
+   * @returns result: 그룹 리스트(페이징)
+   *          total : 총 리스트 개수
+   */
   async getGroupAll(pagingOptions: { page: number; limit: number }): Promise<{result: Group[], total: number}>{
     const { page, limit } = pagingOptions;
-    const query = await this.groupRepository.createQueryBuilder('g')
-                                            .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-                                            .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
-                                            .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id');
+    const query = await this.grpRepo.createQueryBuilder('g')
+                                    .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                    .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
+                                    .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id');
     const [ items, total ] = await applyPaging(query, page, limit);
     const grpIds = getIdsFromItems(items, "grp_id");
 
+    // 모든 그룹중에서 해당 페이지에 해당하는 그룹만 보여주는 쿼리
     const result = await query.select([
                                 'g.grp_id               AS grp_id'
                               , 'g.grp_name             AS grp_name'
@@ -47,36 +55,47 @@ export class GroupService {
     return { result, total };
   }
 
-  async createGroupOne(createGroupDto: CreateGroupDto, routs: Array<any>): Promise<any>{
+  /**
+   * 그룹 생성 함수
+   * @description 그룹당 루틴은 최소 1개 최대 3개 소유하도록 한다.
+   *              1. 그룹 생성     : 유저가 그룹 소유주
+   *              2. 유저 그룹 가입 : 중계 테이블 매핑
+   *              3. 루틴 생성     : 그룹에 해당하는 루틴 등록
+   *              4. 할일 생성     : 그룹 생성시 등록한 루틴 소유주 To-Do로 등록
+   * @param createGroupDto 
+   * @param routs 1 ~ 3개의 루틴 리스트
+   * @returns result: 그룹 생성 성공 여부
+   */
+  async createGroupOne(createGroupDto: CreateGroupDto, routs: Array<any>): Promise<{ result }>{
     if(routs.length == 0){
-      throw this.doWithException.AtLeastOneRoutine;
+      throw this.dwExcept.AtLeastOneRoutine;
     }
 
     if(routs.length > 3){
-      throw this.doWithException.ExceedMaxRoutines;
+      throw this.dwExcept.ExceedMaxRoutines;
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
+    const qr = this.dataSource.createQueryRunner();
 
     try{
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
+      await qr.connect();
+      await qr.startTransaction();
 
       createGroupDto.grp_owner =  createGroupDto.user_id;
       createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
 
-      // Group Insert
-      const result = await queryRunner.manager.save(Group, createGroupDto);
+      // 1. 그룹 생성
+      const result = await qr.manager.save(Group, createGroupDto);
       const ug = new UserGroup();
 
       ug.user_id = +createGroupDto.user_id;
       ug.grp_id = +result.grp_id
 
-      // UserGroup Insert
-      const ugIns = await queryRunner.manager.save(UserGroup ,ug);
+      // 2. 유저 그룹 가입
+      const ugIns = await qr.manager.save(UserGroup ,ug);
 
-      // Routine Insert
       for(const data of routs) {
+        // 3. 루틴 생성
         const rout = new Routine();
 
         rout.grp_id = ug.grp_id;
@@ -86,8 +105,9 @@ export class GroupService {
         rout.rout_srt = data.rout_srt;
         rout.rout_end = data.rout_end;
 
-        await queryRunner.manager.save(Routine, rout);
+        await qr.manager.save(Routine, rout);
 
+        // 4. 할일 생성
         const todo = new Todo();
 
         todo.grp_id = ug.grp_id;
@@ -97,100 +117,145 @@ export class GroupService {
         todo.todo_start = data.rout_srt;
         todo.todo_end = data.rout_end;
 
-        await queryRunner.manager.save(Todo, todo);
+        await qr.manager.save(Todo, todo);
     }
 
-      await queryRunner.commitTransaction();
+      await qr.commitTransaction();
       return { result };
 
     } catch(err){
-      await queryRunner.rollbackTransaction();
+      await qr.rollbackTransaction();
       throw new Error(err);
     } finally {
-      await queryRunner.release();
+      await qr.release();
     }
   }
 
+  /**
+   * 그룹 세부사항 조회 함수
+   * @description 1. grp_detail : 그룹의 세부 정보
+   *              2. rout_detail: 그룹이 갖는 루틴 정보
+   *              3. grp_mems   : 그룹에 가입된 유저 정보
+   * @param grp_id 
+   * @returns result: description의 3가지 정보
+   */
   async getGroupOne(grp_id: number): Promise<{result:{grp_detail: Group, rout_detail:Array<any>, grp_mems:Array<any>}}>{
-    const grp_detail = await this.groupRepository.createQueryBuilder('g')
-                                                 .select([
-                                                   'g.grp_id    AS grp_id'
-                                                 , 'g.grp_name  AS grp_name'
-                                                 , 'g.grp_decs  AS grp_desc'
-                                                 , `to_char(g.reg_at, 'yyyy-MM-dd HH:MI:SS') AS reg_at`
-                                                 , 'u.user_name AS user_name'
-                                                 , 'c.cat_name  AS cat_name'
-                                                 ])
-                                                 .leftJoin('user_group', 'ug', 'g.grp_owner = ug.grp_id')
-                                                 .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
-                                                 .leftJoin('category'  , 'c' , 'c.cat_id = g.cat_id')
-                                                 .where('g.grp_id = :grp_id', { grp_id })
-                                                 .getRawOne();
+    const grp_detail = await this.grpRepo.createQueryBuilder('g')
+                                         .select([
+                                           'g.grp_id    AS grp_id'
+                                         , 'g.grp_name  AS grp_name'
+                                         , 'g.grp_desc  AS grp_desc'
+                                         , `to_char(g.reg_at, 'yyyy-MM-dd HH:MI:SS') AS reg_at`
+                                         , 'u.user_name AS user_name'
+                                         , 'c.cat_name  AS cat_name'
+                                         ])
+                                         .leftJoin('user_group', 'ug', 'g.grp_owner = ug.grp_id')
+                                         .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
+                                         .leftJoin('category'  , 'c' , 'c.cat_id = g.cat_id')
+                                         .where('g.grp_id = :grp_id', { grp_id })
+                                         .getRawOne();
 
-    const rout_detail = await this.groupRepository.createQueryBuilder('g')
-                                                  .select([
-                                                    'r.rout_id   AS rout_id'
-                                                  , 'r.rout_name AS rout_name'
-                                                  , 'r.rout_desc AS rout_desc'
-                                                  ])
-                                                  .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
-                                                  .where('g.grp_id = :grp_id', { grp_id })
-                                                  .getRawMany();
+    const rout_detail = await this.grpRepo.createQueryBuilder('g')
+                                          .select([
+                                            'r.rout_id   AS rout_id'
+                                          , 'r.rout_name AS rout_name'
+                                          , 'r.rout_desc AS rout_desc'
+                                          ])
+                                          .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
+                                          .where('g.grp_id = :grp_id', { grp_id })
+                                          .getRawMany();
     
-    const grp_mems = await this.groupRepository.createQueryBuilder('g')
-                                               .select([
-                                                 'u.user_id    AS user_id'
-                                               , 'u.user_name  AS user_name'
-                                               , 'u.last_login AS last_login'
-                                               ])
-                                               .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-                                               .leftJoin('user'      , 'u' , 'u.user_id = ug.user_id')
-                                               .where('g.grp_id = :grp_id', { grp_id })
-                                               .getRawMany();
+    const grp_mems = await this.grpRepo.createQueryBuilder('g')
+                                       .select([
+                                         'u.user_id    AS user_id'
+                                       , 'u.user_name  AS user_name'
+                                       , 'u.last_login AS last_login'
+                                       ])
+                                       .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                       .leftJoin('user'      , 'u' , 'u.user_id = ug.user_id')
+                                       .where('g.grp_id = :grp_id', { grp_id })
+                                       .getRawMany();
 
     return { result: { grp_detail, rout_detail, grp_mems }};
   }
 
+  /**
+   * 내가 가입한 모든 그룹 조회 함수
+   * @param user_id 
+   * @param pagingOptions 페이징 처리할 때 queryString에서 page와 보여질 개수 인자 값
+   * @returns result: 그룹 리스트(페이징)
+   *          total : 총 리스트 개수
+   */
   async getAllMyGroups(
       user_id: number
     , pagingOptions: { page: number; limit: number }
-  ): Promise<Promise<{result: Group[], total: number}>>{
+  ){ //: Promise<Promise<{result: Group[], total: number}>>
     const { page, limit } = pagingOptions;
-    const Count = await this.groupRepository.createQueryBuilder('g')
-                                            .select([ 
-                                              'g.grp_id AS grp_id'
-                                            , 'count(*) AS mem_cnt'])
-                                            .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-                                            .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
-                                            .groupBy('g.grp_id')
-                                            .getQuery();
-
-    const query = await this.groupRepository.createQueryBuilder('g')
-                                            .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-                                            .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
-                                            .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
-                                            .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
-                                            .leftJoin(`(${Count})`, 'g2', 'g.grp_id = g2.grp_id')
-                                            .where('u1.user_id = :user_id', { user_id });
+    // // 그룹별 멤버 인원 수
+    // const Count = await this.grpRepo.createQueryBuilder('g')
+    //                                 .select([ 
+    //                                   'g.grp_id AS grp_id'
+    //                                 , 'COUNT(*) AS mem_cnt'
+    //                                 ])
+    //                                 .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+    //                                 .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
+    //                                 .groupBy('g.grp_id')
+    //                                 .getQuery();
+    // // 
+    // const query = await this.grpRepo.createQueryBuilder('g')
+    //                                 .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+    //                                 .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
+    //                                 .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
+    //                                 .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
+    //                                 .leftJoin(`(${Count})`, 'g2', 'g.grp_id = g2.grp_id')
+    //                                 .where('u1.user_id = :user_id', { user_id });
     
+    // const [ items, total ] = await applyPaging(query, page, limit);
+    // const grpIds = getIdsFromItems(items, "grp_id");
+    // const result = await query.select([
+    //                             'g.grp_id          AS grp_id'
+    //                           , 'g.grp_name        AS grp_name'
+    //                           , 'g.grp_desc        AS grp_desc'
+    //                           , 'MAX(u2.user_name) AS owner'
+    //                           , 'g.cat_id          AS cat_id'
+    //                           , 'MAX(c.cat_name)   AS cat_name'
+    //                           , 'MAX(g2.mem_cnt)   AS mem_cnt'
+    //                           ])
+    //                           .andWhere('g.grp_id IN (:...grpIds)', { grpIds })
+    //                           .groupBy('g.grp_id')
+    //                           .orderBy('MAX(g2.mem_cnt)', 'DESC')
+    //                           .getRawMany();
 
-    const [ items, total ] = await applyPaging(query, page, limit);
-    const grpIds = getIdsFromItems(items, "grp_id");
-    const result = await query.select([
-                                'g.grp_id          AS grp_id'
-                              , 'g.grp_name        AS grp_name'
-                              , 'g.grp_decs        AS grp_decs'
-                              , 'MAX(u2.user_name) AS owner'
-                              , 'g.cat_id          AS cat_id'
-                              , 'MAX(c.cat_name)   AS cat_name'
-                              , 'MAX(g2.mem_cnt)   AS mem_cnt'
-                              ])
-                              .andWhere('g.grp_id IN (:...grpIds)', { grpIds })
-                              .groupBy('g.grp_id')
-                              .orderBy('MAX(g2.mem_cnt)', 'DESC')
-                              .getRawMany();
+    const qr = this.dataSource.createQueryRunner();
+    const myGrps = await qr.manager.createQueryBuilder()
+                                   .select([
+                                      'ug1.grp_id AS grp_id'
+                                    , 'COUNT(*)   AS mem_cnt'
+                                   ])
+                                   .from('user_group', 'ug1')
+                                   .leftJoin('user_group', 'ug2', 'ug1.grp_id = ug2.grp_id')
+                                   .where('ug1.user_id = :user_id', { user_id })
+                                   .groupBy('ug1.grp_id')
+                                   .getQuery();
 
-    return { result, total };
+    const result = await this.grpRepo.createQueryBuilder('g')
+                                     .select([
+                                       'g.grp_id    AS grp_id'
+                                     , 'g.grp_name  AS grp_name'
+                                     , 'g.grp_desc  AS grp_desc'
+                                     , 'u.user_name AS owner'
+                                     , 'g.cat_id    AS cat_id'
+                                     , 'c.cat_name  AS cat_name'
+                                     , 'sub.mem_cnt AS mem_cnt'
+                                     ])
+                                     .leftJoin('user'        , 'u'  , 'g.grp_owner = u.user_id')
+                                     .leftJoin('category'    , 'c'  , 'g.cat_id = c.cat_id')
+                                     .innerJoin(`(${myGrps})`, 'sub', 'g.grp_id = sub.grp_id')
+                                     .orderBy('sub.mem_cnt', 'DESC')
+                                     .setParameter('user_id', user_id)
+                                     .getRawMany();
+
+    return { result, total: result.length };
   }
 
   async JoinGroup(grp_id: number, user_id: number): Promise<any>{
@@ -200,7 +265,7 @@ export class GroupService {
 
     try{
       const result = await queryRunner.manager.save(UserGroup, { user_id, grp_id });
-      const routs = await this.groupRepository.createQueryBuilder('g')
+      const routs = await this.grpRepo.createQueryBuilder('g')
                                               .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
                                               .select([
                                                 'r.rout_name AS todo_name'
@@ -269,7 +334,7 @@ export class GroupService {
                                .where('grp_id = :grp_id', { grp_id })
                                .execute();
       // 그룹 인원이 0명이면 그룹 삭제
-      const grpDel = await this.groupRepository.createQueryBuilder('g')
+      const grpDel = await this.grpRepo.createQueryBuilder('g')
                                                .softDelete()
                                                .where('grp_id = :grp_id', { grp_id })
                                                .andWhere(`0 = :leftCnt`, { leftCnt })
@@ -285,7 +350,7 @@ export class GroupService {
                                                   .limit(1)
                                                   .getRawOne();
         // 새로운 그룹장 등록
-        await this.groupRepository.createQueryBuilder('g')
+        await this.grpRepo.createQueryBuilder('g')
                                   .update()
                                   .set({ grp_owner: newOwner.user_id })
                                   .where({ grp_id })
@@ -304,7 +369,7 @@ export class GroupService {
   }
 
   async getMemberTodoInGroup(grp_id: number, rout_id: number): Promise<any>{
-    const result = await this.groupRepository.createQueryBuilder('g')
+    const result = await this.grpRepo.createQueryBuilder('g')
                                              .select([
                                                't.user_id   AS user_id'
                                              , 't.todo_img  AS todo_img'
@@ -330,13 +395,13 @@ export class GroupService {
     ,pagingOptions: { page: number; limit: number }
   ): Promise<{ result: Group[], total: number}>{
     const { page, limit } = pagingOptions;
-    const myGrps = await this.groupRepository.createQueryBuilder('g')
+    const myGrps = await this.grpRepo.createQueryBuilder('g')
                                              .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                              .select(['g.grp_id AS grp_id'])
                                              .where('ug.user_id = :user_id', { user_id })
                                              .getRawMany();
     const myGrpsIds = myGrps.map(data => data.grp_id);
-    const query = await this.groupRepository.createQueryBuilder('g')
+    const query = await this.grpRepo.createQueryBuilder('g')
                                             .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
                                             .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                             .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
@@ -361,7 +426,7 @@ export class GroupService {
     const result = await query.select([
                                 'g.grp_id          AS grp_id'
                               , 'g.grp_name        AS grp_name' 
-                              , 'g.grp_decs        AS grp_decs' 
+                              , 'g.grp_desc        AS grp_desc' 
                               , 'max(c.cat_id)     AS cat_id'
                               , 'max(c.cat_name)   AS cat_name'
                               , 'max(u2.user_name) AS owner'
@@ -376,7 +441,7 @@ export class GroupService {
 
   async updateImage(todo_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
     if(!file){
-      throw this.doWithException.ThereIsNoFile;
+      throw this.dwExcept.ThereIsNoFile;
     }
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -394,7 +459,7 @@ export class GroupService {
                               await fs.unlink(filePath);  // 업로드한 원본 파일 삭제
                            });
       
-      const oldFile = await this.todoRepository.createQueryBuilder('t')
+      const oldFile = await this.todoRepo.createQueryBuilder('t')
                                                .select(['t.todo_img AS todo_img'])
                                                .where({ todo_id })
                                                .andWhere({ user_id })
@@ -404,7 +469,7 @@ export class GroupService {
         await fs.unlink(oldFile.todo_img);  // 기존에 저장했던 인증 사진 삭제(새로운 사진 업로드 했으니까)
       }
 
-      const result = await this.todoRepository.createQueryBuilder('t')
+      const result = await this.todoRepo.createQueryBuilder('t')
                                               .update({ todo_img: newPath })
                                               .where({ todo_id })
                                               .andWhere({ user_id })
@@ -421,7 +486,7 @@ export class GroupService {
   }
 
   async updateTodoDone(todo_id: number): Promise<any>{
-    const result = await this.todoRepository.createQueryBuilder('t')
+    const result = await this.todoRepo.createQueryBuilder('t')
                                             .update({ todo_done: true })
                                             .where({ todo_id })
                                             .execute();
@@ -430,7 +495,7 @@ export class GroupService {
   }
 
   async deleteGroup(grp_id: number): Promise<any>{
-    const result = await this.groupRepository.softDelete({grp_id}); 
+    const result = await this.grpRepo.softDelete({grp_id}); 
     
     return { result };
   }

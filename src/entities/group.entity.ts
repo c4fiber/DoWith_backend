@@ -11,7 +11,7 @@ export class Group {
   grp_name: string;
 
   @Column()
-  grp_decs: string;
+  grp_desc: string;
 
   @Column({ nullable: false })
   grp_owner: number;

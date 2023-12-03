@@ -8,7 +8,7 @@ export class CreateGroupDto {
   @IsNotEmpty()
   grp_name: string;
 
-  grp_decs: string;
+  grp_desc: string;
 
   @IsNotEmpty()
   grp_owner: number;
