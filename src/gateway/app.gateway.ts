@@ -116,11 +116,11 @@ export class AppGateway {
     for (const member of groupMembers) {
         if (member.user_id !== data.userId ) {
             const notificationData = new CreateNotificationDto();
-            notificationData.sender_id = data.userId.toString();
-            notificationData.receiver_id = member.user_id.toString();
+            notificationData.sender_id = `${data.userId}`;
+            notificationData.receiver_id = `${member.user_id}`;
             notificationData.noti_type = '2';
             notificationData.req_type = '0';
-            notificationData.sub_id = data.todoId.toString();
+            notificationData.sub_id = `${data.todoId}`;
             
             await this.notificationService.createNotification(notificationData);
 
