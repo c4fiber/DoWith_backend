@@ -29,7 +29,7 @@ https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={
 <span><img src ="https://img.shields.io/badge/Java-007396.svg?&flat-square&logo=Java&logoColor=white"/></span><br/>
 <span><img src ="https://img.shields.io/badge/Java-007396.svg?&style=social&logo=Java&logoColor=white"/></span><br/>
 
-<span><img src ="https://img.shields.io/badge/nodedotjs-#339933?style=for-the-badge&logo=Node.js&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"/></span>
 
 # **[ 🚫 규칙 ]**
 ### **📌 디렉토리 구조**
