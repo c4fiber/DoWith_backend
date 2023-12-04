@@ -50,8 +50,8 @@ export class AppGateway {
     }
 
 		const notificationData = new CreateNotificationDto();
-    notificationData.sender_id = `${data.senderId}`;
-    notificationData.receiver_id = `${data.receiverId}`;
+    notificationData.sender_id = `${sender.user_id}`;
+    notificationData.receiver_id = `${receiver.user_id}`;
     notificationData.noti_type = '0';
     notificationData.req_type = '0';
     notificationData.sub_id = '';
@@ -78,8 +78,8 @@ export class AppGateway {
     }
 
 		const notificationData = new CreateNotificationDto();
-    notificationData.sender_id = `${data.senderId}`;
-    notificationData.receiver_id = `${data.receiverId}`;
+    notificationData.sender_id = `${sender.user_id}`;
+    notificationData.receiver_id = `${receiver.user_id}`;
     notificationData.noti_type = '1';
     notificationData.req_type = '1';
     notificationData.sub_id = '';
@@ -126,7 +126,7 @@ export class AppGateway {
         notificationData.receiver_id = `${member.user_id}`;
         notificationData.noti_type = '2';
         notificationData.req_type = '0';
-        notificationData.sub_id = `${data.todoId}`;
+        notificationData.sub_id = `${todo.todo_id}`;
         
         await this.notificationService.createNotification(notificationData);
 
@@ -164,18 +164,18 @@ export class AppGateway {
     const receiver = await this.userService.getUser( todo.user_id );
 
     const notificationData = new CreateNotificationDto();
-    notificationData.sender_id = `${data.userId}`;
+    notificationData.sender_id = `${sender.user_id}`;
     notificationData.receiver_id = `${todo.user_id}`;
     notificationData.noti_type = '3';
     notificationData.req_type = '0';
-    notificationData.sub_id = `${data.todoId}`;
+    notificationData.sub_id = `${todo.todo_id}`;
 
     await this.notificationService.createNotification(notificationData);
     // 해당 to-do를 공유하는 사용자들에게 알림 전송
 		try {
 			this.server.to(receiver.socket_id).emit('confirmResponse', {
 					message: `${sender.user_name}님이 ${todo.todo_name}에 대한 인증을 완료하였습니다.`,
-					senderId: data.userId,
+					senderId: sender.user_id,
           senderName: sender.user_name,
           receiverId: receiver.user_id,
 					todoId: todo.todo_id,
