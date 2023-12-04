@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { User } from 'src/entities/user.entities';
 import { Repository } from 'typeorm';
 import { FreindRequestDto } from './dto/friend-request.dto';
 import { UserFriend } from 'src/entities/user_friend.entity';
-import { getIdsFromItems } from 'src/utils/paging/PagingOptions';
+import { getIdsFromItems } from 'src/utils/PagingOptions';
 import { FriendStatus } from 'src/enums/FriendStatus.enum';
 
 @Injectable()

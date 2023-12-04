@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemInventoryController } from './item-inventory.controller';
 import { ItemInventoryService } from './item-inventory.service';
 import { ItemShop } from 'src/entities/item-shop.entity';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 
 @Module({
   imports: [

@@ -1,13 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, QueryRunner, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { Todo } from 'src/entities/todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { User } from 'src/entities/user.entities';
-import { Room } from 'src/entities/room.entity';
-import { ItemInventory } from 'src/entities/item-inventory.entity';
 import { Reward } from 'src/enums/Reward.enum';
 
 
@@ -21,30 +19,14 @@ export class TodoService {
     private readonly dataSource: DataSource,
   ) {}
 
-
   // READ
   async findAllByUser(user_id: number): Promise<Todo[]> {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1); // 어제 날짜 계산
-
-    return await this.todoRepository
-      .createQueryBuilder('todo')
-      .where('todo.user_id = :user_id', { user_id })
-      .andWhere(
-        '(todo.todo_date = :today OR todo.todo_date >= :yesterday) \
-         AND \
-         todo.todo_date < :today AND todo_done = :todo_done ',
-        {
-          today,
-          yesterday,
-          todo_done: false,
-        },
-      )
-      .orderBy('todo.todo_date', 'ASC')
-      .orderBy('todo.todo_id', 'ASC')
-      .getMany();
-    // return await this.todoRepository.findBy({ user_id, todo_deleted: false });
+    return await this.todoRepository.createQueryBuilder('t')
+                                    .where('t.user_id = :user_id', { user_id })
+                                    .andWhere(`(to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR t.todo_done = false)`)
+                                    .andWhere('t.todo_deleted = false')
+                                    .orderBy('t.todo_done, t.todo_date', 'ASC')
+                                    .getMany();
   }
 
   /**
@@ -181,7 +163,6 @@ export class TodoService {
     ]);
 
     const result = { todo_today, todo_today_done };
-    Logger.log(`today: ${todo_today}, ${todo_today_done}`);
     return { result };
   }
 
@@ -252,7 +233,6 @@ export class TodoService {
 
       if (updatedTodo.affected === 0) {
         // 투두가 없음
-        Logger.log('Todo data does not exist');
         throw this.dwExcept.NoData;
       }
 
@@ -295,7 +275,6 @@ export class TodoService {
         .execute();
 
       if (userUpdated.affected === 0) {
-        Logger.log('User data does not exist');
         throw this.dwExcept.NoData;
       }
 

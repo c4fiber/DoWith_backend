@@ -4,7 +4,7 @@ import { RoomController } from './room.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Room } from '../../entities/room.entity';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Room, ItemInventory])],

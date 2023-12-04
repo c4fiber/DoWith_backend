@@ -3,11 +3,12 @@ import { User } from '../../entities/user.entities';
 import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { Room } from 'src/entities/room.entity';
 import { JwtService } from '@nestjs/jwt';
+import { v4 as uuidV4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -78,13 +79,23 @@ export class UserService {
   }
 
   // 아이디를 기준으로 유저 삭제
-  async deleteUser(id: number): Promise<void> {
-    const user = await this.getUser(id);
+  async deleteUser(user_id: number): Promise<void> {
+    const user = await this.getUser(user_id);
     if (user == null) {
       throw this.doWithException.UserNotFound;
     }
+    
+    const uuid = uuidV4();
 
-    this.userRepository.softDelete(id);
+    await this.userRepository.createQueryBuilder()
+                             .update()
+                             .set({
+                               user_name: uuid
+                             , user_kakao_id: uuid
+                             , del_at: () => 'CURRENT_TIMESTAMP'
+                             })
+                             .where('user_id = :user_id', { user_id })
+                             .execute();
   }
 
   // 유저 HP 업데이트
