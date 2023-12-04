@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   Req,
+  Request,
   Res,
   UseGuards,
   UsePipes,
@@ -22,11 +23,15 @@ import { User } from 'src/entities/user.entities';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('/login')
-  @UseGuards(AuthGuard())
-  async login(@Headers('Authorization') token: string) {
-    return await this.authService.login(token);
-  }
+//   @Get('/user')
+//   @UseGuards(AuthGuard())
+//   async getUserInfo(
+//     @Request() req,
+//     @Headers('Authorization') token: string
+//   ) {
+//     const user = req.user;
+//     return await this.authService.getUserInfo(user.user_id, token);
+//   }
 
   @Post('/valid')
   async isUserNameUnique(@Body('user_name') user_name: string) {

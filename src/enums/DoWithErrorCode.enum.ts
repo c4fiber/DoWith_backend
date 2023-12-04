@@ -5,6 +5,7 @@ export enum DoWithErrorCode {
   UserNameNotUnique = '0013',
   SelfFriendship    = '0014',
   FailToSignUp      = '0015',
+  Authorization     = '0016',
 
   // Group
 

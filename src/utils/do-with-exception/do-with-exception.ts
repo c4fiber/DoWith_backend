@@ -43,6 +43,11 @@ export class DoWithExceptions {
     DoWithErrorCode.FailToSignUp,
     HttpStatus.BAD_REQUEST,
   );
+  Authorization = new DoWithException(
+    DoWithErrorMsg.Authorization,
+    DoWithErrorCode.Authorization,
+    HttpStatus.BAD_REQUEST,
+  )
 
   // =============== [ Group ] ===============
 

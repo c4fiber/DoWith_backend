@@ -41,16 +41,6 @@ export class AuthService {
 
   private kakaoUrl = process.env.KAKAO_URL;
 
-  // 유저 아이디로 DB를 검색하여
-  // lastLogin 필드를 업데이트
-  async login(token: string) {
-    const { userId } = await this.jwtService.decode(token.substring(7));
-    const result: User = await this.userRepository.findOneBy({
-      user_id: userId,
-    });
-
-    return { result };
-  }
 
   // 새로운 유저 생성
   async signup(request: SignUpDto) {

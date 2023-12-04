@@ -5,6 +5,7 @@ import {
   FileTypeValidator,
   FileValidator,
   Get,
+  Headers,
   Logger,
   MaxFileSizeValidator,
   Param,
@@ -41,11 +42,14 @@ export class UserController {
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))
-  async getUser(@Request() req): Promise<{ result }> {
-    const user: User = req.user;
-    Logger.log(`User info from jwt: ${user.user_id}`);
-    const result = user;
-    return { result };
+  async getUser(
+    @Request() req,
+    @Headers('Authorization') token: string
+  ): Promise<{ result }> {
+    // const user: User = req.user;
+    // Logger.log(`User info from jwt: ${user.user_id}`);
+    const user = req.user;
+    return await this.usersService.getUserInfo(user.user_id, token);
   }
 
   //   @Get('/:user_id')
