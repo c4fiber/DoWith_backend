@@ -112,10 +112,10 @@ export class AppGateway {
     }
 
     const groupMembers = await this.groupService.findUsersByGroupId( todo.grp_id );
+    console.log(groupMembers);
 
     for (const member of groupMembers) {
       if (member.user_id !== data.userId ) {
-        console.log(`${member.user_id}, ${typeof(member.user_id)}`);
         const notificationData = new CreateNotificationDto();
         notificationData.sender_id = `${data.userId}`;
         notificationData.receiver_id = `${member.user_id}`;
