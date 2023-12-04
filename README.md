@@ -9,7 +9,7 @@
 ##### :mailbox_with_mail: [프로젝트-개요](#mailbox_with_mail-프로젝트-개요)</br>
 ##### :wrench: [기술 스택](#wrench-기술-스택)</br>
 ##### :couplekiss: [협업](#couplekiss-협업)</br>
-##### :pushpin: [디렉토리 구조](#디렉토리-구조)</br>
+##### :pushpin: [디렉토리 구조](#pushpin-디렉토리-구조)</br>
 ##### :chart_with_upwards_trend: [기술적 챌린지](#chart_with_upwards_trend-기술적-챌린지)</br>
 </br>
 
