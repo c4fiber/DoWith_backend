@@ -114,30 +114,31 @@ export class AppGateway {
     const groupMembers = await this.groupService.findUsersByGroupId( todo.grp_id );
 
     for (const member of groupMembers) {
-        if (member.user_id !== data.userId ) {
-            const notificationData = new CreateNotificationDto();
-            notificationData.sender_id = `${data.userId}`;
-            notificationData.receiver_id = `${member.user_id}`;
-            notificationData.noti_type = '2';
-            notificationData.req_type = '0';
-            notificationData.sub_id = `${data.todoId}`;
-            
-            await this.notificationService.createNotification(notificationData);
+      if (member.user_id !== data.userId ) {
+        console.log(`${member}`);
+        const notificationData = new CreateNotificationDto();
+        notificationData.sender_id = `${data.userId}`;
+        notificationData.receiver_id = `${member.user_id}`;
+        notificationData.noti_type = '2';
+        notificationData.req_type = '0';
+        notificationData.sub_id = `${data.todoId}`;
+        
+        await this.notificationService.createNotification(notificationData);
 
-            // 해당 to-do를 공유하는 사용자들에게 알림 전송
-            try {
-                this.server.to(member.socket_id).emit('confirmRequest', {
-                    message: `${member.user_name}이 ${todo.todo_name}에 대한 인증을 요청했습니다.`,
-                    senderId: data.userId,
-                    senderName: sender.user_name,
-                    todoId: todo.todo_id,
-                    totoName: todo.todo_name,
-                    photoUrl: data.photoUrl
-                });
-            } catch (error) {
-                console.error('Error sending notification to user ${member.user_id}:', error);
-            }
+        // 해당 to-do를 공유하는 사용자들에게 알림 전송
+        try {
+            this.server.to(member.socket_id).emit('confirmRequest', {
+                message: `${sender.user_name}이 ${todo.todo_name}에 대한 인증을 요청했습니다.`,
+                senderId: data.userId,
+                senderName: sender.user_name,
+                todoId: todo.todo_id,
+                totoName: todo.todo_name,
+                photoUrl: data.photoUrl
+            });
+        } catch (error) {
+            console.error('Error sending notification to user ${member.user_id}:', error);
         }
+      }
     }
   }
 
