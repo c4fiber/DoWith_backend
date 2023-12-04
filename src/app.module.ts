@@ -19,13 +19,13 @@ import { CategoryModule } from './features/category/category.module';
 import { UtilsModule } from './utils/utils.module';
 import { DoWithInterceptor } from './utils/do-with-interceptor/do-with-Interceptor';
 import { HttpModule } from '@nestjs/axios';
+import { NotificationModule } from './notification/notification.module';
+import { GatewayModule } from './gateway/gateway.module';
 import { AchievementsModule } from './features/achievements/achievements.module';
 import { ItemInventoryModule } from './features/item-inventory/item-inventory.module';
 import { ItemShopModule } from './features/item-shop/item-shop.module';
 import { RoomModule } from './features/room/room.module';
-import { AppGateway } from './app.gateway';
 import { EntitiesModule } from './entities/entities.module';
-import { NotificationModule } from './notification/notification.module';
 import { AnnouncementModule } from './features/announcement/announcement.module';
 
 @Module({
@@ -58,15 +58,17 @@ import { AnnouncementModule } from './features/announcement/announcement.module'
     ItemShopModule,
     AchievementsModule,
     // API Module
+    UserModule,
     TodoModule,
     GroupModule,
     RoutineModule,
-    UserModule,
     AuthModule,
+    NotificationModule,
     FriendModule,
     CommentModule,
     ItemInventoryModule,
     RoomModule,
+    GatewayModule,
     EntitiesModule,
     NotificationModule,
     AnnouncementModule,
@@ -83,7 +85,6 @@ import { AnnouncementModule } from './features/announcement/announcement.module'
     //   provide: APP_INTERCEPTOR,
     //   useClass: DoWithInterceptor,
     // },
-    // AppGateway,
   ],
 })
 export class AppModule implements NestModule {
