@@ -87,16 +87,6 @@ export class UserService {
     this.userRepository.softDelete(id);
   }
 
-  // 카카오 아이디를 기준으로 유저 삭제
-  async deleteUserByKakaoId(kakao_id: string): Promise<void> {
-    const user = await this.getUserByKakaoId(kakao_id);
-    if (user == null) {
-      throw this.doWithException.UserNotFound;
-    }
-
-    this.userRepository.softDelete(user.user_id);
-  }
-
   // 유저 HP 업데이트
   async updateHp(id: number, hp: number): Promise<boolean> {
     const updateResult = await this.userRepository

@@ -7,10 +7,13 @@ export class Achievements {
   achi_id: number;
 
   @Column()
-  ache_name: string;
+  achi_name: string;
 
   @Column()
-  ache_desc: string;
+  achi_desc: string;
+
+  @Column()
+  achi_img: string;  
 
   @Column({ default: false })
   is_hidden: boolean;
