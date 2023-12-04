@@ -101,6 +101,6 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 
 </br>
 
-# :chart_with_upwards_trend: 기술적 챌린지
+## :chart_with_upwards_trend: 기술적 챌린지
 1. 이거
 2. 저거
