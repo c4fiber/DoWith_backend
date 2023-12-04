@@ -90,7 +90,7 @@ export class AuthService {
                                 .into(ItemInventory)
                                 .values({
                                   user_id:   user_id,
-                                  item_id:   54, // 
+                                  item_id:   55, // 
                                   pet_name:  user_pet_name,
                                   pet_exp: 0,
                                 })
@@ -106,7 +106,7 @@ export class AuthService {
                                 .into(Room)
                                 .values({
                                   user_id:   user_id,
-                                  item_id:   54
+                                  item_id:   55
                                 })
                                 .execute();
       
@@ -128,7 +128,6 @@ export class AuthService {
       };
 
       await queryRunner.commitTransaction();
-
       return { result };
 
     } catch(error) {
@@ -182,7 +181,7 @@ export class AuthService {
   async isUserNameUnique(user_name: string) {
     const user = await this.userRepository.createQueryBuilder()
                                     .where({ user_name })
-                                    .select(['user_id'])
+                                    .select()
                                     .getCount();
     const result = user == 0;
     return { result };
