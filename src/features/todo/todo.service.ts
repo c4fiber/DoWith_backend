@@ -32,7 +32,7 @@ export class TodoService {
       .createQueryBuilder('todo')
       .where('todo.user_id = :user_id', { user_id })
       .andWhere(
-        'todo.todo_date = :today OR todo.todo_date >= :yesterday \
+        '(todo.todo_date = :today OR todo.todo_date >= :yesterday) \
          AND \
          todo.todo_date < :today AND todo_done = :todo_done ',
         {

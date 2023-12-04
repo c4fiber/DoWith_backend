@@ -8,6 +8,7 @@ import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception'
 @Module({
   imports: [TypeOrmModule.forFeature([Todo])],
   controllers: [TodoController],
-  providers: [TodoService, DoWithExceptions]
+  providers: [TodoService, DoWithExceptions],
+  exports: [TodoService]
 })
 export class TodoModule {}
