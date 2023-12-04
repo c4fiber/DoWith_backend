@@ -3,9 +3,12 @@
 ##### Front End: https://github.com/tomoyo519/DoWith_frontend
 </br>
 
-# ⚙️ 목차
-1. :calendar:[기간](#calendar-기간)
-2. :mailbox_with_mail:[프로젝트-개요](#mailbox_with_mail-프로젝트-개요)
+# 🗂️ 목차
+##### :calendar: [기간](#calendar-기간)</br>
+##### :mailbox_with_mail: [프로젝트-개요](#mailbox_with_mail-프로젝트-개요)</br>
+##### :information_desk_person: [멤버](#information_desk_person-멤버)</br>
+##### :wrench: [기술 스택](#wrench-기술-스택)</br>
+##### :pushpin: [디렉토리 구조](#pushpin-디렉토리-구조)</br>
 </br>
 
 # :calendar: 기간
@@ -19,50 +22,37 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 여기에 프로젝트를 왜 시작 했는지 설명
 </br>
 
-# **[ 👨‍👨‍👧‍👦 ‍멤버 ]**
+# :information_desk_person: ‍멤버
 |Github|[<img src="https://avatars.githubusercontent.com/nashs789" width="130px;" style="max-width: 100%;">](https://github.com/nashs789)|[<img src="https://avatars.githubusercontent.com/c4fiber" width="130px;" style="max-width: 100%;">](https://github.com/c4fiber)|[<img src="https://avatars.githubusercontent.com/coding-jjun" width="130px;" style="max-width: 100%;">](https://github.com/coding-jjun)|[<img src="https://avatars.githubusercontent.com/cece-09" width="130px;" style="max-width: 100%;">](https://github.com/cece-09)|[<img src="https://avatars.githubusercontent.com/tomoyo519" width="130px;" style="max-width: 100%;">](https://github.com/tomoyo519)|
 |---|:---:|:---:|:---:|:---:|:---:|
 |이름|이인복|신병철|박세준|이소정|정다희|
 |포지션|<img src="https://img.shields.io/badge/Back End-498EAF?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Front End-E5BB4B?style=for-the-badge&logo=&logoColor=white"/>|
 |담당업무|무엇 했는지|||||
 
-### 기술스택
-| 분야 | 기술 |
-| --- | --- |
-| Front | Flutter + Three.js + Tailwindcss + Axios |
-| Back | NestJs + TypeScript + TypeORM + PostgreSQL |
-| DB | PostgresSQL |
-| Test | Jest |
-| DevOps | Docker + Jenkins |
+# :wrench: 기술 스택
+<span><img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"/></span>
+<span><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=tsnode&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white"/></span>
+<span><img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/sharp-99CC00?style=for-the-badge&logo=sharp&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/typeform-262627?style=for-the-badge&logo=typeform&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/kakao-FFCD00?style=for-the-badge&logo=kakao&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white"/></span>
 
-# 임시(뱃지)
-[ 기본 틀 ]<br/>
-https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={로고}&logoColor={로고컬러}<br/>
-[ 뱃지 스타일 ]<br/>
-<span><img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"/></span><br/>
-<span><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=tsnode&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white"/></span><br/>
-<span><img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/sharp-99CC00?style=for-the-badge&logo=sharp&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/typeform-262627?style=for-the-badge&logo=typeform&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/kakao-FFCD00?style=for-the-badge&logo=kakao&logoColor=white"/></span><br/>
-<span><img src ="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white"/></span><br/>
-
-# **[ 🚫 규칙 ]**
-### **📌 디렉토리 구조**
+# :pushpin: 디렉토리 구조
 
        ├ 📦 package
        ⎮    ├ 📁 env   : 개발 / 테스트 / 운영 환경변수
