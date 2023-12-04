@@ -2,11 +2,11 @@
 
 import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { NotificationService } from '../notification/notification.service';
+import { NotificationService } from '../features/notification/notification.service';
 import { UserService } from 'src/features/user/user.service';
 import { TodoService } from 'src/features/todo/todo.service';
 import { GroupService } from 'src/features/group/group.service';
-import { CreateNotificationDto } from 'src/notification/dto/createNotification.dto';
+import { CreateNotificationDto } from 'src/features/notification/dto/createNotification.dto';
 import { Comment } from 'src/entities/comment.entity';
 
 @WebSocketGateway()

@@ -17,7 +17,7 @@ import { CategoryModule } from './features/category/category.module';
 import { UtilsModule } from './utils/utils.module';
 import { DoWithInterceptor } from './utils/do-with-interceptor/do-with-Interceptor';
 import { HttpModule } from '@nestjs/axios';
-import { NotificationModule } from './notification/notification.module';
+import { NotificationModule } from './features/notification/notification.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { AchievementsModule } from './features/achievements/achievements.module';
 import { ItemInventoryModule } from './features/item-inventory/item-inventory.module';
