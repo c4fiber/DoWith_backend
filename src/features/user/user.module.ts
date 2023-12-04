@@ -3,9 +3,9 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entities';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { UtilsModule } from 'src/utils/utils.module';
-import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
+import { MulterConfig } from 'src/utils/MulterConfigService';
 
 @Module({
   imports: [

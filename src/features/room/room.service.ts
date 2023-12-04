@@ -10,7 +10,7 @@ import { Room } from '../../entities/room.entity';
 import { DataSource } from 'typeorm';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
 import { isIn } from 'class-validator';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 
 @Injectable()
 export class RoomService {

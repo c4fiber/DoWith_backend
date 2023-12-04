@@ -6,13 +6,13 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/entities/user_group.entity';
 import { Todo } from 'src/entities/todo.entity';
 import { User } from 'src/entities/user.entities';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { Routine } from 'src/entities/routine.entity';
 import * as sharp from 'sharp'
 import * as fs from 'fs/promises'
 import * as path from 'path';
 
-import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
+import { applyPaging, getIdsFromItems } from 'src/utils/PagingOptions';
 import { Room } from 'src/entities/room.entity';
 import { Reward } from 'src/enums/Reward.enum';
 import { ItemInventory } from 'src/entities/item-inventory.entity';

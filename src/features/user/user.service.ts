@@ -3,7 +3,7 @@ import { User } from '../../entities/user.entities';
 import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { v4 as uuidV4 } from 'uuid';

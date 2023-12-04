@@ -26,7 +26,7 @@ import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
+import { MulterConfig } from 'src/utils/MulterConfigService';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../../entities/user.entities';
 

@@ -3,8 +3,8 @@ import { GroupService } from './group.service';
 import { Group } from '../../entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
-import { PagingOptions } from 'src/utils/paging/PagingOptions';
+import { MulterConfig } from 'src/utils/MulterConfigService';
+import { PagingOptions } from 'src/utils/PagingOptions';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('group')

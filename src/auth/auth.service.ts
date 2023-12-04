@@ -6,7 +6,7 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { UserRequestDto } from 'src/features/user/dto/user-request.dto';
 import { UserResponseDto } from 'src/features/user/dto/user-response.dto';
 import { UserService } from 'src/features/user/user.service';

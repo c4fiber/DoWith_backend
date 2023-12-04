@@ -4,7 +4,7 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { Todo } from 'src/entities/todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { User } from 'src/entities/user.entities';
 import { Reward } from 'src/enums/Reward.enum';
 
