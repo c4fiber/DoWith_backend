@@ -53,8 +53,7 @@ export class ItemShopService {
                                          , 'ish.item_path AS item_path'
                                          ])
                                          .leftJoin('item_inventory', 'iv', 'iv.user_id = :user_id AND ish.item_id = iv.item_id', { user_id })
-                                         .leftJoin('item_type'     , 'it', 'ish.type_id = it.type_id')
-
+                                         .leftJoin('item_type'     , 'it', 'ish.type_id = it.type_id');
     if(ownItems.length > 0){
       query.where('ish.item_id NOT IN (:...ownItems)', { ownItems });
     } else {

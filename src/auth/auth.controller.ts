@@ -53,20 +53,17 @@ export class AuthController {
     @Res() response: Response,
   ) {
     if (error) {
-      Logger.log(`Error while kakao auth. ${error}: ${state} ${desc} `);
       return desc;
     }
 
     const { token, kakao_id } = await this.authService.oauth(code);
     const redirectUri = `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${kakao_id}`;
-    Logger.log(`redirect to ${redirectUri}`);
     return response.redirect(redirectUri);
   }
 
   @Post('/test')
   @UseGuards(AuthGuard())
   async test(@Req() req) {
-    Logger.log(`@@ ${req}`);
     return 'Hello World!';
   }
 }
