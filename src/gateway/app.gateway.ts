@@ -60,10 +60,10 @@ export class AppGateway {
 
 		try {
 			this.server.to(receiver.socket_id).emit('friendRequest', { 
-					message: `${sender.user_name}이 친구 요청을 보냈습니다.`,
-					senderId: data.senderId,
+					message: `${sender.user_name}님이 친구 요청을 보냈습니다.`,
+					senderId: sender.user_id,
           senderName: sender.user_name,
-					receiverId: data.receiverId }) ;
+					receiverId: receiver.user_id }) ;
 		} catch (error) {
 			console.error(`Error sending notification to user ${receiver.user_id}:`, error);
 		}				
@@ -88,10 +88,10 @@ export class AppGateway {
 
 		try {
     	this.server.to(receiver.socket_id).emit('friendResponse', {
-        message: `${sender.user_name}이 친구 요청을 수락하였습니다.`,
-        senderId: data.senderId,
+        message: `${sender.user_name}님이 친구 요청을 수락하였습니다.`,
+        senderId: sender.user_id,
         senderName: sender.user_name,
-        receiverId: data.receiverId });
+        receiverId: receiver.user_id });
 		} catch (error) {
 			console.error(`Error sending notification to user ${receiver.user_id}:`, error);
 		}
@@ -100,12 +100,14 @@ export class AppGateway {
   @SubscribeMessage('confirmRequest')
   async handleConfirmRequest(@MessageBody() data: { userId: number; todoId: number; photoUrl: string }, @ConnectedSocket() client: Socket) {
     const sender = await this.userService.getUser( data.userId );
+    console.log(sender);
     if (!sender) {
       console.log('Invalid userId');
       return;
     }
 
     const todo = await this.todoService.findOne( data.todoId );
+    console.log(todo);
     if (!todo) {
       console.log('Invalid todoId');
       return;
@@ -117,10 +119,10 @@ export class AppGateway {
     console.log(typeof(data.userId));
 
     for (const member of groupMembers) {
-      if (member.user_id !== data.userId ) {
+      if (member.user_id !== sender.user_id ) {
         console.log(`${member.user_id}, ${typeof(member.user_id)}, ${data.userId}, ${typeof(data.userId)}`);
         const notificationData = new CreateNotificationDto();
-        notificationData.sender_id = `${data.userId}`;
+        notificationData.sender_id = `${sender.user_id}`;
         notificationData.receiver_id = `${member.user_id}`;
         notificationData.noti_type = '2';
         notificationData.req_type = '0';
@@ -131,8 +133,8 @@ export class AppGateway {
         // 해당 to-do를 공유하는 사용자들에게 알림 전송
         try {
             this.server.to(member.socket_id).emit('confirmRequest', {
-                message: `${sender.user_name}이 ${todo.todo_name}에 대한 인증을 요청했습니다.`,
-                senderId: data.userId,
+                message: `${sender.user_name}님이 ${todo.todo_name}에 대한 인증을 요청했습니다.`,
+                senderId: sender.user_id,
                 senderName: sender.user_name,
                 todoId: todo.todo_id,
                 totoName: todo.todo_name,
@@ -172,11 +174,11 @@ export class AppGateway {
     // 해당 to-do를 공유하는 사용자들에게 알림 전송
 		try {
 			this.server.to(receiver.socket_id).emit('confirmResponse', {
-					message: `${sender.user_name}이 ${todo.todo_name}에 대한 인증을 완료하였습니다.`,
+					message: `${sender.user_name}님이 ${todo.todo_name}에 대한 인증을 완료하였습니다.`,
 					senderId: data.userId,
           senderName: sender.user_name,
           receiverId: receiver.user_id,
-					todoId: data.todoId,
+					todoId: todo.todo_id,
           totoName: todo.todo_name, });
 		} catch (error) {
 			console.error(`Error sending notification to user ${receiver.user_id}:`, error);
@@ -209,7 +211,7 @@ export class AppGateway {
 
 		try {
 			this.server.to(receiver.socket_id).emit('newComment', {
-				message: `${author.user_name}이 방명록에 댓글을 남겼습니다.`,
+				message: `${author.user_name}님이 방명록에 댓글을 남겼습니다.`,
 				authorId: author.user_id,
         authorName: author.user_name,
 				comId: comment.com_id,
