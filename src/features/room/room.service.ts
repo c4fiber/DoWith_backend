@@ -56,7 +56,7 @@ export class RoomService {
         throw new DoWithExceptions().FailedToUpdateMyRoom;
       })
       .finally(() => {
-        this.dataSource.manager.release();
+        // this.dataSource.manager.release();
       });
 
     return { result };
