@@ -163,7 +163,6 @@ export class TodoService {
     ]);
 
     const result = { todo_today, todo_today_done };
-    Logger.log(`today: ${todo_today}, ${todo_today_done}`);
     return { result };
   }
 
@@ -234,7 +233,6 @@ export class TodoService {
 
       if (updatedTodo.affected === 0) {
         // 투두가 없음
-        Logger.log('Todo data does not exist');
         throw this.dwExcept.NoData;
       }
 
@@ -277,7 +275,6 @@ export class TodoService {
         .execute();
 
       if (userUpdated.affected === 0) {
-        Logger.log('User data does not exist');
         throw this.dwExcept.NoData;
       }
 

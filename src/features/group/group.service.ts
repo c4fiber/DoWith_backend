@@ -540,7 +540,6 @@ export class GroupService {
 
     if (updatedTodo.affected === 0) {
       // 투두가 없음
-      Logger.log('Todo data does not exist');
       throw this.dwExcept.NoData;
     }
 
@@ -588,7 +587,6 @@ export class GroupService {
                                                   .execute();
 
     if (userUpdated.affected === 0) {
-      Logger.log('User data does not exist');
       throw this.dwExcept.NoData;
     }
 
@@ -623,7 +621,6 @@ export class GroupService {
                                                .execute();
 
     if (updateExp.affected === 0) {
-      Logger.log('Pet data does not exist');
       throw this.dwExcept.NoData;
     }
 
