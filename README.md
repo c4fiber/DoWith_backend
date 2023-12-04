@@ -1,10 +1,22 @@
-# DoWith-backend
-SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔드)
+# Project  : DoWith-backend
+# Team     : IIW - It Works Why
+##### Front End: https://github.com/tomoyo519/DoWith_frontend
+</br>
 
-프론트엔드: https://github.com/tomoyo519/DoWith_frontend
+# **[ ⚙️ 목차 ]**
+1. [📆 기간](#이동할-위치)
+</br>
 
-### 기간
-2023-11-07 ~ 2023-12-16 (약 6주)
+# **[ 📆 기간 ]**
+- 설계 - 2023.11.07 ~ 2023.11.14 (1주)
+- 개발 - 2023.11.14 ~ 2023.12.07 (약 3주)
+- 테스트 - 2023.12.07 ~ 2023.12.16 (약 1주)
+</br>
+
+# **[ 📬 프로젝트 개요 ]**
+SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔드) </br>
+여기에 프로젝트를 왜 시작 했는지 설명
+</br>
 
 # **[ 👨‍👨‍👧‍👦 ‍멤버 ]**
 |Github|[<img src="https://avatars.githubusercontent.com/nashs789" width="130px;" style="max-width: 100%;">](https://github.com/nashs789)|[<img src="https://avatars.githubusercontent.com/c4fiber" width="130px;" style="max-width: 100%;">](https://github.com/c4fiber)|[<img src="https://avatars.githubusercontent.com/coding-jjun" width="130px;" style="max-width: 100%;">](https://github.com/coding-jjun)|[<img src="https://avatars.githubusercontent.com/cece-09" width="130px;" style="max-width: 100%;">](https://github.com/cece-09)|[<img src="https://avatars.githubusercontent.com/tomoyo519" width="130px;" style="max-width: 100%;">](https://github.com/tomoyo519)|
@@ -12,9 +24,6 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 |이름|이인복|신병철|박세준|이소정|정다희|
 |포지션|<img src="https://img.shields.io/badge/Back End-498EAF?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Front End-E5BB4B?style=for-the-badge&logo=&logoColor=white"/>|
 |담당업무|무엇 했는지|||||
-
-### 주제
-다마고치를 접목한 TODO 리스트
 
 ### 기술스택
 | 분야 | 기술 |
@@ -85,6 +94,4 @@ https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={
        ⎮    ⎮    ├ 📄 main.ts
        ├ 📝 README.md
 
-## License
-
-Nest is [MIT licensed](LICENSE).
+#이동할 위치
