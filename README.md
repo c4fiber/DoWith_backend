@@ -49,6 +49,7 @@ https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={
 <span><img src ="https://img.shields.io/badge/three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white"/></span><br/>
 <span><img src ="https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white"/></span><br/>
 <span><img src ="https://img.shields.io/badge/kakao-FFCD00?style=for-the-badge&logo=kakao&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white"/></span><br/>
 
 # **[ 🚫 규칙 ]**
 ### **📌 디렉토리 구조**
