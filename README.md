@@ -29,7 +29,26 @@ https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={
 <span><img src ="https://img.shields.io/badge/Java-007396.svg?&flat-square&logo=Java&logoColor=white"/></span><br/>
 <span><img src ="https://img.shields.io/badge/Java-007396.svg?&style=social&logo=Java&logoColor=white"/></span><br/>
 
-<span><img src ="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"/></span>
+<span><img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"/></span><br/>
+<span><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=tsnode&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white"/></span><br/>
+<span><img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/sharp-99CC00?style=for-the-badge&logo=sharp&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/typeform-262627?style=for-the-badge&logo=typeform&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white"/></span><br/>
+<span><img src ="https://img.shields.io/badge/kakao-FFCD00?style=for-the-badge&logo=kakao&logoColor=white"/></span><br/>
 
 # **[ 🚫 규칙 ]**
 ### **📌 디렉토리 구조**
