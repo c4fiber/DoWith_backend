@@ -3,17 +3,18 @@
 ##### Front End: https://github.com/tomoyo519/DoWith_frontend
 </br>
 
-# **[ ⚙️ 목차 ]**
-1. [:gear: 환경 설정 및 실행](#gear-환경-설정-및-실행)
+# ⚙️ 목차
+1. :calendar:[기간](calendar-기간)
+2. :mailbox_with_mail:[프로젝트-개요](mailbox_with_mail-프로젝트-개요)
 </br>
 
-# **[ 📆 기간 ]**
+# :calendar: 기간
 - 설계 - 2023.11.07 ~ 2023.11.14 (1주)
 - 개발 - 2023.11.14 ~ 2023.12.07 (약 3주)
 - 테스트 - 2023.12.07 ~ 2023.12.16 (약 1주)
 </br>
 
-# **[ 📬 프로젝트 개요 ]**
+# :mailbox_with_mail: 프로젝트 개요
 SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔드) </br>
 여기에 프로젝트를 왜 시작 했는지 설명
 </br>
@@ -93,5 +94,3 @@ https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={
        ⎮    ⎮    ├ 📄 app.module.ts
        ⎮    ⎮    ├ 📄 main.ts
        ├ 📝 README.md
-
-## :gear: 환경 설정 및 실행
