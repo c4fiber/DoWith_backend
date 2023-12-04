@@ -15,6 +15,9 @@ export class ItemShop {
   @Column({ nullable: true })
   item_path: string;
 
+  @Column({ nullable: true })
+  next_step: string;
+
   @Column()
   @ManyToMany(() => ItemType)
   @JoinColumn({ name: 'type_id', referencedColumnName: 'type_id' })
