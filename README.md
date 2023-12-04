@@ -19,16 +19,16 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 | DevOps | Docker + Jenkins |
 
 # 임시(뱃지)
-[ 기본 틀 ] - https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={로고}&logoColor={로고컬러}
+[ 기본 틀 ]
+https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={로고}&logoColor={로고컬러}
 [ 뱃지 스타일 ]
-https://img.shields.io/badge/{배지이름}-{css컬러}?style={plastic}&logo={로고}&logoColor={로고컬러}
-https://img.shields.io/badge/{배지이름}-{css컬러}?style={flat}&logo={로고}&logoColor={로고컬러}
-https://img.shields.io/badge/{배지이름}-{css컬러}?style={flat-square}&logo={로고}&logoColor={로고컬러}
-https://img.shields.io/badge/{배지이름}-{css컬러}?style={for-the-badge}&logo={로고}&logoColor={로고컬러}
-https://img.shields.io/badge/{배지이름}-{css컬러}?style={social}&logo={로고}&logoColor={로고컬러}
+<span><img src ="https://img.shields.io/badge/Java-007396.svg?&style=for-the-badge&logo=Java&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/Java-007396.svg?&style=plastic&logo=Java&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/Java-007396.svg?&style=flat&logo=Java&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/Java-007396.svg?&flat-square&logo=Java&logoColor=white"/></span>
+<span><img src ="https://img.shields.io/badge/Java-007396.svg?&style=social&logo=Java&logoColor=white"/></span>
 
-
-https://img.shields.io/badge/{nodedotjs}-{#339933}?style={스타일}&logo={Node.js}&logoColor={white}
+<span><img src ="https://img.shields.io/badge/nodedotjs-#339933?style=for-the-badge&logo=Node.js&logoColor={white"/></span>
 
 # **[ 🚫 규칙 ]**
 ### **📌 디렉토리 구조**
