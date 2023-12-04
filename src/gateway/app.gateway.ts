@@ -50,8 +50,8 @@ export class AppGateway {
     }
 
 		const notificationData = new CreateNotificationDto();
-    notificationData.sender_id = data.senderId.toString();
-    notificationData.receiver_id = data.receiverId.toString();
+    notificationData.sender_id = `${data.senderId}`;
+    notificationData.receiver_id = `${data.receiverId}`;
     notificationData.noti_type = '0';
     notificationData.req_type = '0';
     notificationData.sub_id = '';
@@ -78,8 +78,8 @@ export class AppGateway {
     }
 
 		const notificationData = new CreateNotificationDto();
-    notificationData.sender_id = data.senderId.toString();
-    notificationData.receiver_id = data.receiverId.toString();
+    notificationData.sender_id = `${data.senderId}`;
+    notificationData.receiver_id = `${data.receiverId}`;
     notificationData.noti_type = '1';
     notificationData.req_type = '1';
     notificationData.sub_id = '';
@@ -158,11 +158,11 @@ export class AppGateway {
     const receiver = await this.userService.getUser( todo.user_id );
 
     const notificationData = new CreateNotificationDto();
-    notificationData.sender_id = data.userId.toString();
-    notificationData.receiver_id = todo.user_id.toString();
+    notificationData.sender_id = `${data.userId}`;
+    notificationData.receiver_id = `${todo.user_id}`;
     notificationData.noti_type = '3';
     notificationData.req_type = '0';
-    notificationData.sub_id = data.todoId.toString();
+    notificationData.sub_id = `${data.todoId}`;
 
     await this.notificationService.createNotification(notificationData);
     // 해당 to-do를 공유하는 사용자들에게 알림 전송
@@ -193,6 +193,15 @@ export class AppGateway {
 		if (!receiver) {
 			return;
 		}
+
+    const notificationData = new CreateNotificationDto();
+    notificationData.sender_id = `${comment.author_id}`;
+    notificationData.receiver_id = `${comment.owner_id}`;
+    notificationData.noti_type = '4';
+    notificationData.req_type = '0';
+    notificationData.sub_id = `${comment.com_id}`;
+
+    await this.notificationService.createNotification(notificationData);
 
 		try {
 			this.server.to(receiver.socket_id).emit('newComment', {
