@@ -1,6 +1,4 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TodoModule } from './features/todo/todo.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
@@ -71,9 +69,8 @@ import { AnnouncementModule } from './features/announcement/announcement.module'
     NotificationModule,
     AnnouncementModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     Logger,
     {
       provide: APP_FILTER,
