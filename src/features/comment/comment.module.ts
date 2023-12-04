@@ -4,7 +4,7 @@ import { CommentService } from './comment.service';
 import { Comment } from '../../entities/comment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GatewayModule } from 'src/gateway/gateway.module';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Comment]), GatewayModule],

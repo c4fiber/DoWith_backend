@@ -27,7 +27,7 @@ import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
+import { MulterConfig } from 'src/utils/MulterConfigService';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../../entities/user.entities';
 
@@ -36,9 +36,7 @@ export class UserController {
   constructor(
     private readonly usersService: UserService,
     private readonly multerConifg: MulterConfig,
-  ) {
-    this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
-  }
+  ) {}
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))
@@ -47,7 +45,6 @@ export class UserController {
     @Headers('Authorization') token: string
   ): Promise<{ result }> {
     // const user: User = req.user;
-    // Logger.log(`User info from jwt: ${user.user_id}`);
     const user = req.user;
     return await this.usersService.getUserInfo(user.user_id, token);
   }
@@ -80,6 +77,7 @@ export class UserController {
     @UploadedFile() profile: Express.Multer.File,
   ): Promise<boolean> {
     // TODO: type, size, .. 검증 로직, 디스크 공간 체크
+    this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
     return true;
   }
 

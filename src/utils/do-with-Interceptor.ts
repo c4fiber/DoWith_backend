@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from "@nestjs/common";
 import { Observable, map } from "rxjs";
-import { DoWithExceptions } from "src/utils/do-with-exception/do-with-exception";
+import { DoWithExceptions } from "src/utils/do-with-exception";
 import { HttpMethod } from "src/enums/HttpMethod.enum";
 
 @Injectable()

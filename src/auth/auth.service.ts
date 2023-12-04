@@ -6,7 +6,10 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
+import { UserRequestDto } from 'src/features/user/dto/user-request.dto';
+import { UserResponseDto } from 'src/features/user/dto/user-response.dto';
+import { UserService } from 'src/features/user/user.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
@@ -137,10 +140,6 @@ export class AuthService {
     // 토큰 디코딩하여 카카오 유저 정보 확인
     // aud: 앱 링크, sub: 유저 카카오 아이디
     const { sub } = kakaoIdToken;
-    Logger.log(
-      `Kakao open id token is successfully responsed` +
-        `{sub: ${kakaoIdToken.sub}}`,
-    );
 
     // 유저 아이디를 가져와 DB에서 검색하고
     const user: User = await this.userRepository.findOneBy({
@@ -158,7 +157,6 @@ export class AuthService {
     const userId = user.user_id;
     const payload = { userId };
     const token = this.jwtService.sign(payload);
-    Logger.log(`JWT_TOKEN: ${token}`);
     return {
       token: token,
       kakao_id: user.user_kakao_id,
