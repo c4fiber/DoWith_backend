@@ -18,6 +18,25 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 | Test | Jest |
 | DevOps | Docker + Jenkins |
 
+# **[ 🚫 규칙 ]**
+### **📌 디렉토리 구조**
+
+       ├ 📦패키지
+       ⎮    ├ 📁env   : 개발 / 테스트 / 운영 환경변수
+       ⎮    ├ 📁public: 정적 리소스
+       ⎮    ├ 📁src   : 소스 코드
+       ⎮    ⎮    ├ 📁auth
+       ⎮    ⎮    ├ 📁entities
+       ⎮    ⎮    ├ 📁enums
+       ⎮    ⎮    ├ 📁features
+       ⎮    ⎮    ├ 📁firebase
+       ⎮    ⎮    ├ 📁gateway
+       ⎮    ⎮    ├ 📁utils
+       ⎮    ⎮    ├ 📃app.gateway.ts
+       ⎮    ⎮    ├ 📃app.module.ts
+       ⎮    ⎮    ├ 📃main.ts
+       ├ 📝README.md (스터디 관련 설명 README)
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
