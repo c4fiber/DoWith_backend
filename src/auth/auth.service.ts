@@ -7,17 +7,17 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
-import { UserRequestDto } from 'src/features/user/dto/user-request.dto';
-import { UserResponseDto } from 'src/features/user/dto/user-response.dto';
-import { UserService } from 'src/features/user/user.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entities';
-import { Repository } from 'typeorm';
+import { DataSource, In, QueryRunner, Repository } from 'typeorm';
 import { SignUpDto } from './dto/singup.dto';
+import { ItemInventory } from 'src/entities/item-inventory.entity';
+import { Room } from 'src/entities/room.entity';
+import { InitUser } from 'src/enums/InitUser.enum';
 
 export class KakaoTokenResponse {
   token_type: string;
@@ -37,61 +37,94 @@ export class AuthService {
     private readonly doWithExceptions: DoWithExceptions,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly dataSource: DataSource,
   ) {}
 
   private kakaoUrl = process.env.KAKAO_URL;
 
-  // 유저 아이디로 DB를 검색하여
-  // lastLogin 필드를 업데이트
-  async login(token: string) {
-    const { userId } = await this.jwtService.decode(token.substring(7));
-    const result: User = await this.userRepository.findOneBy({
-      user_id: userId,
-    });
-
-    return { result };
-  }
 
   // 새로운 유저 생성
-  async signup(
-    request: SignUpDto,
-  ): Promise<{ result: { user: User; token: string } }> {
-    const { user_name, user_tel, user_kakao_id } = request;
+  async signup(request: SignUpDto) {
+    const { user_name, user_tel, user_kakao_id, user_pet_name } = request;
 
-    // 만약 이미 가입된 유저인 경우 예외처리
-    const found = await this.userRepository
-      .createQueryBuilder('user')
-      .select()
-      .where('user_kakao_id = :user_kakao_id', { user_kakao_id })
-      .orWhere('user_name = :user_name', { user_name })
-      .getExists();
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    if (found == true) {
-      throw this.doWithExceptions.UserAlreadyExists;
+    try {
+      const now = new Date();
+
+      // 1. 유저 엔티티 생성
+      const createUser = await queryRunner.manager.createQueryBuilder()
+                                .insert()
+                                .into(User)
+                                .values({
+                                  user_name:      user_name,
+                                  user_kakao_id:  user_kakao_id,
+                                  user_tel:       user_tel,
+                                  user_cash:      InitUser.cash,
+                                  user_hp:        InitUser.hp,
+                                  last_login:     now,
+                                  login_cnt:      InitUser.login_cnt, 
+                                  login_seq:      InitUser.login_seq, 
+                                })
+                                .execute();
+      
+      if(createUser.identifiers.length === 0) {
+        throw this.doWithExceptions.FailToSignUp;
+      }
+
+      const user_id = createUser.identifiers[0].user_id;
+      
+      // 2. 펫을 기본펫으로 설정
+      await queryRunner.manager.createQueryBuilder()
+                            .insert()
+                            .into(ItemInventory)
+                            .values({
+                                user_id:   user_id,
+                                item_id:   InitUser.pet_id,
+                                pet_name:  user_pet_name,
+                                pet_exp:   InitUser.pet_exp,
+                            })
+                            .execute();
+
+
+      // 3. 펫을 룸에 배치
+      await queryRunner.manager.createQueryBuilder()
+                            .insert()
+                            .into(Room)
+                            .values({
+                                user_id:   user_id,
+                                item_id:   InitUser.pet_id
+                            })
+                            .execute();
+      
+
+      const mainPet = await this.getUserMainPet(queryRunner, user_id);
+
+      // 4. 토큰 발행
+      const payload = { user_id };
+      const token = this.jwtService.sign(payload);
+
+      const saveduser: User = await queryRunner.manager.findOneBy(User, {user_id: user_id});
+
+      const result = {
+        user: saveduser,
+        user_pet: mainPet,
+        token: token,
+      };
+
+      await queryRunner.commitTransaction();
+      return { result };
+
+    } catch(error) {
+      await queryRunner.rollbackTransaction();
+      throw new Error(error);
+
+    } finally {
+      await queryRunner.release();
+      
     }
-
-    // 유저 엔티티 생성
-    const now = new Date();
-    const user = new User();
-
-    user.user_name = user_name;
-    user.user_tel = user_tel;
-    user.user_kakao_id = user_kakao_id;
-    user.last_login = now;
-    user.user_hp = 0;
-
-    // 토큰 발행
-    const userId = user.user_id;
-    const payload = { userId };
-    const token = this.jwtService.sign(payload);
-
-    const saveduser: User = await this.userRepository.save(user);
-    const result = {
-      user: saveduser,
-      token: token,
-    };
-
-    return { result };
   }
 
   // 인가 코드로 토큰 발급을 요청합니다.
@@ -125,11 +158,20 @@ export class AuthService {
     const userId = user.user_id;
     const payload = { userId };
     const token = this.jwtService.sign(payload);
-    Logger.log(`💜 JWT_TOKEN: ${token}`);
+    Logger.log(`JWT_TOKEN: ${token}`);
     return {
       token: token,
       kakao_id: user.user_kakao_id,
     };
+  }
+
+  async isUserNameUnique(user_name: string) {
+    const user = await this.userRepository.createQueryBuilder()
+                                    .where({ user_name })
+                                    .select()
+                                    .getCount();
+    const result = user == 0;
+    return { result };
   }
 
   // === Helpers === //
@@ -164,5 +206,28 @@ export class AuthService {
     );
 
     return response;
+  }
+
+  /**
+   * 유저의 Room에 있는 펫을 가져옵니다.
+   * @param user_id
+   * @returns
+   */
+  private async getUserMainPet(queryRunner: QueryRunner, user_id: number) {
+    return await queryRunner.manager
+      .getRepository(Room)
+      .createQueryBuilder('r')
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id AND ish.type_id = :PET_TYPE')
+      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
+      .where('r.user_id = :user_id', { user_id: user_id, PET_TYPE: 1 })
+      .select([
+        'ish.item_id as item_id',
+        'ish.type_id as item_type',
+        'ish.item_name as item_name',
+        'ish.item_path as item_path',
+        'iv.pet_name as pet_name',
+        'iv.pet_exp as pet_exp',
+      ])
+      .getRawOne();
   }
 }
