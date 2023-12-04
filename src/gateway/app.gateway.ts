@@ -101,12 +101,14 @@ export class AppGateway {
   async handleConfirmRequest(@MessageBody() data: { userId: number; todoId: number; photoUrl: string }, @ConnectedSocket() client: Socket) {
     const sender = await this.userService.getUser( data.userId );
     if (!sender) {
-        return;
+      console.log('Invalid userId');
+      return;
     }
 
     const todo = await this.todoService.findOne( data.todoId );
     if (!todo) {
-        return;
+      console.log('Invalid todoId');
+      return;
     }
 
     const groupMembers = await this.groupService.findUsersByGroupId( todo.grp_id );
