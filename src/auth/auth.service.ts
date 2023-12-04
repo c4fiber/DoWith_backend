@@ -13,10 +13,11 @@ import { lastValueFrom, map } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entities';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { DataSource, In, QueryRunner, Repository } from 'typeorm';
 import { SignUpDto } from './dto/singup.dto';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
 import { Room } from 'src/entities/room.entity';
+import { InitUser } from 'src/enums/InitUser.enum';
 
 export class KakaoTokenResponse {
   token_type: string;
@@ -52,6 +53,7 @@ export class AuthService {
 
     try {
       const now = new Date();
+
       // 1. 유저 엔티티 생성
       const createUser = await queryRunner.manager.createQueryBuilder()
                                 .insert()
@@ -60,11 +62,11 @@ export class AuthService {
                                   user_name:      user_name,
                                   user_kakao_id:  user_kakao_id,
                                   user_tel:       user_tel,
-                                  user_cash:      0,
-                                  user_hp:        0,
+                                  user_cash:      InitUser.cash,
+                                  user_hp:        InitUser.hp,
                                   last_login:     now,
-                                  login_cnt:      1, 
-                                  login_seq:      0, 
+                                  login_cnt:      InitUser.login_cnt, 
+                                  login_seq:      InitUser.login_seq, 
                                 })
                                 .execute();
       
@@ -75,42 +77,37 @@ export class AuthService {
       const user_id = createUser.identifiers[0].user_id;
       
       // 2. 펫을 기본펫으로 설정
-      const setUserPet = await queryRunner.manager.createQueryBuilder()
-                                .insert()
-                                .into(ItemInventory)
-                                .values({
-                                  user_id:   user_id,
-                                  item_id:   55, // 
-                                  pet_name:  user_pet_name,
-                                  pet_exp: 0,
-                                })
-                                .execute();
+      await queryRunner.manager.createQueryBuilder()
+                            .insert()
+                            .into(ItemInventory)
+                            .values({
+                                user_id:   user_id,
+                                item_id:   InitUser.pet_id,
+                                pet_name:  user_pet_name,
+                                pet_exp:   InitUser.pet_exp,
+                            })
+                            .execute();
 
-      if(setUserPet.identifiers.length === 0) {
-        throw this.doWithExceptions.FailToSignUp;
-      }
 
       // 3. 펫을 룸에 배치
-      const setPetInUserRoom = await queryRunner.manager.createQueryBuilder()
-                                .insert()
-                                .into(Room)
-                                .values({
-                                  user_id:   user_id,
-                                  item_id:   55
-                                })
-                                .execute();
+      await queryRunner.manager.createQueryBuilder()
+                            .insert()
+                            .into(Room)
+                            .values({
+                                user_id:   user_id,
+                                item_id:   InitUser.pet_id
+                            })
+                            .execute();
       
-      if(setPetInUserRoom.identifiers.length == 0) {
-        throw this.doWithExceptions.FailToSignUp;
-      }
 
       const mainPet = await this.getUserMainPet(queryRunner, user_id);
 
-      // 토큰 발행
+      // 4. 토큰 발행
       const payload = { user_id };
       const token = this.jwtService.sign(payload);
 
       const saveduser: User = await queryRunner.manager.findOneBy(User, {user_id: user_id});
+
       const result = {
         user: saveduser,
         user_pet: mainPet,
