@@ -113,6 +113,8 @@ export class AppGateway {
 
     const groupMembers = await this.groupService.findUsersByGroupId( todo.grp_id );
     console.log(groupMembers);
+    console.log(data.userId);
+    console.log(typeof(data.userId));
 
     for (const member of groupMembers) {
       if (member.user_id !== data.userId ) {
