@@ -35,9 +35,7 @@ export class UserController {
   constructor(
     private readonly usersService: UserService,
     private readonly multerConifg: MulterConfig,
-  ) {
-    this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
-  }
+  ) {}
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))
@@ -76,6 +74,7 @@ export class UserController {
     @UploadedFile() profile: Express.Multer.File,
   ): Promise<boolean> {
     // TODO: type, size, .. 검증 로직, 디스크 공간 체크
+    this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
     return true;
   }
 

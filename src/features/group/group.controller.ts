@@ -12,9 +12,7 @@ export class GroupController {
   constructor(
     private readonly groupService: GroupService,
     private readonly multerConifg: MulterConfig
-  ){
-    this.multerConifg.changePath(process.env.IMAGE_PATH);
-  }
+  ){}
   
   // 모든 그룹 조회
   @Get('/')
@@ -93,6 +91,7 @@ export class GroupController {
     @Param('user_id') user_id: number,
     @UploadedFile() file: Express.Multer.File
   ): Promise<any>{
+    this.multerConifg.changePath(process.env.IMAGE_PATH);
     return this.groupService.updateImage(todo_id, user_id, file);
   }
 
