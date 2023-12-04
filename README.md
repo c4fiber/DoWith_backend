@@ -18,6 +18,18 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 | Test | Jest |
 | DevOps | Docker + Jenkins |
 
+# 임시(뱃지)
+[ 기본 틀 ] - https://img.shields.io/badge/{배지이름}-{css컬러}?style={스타일}&logo={로고}&logoColor={로고컬러}
+[ 뱃지 스타일 ]
+https://img.shields.io/badge/{배지이름}-{css컬러}?style={plastic}&logo={로고}&logoColor={로고컬러}
+https://img.shields.io/badge/{배지이름}-{css컬러}?style={flat}&logo={로고}&logoColor={로고컬러}
+https://img.shields.io/badge/{배지이름}-{css컬러}?style={flat-square}&logo={로고}&logoColor={로고컬러}
+https://img.shields.io/badge/{배지이름}-{css컬러}?style={for-the-badge}&logo={로고}&logoColor={로고컬러}
+https://img.shields.io/badge/{배지이름}-{css컬러}?style={social}&logo={로고}&logoColor={로고컬러}
+
+
+https://img.shields.io/badge/{nodedotjs}-{#339933}?style={스타일}&logo={Node.js}&logoColor={white}
+
 # **[ 🚫 규칙 ]**
 ### **📌 디렉토리 구조**
 
