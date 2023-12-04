@@ -1,9 +1,11 @@
 export enum DoWithErrorMsg {
   // User
-  UserAlreadyExists = 'User is already registerd',
-  UserNotFound      = 'User not found',
-  UserNameNotUnique = 'User name is not unique',
-  SelfFriendship    = 'A user cannot befriend themselves',
+  UserAlreadyExists = '이미 가입한 사용자입니다.',
+  UserNotFound      = '사용자 정보가 없습니다.',
+  UserNameNotUnique = '중복된 사용자 이름입니다.',
+  SelfFriendship    = '자신과 친구가 될 수 없습니다.',
+  FailToSignUp      = '회원가입에 실패하였습니다.',
+  Authorization     = '인증에 실패하였습니다.',
 
   // Group
 

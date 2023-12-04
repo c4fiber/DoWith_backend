@@ -12,6 +12,9 @@ export class Achievements {
   @Column()
   achi_desc: string;
 
+  @Column()
+  achi_img: string;  
+
   @Column({ default: false })
   is_hidden: boolean;
 
