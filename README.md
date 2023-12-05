@@ -7,10 +7,12 @@
 ##### :information_desk_person: [멤버](#information_desk_person-멤버)</br>
 ##### :calendar: [기간](#calendar-기간)</br>
 ##### :mailbox_with_mail: [프로젝트-개요](#mailbox_with_mail-프로젝트-개요)</br>
+##### :round_pushpin: [기능](#round_pushpin-기능)</br>
 ##### :wrench: [기술 스택](#wrench-기술-스택)</br>
 ##### :couplekiss: [협업](#couplekiss-협업)</br>
 ##### :pushpin: [디렉토리 구조](#pushpin-디렉토리-구조)</br>
 ##### :chart_with_upwards_trend: [기술적 챌린지](#chart_with_upwards_trend-기술적-챌린지)</br>
+##### :octocat: [업무 상세 내용](#octocat-업무-상세-내용)</br>
 </br>
 
 ## :information_desk_person: ‍멤버
@@ -35,6 +37,10 @@
 ## :mailbox_with_mail: 프로젝트 개요
 SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔드) </br>
 여기에 프로젝트를 왜 시작 했는지 설명
+</br></br>
+
+## :round_pushpin: 기능
+API 정의 해둘 예정 시간 된다면? OR url 링크만 걸어두기
 </br></br>
 
 ## :wrench: 기술 스택
@@ -97,3 +103,10 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 ## :chart_with_upwards_trend: 기술적 챌린지
 1. 이거
 2. 저거
+
+## :octocat: 업무 상세 내용
+- 인복
+- 병철
+- 세준
+- 소정
+- 다희
