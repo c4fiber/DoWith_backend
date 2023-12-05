@@ -18,6 +18,8 @@
 |---|:---:|:---:|:---:|:---:|:---:|
 |이름|이인복|신병철|박세준|이소정|정다희|
 |포지션|<img src="https://img.shields.io/badge/Back End-498EAF?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Front End-E5BB4B?style=for-the-badge&logo=&logoColor=white"/>|
+|연락처|bbock1214@gmail.com|||||
+|블로그|[<img src="https://img.shields.io/badge/tistory-000000?style=for-the-badge&logo=tistory&logoColor=white"/>](https://nashs789.tistory.com/)|||||
 |담당업무|무엇 했는지|||||
 </br>
 멘토님도 넣을지??????
@@ -25,7 +27,7 @@
 
 ## :calendar: 기간
 - 설계 - 2023.11.07 ~ 2023.11.14 (1주)
-    - PPT: https://docs.google.com/presentation/d/1aGyAQPrHDuRw4QX_VfzhHuHh4uk_epPGAr8O62015zU/edit#slide=id.p  
+    - PPT: [바로가기](https://docs.google.com/presentation/d/1aGyAQPrHDuRw4QX_VfzhHuHh4uk_epPGAr8O62015zU/edit#slide=id.p)
 - 개발 - 2023.11.14 ~ 2023.12.07 (약 3주)
 - 테스트 - 2023.12.07 ~ 2023.12.16 (약 1주)
 </br>
@@ -56,14 +58,14 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 </br>여기에다가 기술 아키텍쳐 사진 넣을것</br></br>
 
 ## :couplekiss: 협업
-|Tool|url|
+|바로가기|설명|
 |---|:---:|
-|<span><img src ="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/></span>|https://github.com/c4fiber/DoWith_backend|
-|<span><img src ="https://img.shields.io/badge/jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/></span>|https://persimmon.atlassian.net/jira/software/projects/IWW/boards/1|
-|<span><img src ="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/></span>|https://www.notion.so/7abb2ce040af491aad3f6e877268be5b?pvs=4|
-|<span><img src ="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/></span>|https://www.figma.com/file/TbIxjCTQzHCiIh9fgxObid/Do-With?type=design&node-id=0-1&mode=design&t=QNC0NqmfmA7WXusp-0|
-|<span><img src ="https://img.shields.io/badge/dbdiagram-004088?style=for-the-badge&logo=diagramsdotnet&logoColor=white"/></span>|https://dbdiagram.io/d/6564dc863be1495787d4b92e|
-|<span><img src ="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/></span>|X|
+|[<img src ="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/>](https://github.com/c4fiber/DoWith_backend)|형상, 이슈 관리 & 코드 리뷰|
+|[<img src ="https://img.shields.io/badge/jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/>](https://persimmon.atlassian.net/jira/software/projects/IWW/boards/1)|타임라인기반 일정 관리|
+|[<img src ="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/>](https://www.notion.so/7abb2ce040af491aad3f6e877268be5b?pvs=4)|스크럼, API Docs, 메타데이터, 피드백, 회의록 등|
+|[<img src ="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/>](https://www.figma.com/file/TbIxjCTQzHCiIh9fgxObid/Do-With?type=design&node-id=0-1&mode=design&t=QNC0NqmfmA7WXusp-0)|화면 설계|
+|[<img src ="https://img.shields.io/badge/dbdiagram-004088?style=for-the-badge&logo=diagramsdotnet&logoColor=white"/>](https://dbdiagram.io/d/6564dc863be1495787d4b92e)|DB ERD|
+|[<img src ="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/>]()|의사소통|
 </br>
 
 ## :pushpin: 디렉토리 구조
