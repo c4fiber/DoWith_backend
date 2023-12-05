@@ -25,19 +25,22 @@ export class NotificationService {
       .leftJoinAndSelect(User, 'receiver', 'receiver.user_id::text = notification.receiver_id')
       .leftJoinAndSelect(Todo, 'todo', `todo.todo_id::text = notification.sub_id AND (notification.noti_type = '2' OR notification.noti_type = '3')`)
       .select([
-        'notification.noti_id',
-        'notification.noti_time',
-        'notification.noti_type',
-        'notification.req_type',
-        'notification.sub_id',
+        'notification.noti_id AS noti_id',
+        'notification.noti_type AS noti_type',
+        'notification.req_type AS req_type',
+        'notification.sub_id AS sub_id',
+        'sender.user_id AS sender_id',
         'sender.user_name AS sender_name',
+        'receiver.user_id AS receiver_id',
         'receiver.user_name AS receiver_name',
         'todo.todo_name AS todo_name',
       ])
       .where('notification.receiver_id = :user_id::text', { user_id })
       .orderBy('notification.noti_time', 'DESC')
       .getRawMany();
-  
+      
+      console.log(notifications);
+
       return notifications.map(noti => ({
         ...noti,
         todo_name: noti.noti_type === '2' || noti.noti_type === '3' ? noti.todo_name : null,
