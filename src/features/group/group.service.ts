@@ -177,7 +177,7 @@ export class GroupService {
                                        , 'u.last_login AS last_login'
                                        ])
                                        .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
-                                       .leftJoin('user'      , 'u' , 'u.user_id = ug.user_id')
+                                       .innerJoin('user'     , 'u' , 'u.user_id = ug.user_id')
                                        .where('g.grp_id = :grp_id', { grp_id })
                                        .getRawMany();
 

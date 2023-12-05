@@ -7,6 +7,8 @@ import { UpdateTodoDto } from './dto/update-todo.dto';
 import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { User } from 'src/entities/user.entities';
 import { Reward } from 'src/enums/Reward.enum';
+import { Days } from 'src/enums/Days.enum';
+import { AchiLogin } from 'src/enums/AchiLogin.enum';
 
 
 
@@ -37,6 +39,8 @@ export class TodoService {
    *              2. 연속 로그인 갱신
    *              3. 누적 로그인 갱신
    *              4. Routine에서 만들어지는 To-Do 생성
+   *              5. login_cnt에 따른 업적 달성
+   *              6. login 안한 일 수 만큼 hp 마이너스
    * @returns 
    */
   async createTodayTodo(user_id: number){
@@ -56,7 +60,7 @@ export class TodoService {
                                    .where('user_id = :user_id', { user_id });
     // 이미 todo 생성했을 경우
     if (user) {
-      // 1. 오늘 로그인 날짜로 최신화
+      // 1. 마지막 로그인 날짜로 최신화
       await newLastLogin.execute();
       throw this.dwExcept.AlreadyMadeTodos;
     }
@@ -65,27 +69,72 @@ export class TodoService {
       await qr.connect();
       await qr.startTransaction();
 
-      // 2. 연속 로그인 증가
+      // 3. 누적 로그인 증가
       const result = await qr.manager.createQueryBuilder()
                                      .update('user')
                                      .set({ login_cnt: () => '"login_cnt" + 1' })
                                      .where({ user_id })
                                      .execute();
+
       if(result.affected === 0){
         throw this.dwExcept.UserNotFound;  
       }
-      // 3. 누적 로그인 증가
-      const test = await qr.manager.createQueryBuilder()
-                                   .update('user')
-                                   .set({
-                                     login_seq:
-                                       () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
-                                                   THEN "login_seq" + 1 
-                                                   ELSE 1
-                                               END`,
-                                   })
-                                   .where({ user_id })
-                                   .execute();
+      // 2. 연속 로그인 증가
+      await qr.manager.createQueryBuilder()
+                      .update('user')
+                      .set({
+                        user_hp:
+                        () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) > 1
+                                    THEN "user_hp" - EXTRACT(DAY FROM AGE(now(), "last_login"))
+                                    WHEN "user_hp" = 10
+                                    THEN "user_hp"
+                                    ELSE "user_hp" + 1
+                                END`,
+                        login_seq:
+                          () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
+                                      THEN "login_seq" + 1 
+                                      ELSE 1
+                                  END`,
+                      })
+                      .where({ user_id })
+                      .execute();
+                      
+      // 5. 로그인 관련 업적 확인을 위해 로그인 일 수 조회
+      const login_cnt = await qr.manager.createQueryBuilder()
+                                        .from('user', 'u')
+                                        .select(['login_cnt'])
+                                        .where({ user_id })
+                                        .getRawOne();
+
+      let achi_id = 0;
+      // 5. 로그인 일 수가 업적 달성 조건에 일치한지 확인
+      switch(login_cnt.login_cnt){
+        case Days.A_DAY:
+          achi_id = AchiLogin.FOR_A_DAY
+          break;
+        case Days.A_WEEK:
+          achi_id = AchiLogin.FOR_A_WEEK
+          break;
+        case Days.A_MONTH:
+          achi_id = AchiLogin.FOR_A_MONTH
+          break;
+        case Days.A_YEAR:
+          achi_id = AchiLogin.FOR_A_YEAR
+          break;
+      }
+
+      // 5. 업적 달성시 insert (ID: 0은 존재하지 않는 업적 ID)
+      if(achi_id != 0){
+        await qr.manager.createQueryBuilder()
+                        .insert()
+                        .into('user_achi')
+                        .values({ 
+                            user_id
+                          , achi_id
+                        })
+                        .execute();
+      }
+
       // 1. 오늘 로그인 날짜로 최신화
       await newLastLogin.execute();
       // 4. todo 생성기 - 유저가 가입한 그룹 리스트
@@ -133,7 +182,13 @@ export class TodoService {
       }
 
       await qr.commitTransaction();
-      return { result };
+      return { 
+        result, 
+        user_achi: await qr.manager.createQueryBuilder()
+                                   .from('achievements', 'ac')
+                                   .where('achi_id = :achi_id', { achi_id })
+                                   .getRawOne()
+      };
     } catch (err) {
       await qr.rollbackTransaction();
       throw new Error(err);
