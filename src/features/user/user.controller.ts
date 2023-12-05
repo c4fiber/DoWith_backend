@@ -43,7 +43,6 @@ export class UserController {
   async getUser(
     @Request() req,
   ): Promise<{ result }> {
-    
     return await this.usersService.getUserInfo(req.user);
   }
 
@@ -53,7 +52,6 @@ export class UserController {
     @Param('user_id', ParseIntPipe) id: number,
     @UploadedFile() profile: Express.Multer.File,
   ): Promise<boolean> {
-    // TODO: type, size, .. 검증 로직, 디스크 공간 체크
     this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
     return true;
   }
@@ -65,14 +63,6 @@ export class UserController {
     @Body() request: UserRequestDto,
   ): Promise<boolean> {
     return await this.usersService.updateUser(id, request);
-  }
-
-  @Patch('/:user_id')
-  async updateUserHp(
-    @Param('user_id', ParseIntPipe) id: number,
-    @Query('hp', ParseIntPipe) hp: number,
-  ): Promise<boolean> {
-    return await this.usersService.updateHp(id, hp);
   }
 
   @Delete('/:user_id')

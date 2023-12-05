@@ -3,7 +3,9 @@ export enum InitUser {
     cash = 0,
     hp = 0,
     login_cnt = 1,
-    login_seq = 0,
+    login_seq = 1,
     pet_exp = 0,
     pet_id = 55,
+
+    achi_id = 5, // 첫 로그인
 }
