@@ -25,7 +25,7 @@ export class User {
   @Column({ unique: true })
   user_kakao_id: string;
 
-  @Column({ default: 100 })
+  @Column({ default: 10 })
   user_hp: number;
 
   @Column({ default: 0 })
@@ -34,10 +34,10 @@ export class User {
   @Column({ default: 0 })
   total_exp: number;
 
-  @Column({ default: 0 })
+  @Column({ default: 1 })
   login_cnt: number;
 
-  @Column({ default: 0 })
+  @Column({ default: 1 })
   login_seq: number;
 
   // @OneToOne(() => Room)
