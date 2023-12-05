@@ -21,19 +21,12 @@ export class UserService {
   ) {}
 
   // 토큰 검사 & 유저 정보 반환
-  async getUserInfo(user_id: number, token: string) {
-    const tokenStr = token.substring(7);
-    // const verify =  this.jwtService.verify(tokenStr)
-    const { userId } = await this.jwtService.decode(tokenStr);
-
-    if(user_id != userId) {
-      throw this.doWithException.Authorization;
-    }
-    const queryRunner =this.dataSource.createQueryRunner();
-    const user = await this.userRepository.findOneBy({user_id});
-    const user_pet = await this.getUserMainPet(queryRunner, user_id);
-
-    const result = {user, user_pet};
+  async getUserInfo(user: User) {
+    // const tokenStr = token.substring(7);
+    const {user_id} = user;
+    const user_pet = await this.getUserMainPet(this.dataSource, user_id);
+  
+    const result = { user, user_pet };
     return { result };
   }
 
@@ -164,8 +157,8 @@ export class UserService {
    * @param user_id
    * @returns
    */
-  private async getUserMainPet(queryRunner: QueryRunner, user_id: number) {
-    return await queryRunner.manager
+  private async getUserMainPet(dataSource: DataSource, user_id: number) {
+    return await dataSource
       .getRepository(Room)
       .createQueryBuilder('r')
       .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id AND ish.type_id = :PET_TYPE')
