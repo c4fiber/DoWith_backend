@@ -428,8 +428,8 @@ export class GroupService {
       query.andWhere('g.grp_id NOT IN (:...myGrpsIds)', { myGrpsIds });
     }
 
-    // 그룹 카테고리가 전체인 경우 (1: 전체)
-    if(cat_id != 1){
+    // 그룹 카테고리가 전체인 경우 (0: 전체)
+    if(cat_id != 0){
       query.andWhere('c.cat_id = :cat_id', { cat_id });
     }
 
