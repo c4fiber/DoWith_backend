@@ -23,7 +23,7 @@ export class NotificationService {
         const notifications = await this.notificationRepository.createQueryBuilder('notification')
         .leftJoinAndSelect(User, 'sender', 'sender.user_id = notification.sender_id')
         .leftJoinAndSelect(User, 'receiver', 'receiver.user_id = notification.receiver_id')
-        .leftJoinAndSelect(Todo, 'todo', 'todo.todo_id = notification.sub_id AND notification.noti_type IN (:...types)', { types: [2, 3] })
+        .leftJoinAndSelect(Todo, 'todo', 'todo.todo_id = CAST(notification.sub_id AS INTEGER) AND notification.noti_type IN (:...types)', { types: ['2', '3'] })
         .select([
           'notification.noti_id',
           'notification.noti_time',
