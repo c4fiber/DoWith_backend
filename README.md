@@ -18,8 +18,8 @@
 |---|:---:|:---:|:---:|:---:|:---:|
 |이름|이인복|신병철|박세준|이소정|정다희|
 |포지션|<img src="https://img.shields.io/badge/Back End-498EAF?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Front End-E5BB4B?style=for-the-badge&logo=&logoColor=white"/>|
-|연락처|bbock1214@gmail.com|||||
-|블로그|[<img src="https://img.shields.io/badge/tistory-000000?style=for-the-badge&logo=tistory&logoColor=white"/>](https://nashs789.tistory.com/)|||||
+|gmail|bbock1214|qudcjf153|psjbrian|sojeong.lee017|vanessa.cheong1|
+|블로그|[<img src="https://img.shields.io/badge/tistory-000000?style=for-the-badge&logo=tistory&logoColor=white"/>](https://nashs789.tistory.com/)|[<img src="https://img.shields.io/badge/velog-20C997?style=for-the-badge&logo=velog&logoColor=white"/>](https://velog.io/@c4fiber)||[<img src="https://img.shields.io/badge/tistory-000000?style=for-the-badge&logo=tistory&logoColor=white"/>](https://cece-blog.tistory.com/)|[<img src="https://img.shields.io/badge/githubpages-222222?style=for-the-badge&logo=githubpages&logoColor=white"/>](https://tomoyo519.github.io/)|
 |담당업무|무엇 했는지|||||
 </br>
 멘토님도 넣을지??????
@@ -38,23 +38,14 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 </br></br>
 
 ## :wrench: 기술 스택
-기술(back, front), 라이브러리, devops,</br>
-<span><img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"/></span>
-<span><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=tsnode&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white"/></span>
-<span><img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/sharp-99CC00?style=for-the-badge&logo=sharp&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/typeform-262627?style=for-the-badge&logo=typeform&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/kakao-FFCD00?style=for-the-badge&logo=kakao&logoColor=white"/></span>
-<span><img src ="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white"/></span>
+| 분야 | 기술 |
+| --- | --- |
+| Front |<img src ="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"/> <img src ="https://img.shields.io/badge/three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white"/><img src ="https://img.shields.io/badge/dart-0175C2?style=for-the-badge&logo=dart&logoColor=white"/>|
+| Back |<img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"/><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=tsnode&logoColor=white"/><img src ="https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white"/><img src ="https://img.shields.io/badge/typeform-262627?style=for-the-badge&logo=typeform&logoColor=white"/><img src ="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/>|
+| DB |<img src ="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>|
+| Lib |<img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/><img src ="https://img.shields.io/badge/sharp-99CC00?style=for-the-badge&logo=sharp&logoColor=white"/><img src ="https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white"/><img src ="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white"/>|
+| DevOps |<img src ="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/><img src ="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>|
+
 </br>여기에다가 기술 아키텍쳐 사진 넣을것</br></br>
 
 ## :couplekiss: 협업
