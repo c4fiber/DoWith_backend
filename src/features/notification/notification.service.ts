@@ -20,23 +20,25 @@ export class NotificationService {
 
     // READ
     async findAllByUser(user_id: number): Promise<Notification[]> {
-        const notifications = await this.notificationRepository.createQueryBuilder('notification')
-        .leftJoinAndSelect(User, 'sender', 'sender.user_id = notification.sender_id')
-        .leftJoinAndSelect(User, 'receiver', 'receiver.user_id = notification.receiver_id')
-        .leftJoinAndSelect(Todo, 'todo', 'todo.todo_id = CAST(notification.sub_id AS INTEGER) AND notification.noti_type IN (:...types)', { types: ['2', '3'] })
-        .select([
-          'notification.noti_id',
-          'notification.noti_time',
-          'notification.noti_type',
-          'notification.req_type',
-          'notification.sub_id',
-          'sender.user_name AS sender_name',
-          'receiver.user_name AS receiver_name',
-          'todo.todo_name AS todo_name',
-        ])
-        .where('notification.receiver_id = :user_id', { user_id })
-        .orderBy('notification.noti_time', 'DESC')
-        .getRawMany();
+      const notifications = await this.notificationRepository.createQueryBuilder('notification')
+      .leftJoinAndSelect(User, 'sender', 'sender.user_id = notification.sender_id')
+      .leftJoinAndSelect(User, 'receiver', 'receiver.user_id = notification.receiver_id')
+      .leftJoinAndSelect(Todo, 'todo', 'todo.todo_id = CAST(notification.sub_id AS INTEGER) AND notification.noti_type IN (:...types)', { types: ['2', '3'] })
+      .select([
+        'notification.noti_id',
+        'notification.noti_time',
+        'notification.noti_type',
+        'notification.req_type',
+        'notification.sub_id',
+        'sender.user_name AS sender_name',
+        'receiver.user_name AS receiver_name',
+        'todo.todo_name AS todo_name',
+      ])
+      .where('notification.receiver_id = :user_id', { user_id })
+      .orderBy('notification.noti_time', 'DESC')
+      .getRawMany();
+
+      console.log(notifications);
   
       return notifications.map(noti => ({
         ...noti,
