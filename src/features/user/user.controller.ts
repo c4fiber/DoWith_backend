@@ -42,33 +42,10 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   async getUser(
     @Request() req,
-    @Headers('Authorization') token: string
   ): Promise<{ result }> {
-    // const user: User = req.user;
-    const user = req.user;
-    return await this.usersService.getUserInfo(user.user_id, token);
+    
+    return await this.usersService.getUserInfo(req.user);
   }
-
-  //   @Get('/:user_id')
-  //   async getUserById(
-  //     @Param('user_id', ParseIntPipe) id: number,
-  //   ): Promise<UserResponseDto> {
-  //     return await this.usersService.getUser(id);
-  //   }
-
-  //   @Get('/')
-  //   async getUserByKakakoId(
-  //     @Query('user_kakao_id') kakaoId: string,
-  //   ): Promise<UserResponseDto> {
-  //     return await this.usersService.getUserByKakaoId(kakaoId);
-  //   }
-
-  //   @Get('/')
-  //   async getUserByName(
-  //     @Query('user_name') name: string,
-  //   ): Promise<UserResponseDto> {
-  //     return await this.usersService.getUserByName(name);
-  //   }
 
   @UseInterceptors(FileInterceptor('profile'))
   @Post('/:user_id/profile')
