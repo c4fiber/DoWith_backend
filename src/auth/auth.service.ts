@@ -21,6 +21,8 @@ import { SignUpDto } from './dto/singup.dto';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
 import { Room } from 'src/entities/room.entity';
 import { InitUser } from 'src/enums/InitUser.enum';
+import { UserAchi } from 'src/entities/user_achi.entity';
+import { Achievements } from 'src/entities/achievements.entity';
 
 export class KakaoTokenResponse {
   token_type: string;
@@ -45,10 +47,13 @@ export class AuthService {
 
   private kakaoUrl = process.env.KAKAO_URL;
 
-
   // 새로운 유저 생성
   async signup(request: SignUpDto) {
     const { user_name, user_tel, user_kakao_id, user_pet_name } = request;
+
+    if(user_name.length > 10) {
+      throw this.doWithExceptions.UserNameLimit;
+    }
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -72,14 +77,24 @@ export class AuthService {
                                   login_seq:      InitUser.login_seq, 
                                 })
                                 .execute();
-      
-      if(createUser.identifiers.length === 0) {
-        throw this.doWithExceptions.FailToSignUp;
-      }
 
       const user_id = createUser.identifiers[0].user_id;
+
+      // 2. 첫 로그인 업적 달성
+      const loginAchi = await queryRunner.manager.findOneBy(
+                                Achievements,
+                                {achi_id: InitUser.achi_id});
+
+      await queryRunner.manager.createQueryBuilder()
+                               .insert()
+                               .into(UserAchi)
+                               .values({
+                                 user_id: user_id,
+                                 achi_id: InitUser.achi_id
+                               })
+                               .execute();
       
-      // 2. 펫을 기본펫으로 설정
+      // 3. 펫을 기본펫으로 설정
       await queryRunner.manager.createQueryBuilder()
                             .insert()
                             .into(ItemInventory)
@@ -92,7 +107,7 @@ export class AuthService {
                             .execute();
 
 
-      // 3. 펫을 룸에 배치
+      // 4. 펫을 룸에 배치
       await queryRunner.manager.createQueryBuilder()
                             .insert()
                             .into(Room)
@@ -105,7 +120,7 @@ export class AuthService {
 
       const mainPet = await this.getUserMainPet(queryRunner, user_id);
 
-      // 4. 토큰 발행
+      // 5. 토큰 발행
       const payload = { user_id };
       const token = this.jwtService.sign(payload);
 
@@ -114,6 +129,7 @@ export class AuthService {
       const result = {
         user: saveduser,
         user_pet: mainPet,
+        user_achi: loginAchi,
         token: token,
       };
 
@@ -163,6 +179,7 @@ export class AuthService {
     };
   }
 
+  // 닉네임 중복검사.
   async isUserNameUnique(user_name: string) {
     const user = await this.userRepository.createQueryBuilder()
                                     .where({ user_name })
@@ -206,11 +223,7 @@ export class AuthService {
     return response;
   }
 
-  /**
-   * 유저의 Room에 있는 펫을 가져옵니다.
-   * @param user_id
-   * @returns
-   */
+  // 유저의 Room에 있는 펫을 가져옵니다.
   private async getUserMainPet(queryRunner: QueryRunner, user_id: number) {
     return await queryRunner.manager
       .getRepository(Room)
