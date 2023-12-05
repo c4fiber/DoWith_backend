@@ -40,6 +40,7 @@ export class TodoService {
    *              3. 누적 로그인 갱신
    *              4. Routine에서 만들어지는 To-Do 생성
    *              5. login_cnt에 따른 업적 달성
+   *              6. login 안한 일 수 만큼 hp 마이너스
    * @returns 
    */
   async createTodayTodo(user_id: number){
@@ -82,6 +83,11 @@ export class TodoService {
       await qr.manager.createQueryBuilder()
                       .update('user')
                       .set({
+                        user_hp:
+                        () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
+                                    THEN "user_hp"
+                                    ELSE "user_hp" - EXTRACT(DAY FROM AGE(now(), "last_login"))
+                                END`,
                         login_seq:
                           () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
                                       THEN "login_seq" + 1 
@@ -91,6 +97,7 @@ export class TodoService {
                       .where({ user_id })
                       .execute();
                       
+      // 5. 로그인 관련 업적 확인을 위해 로그인 일 수 조회
       const login_cnt = await qr.manager.createQueryBuilder()
                                         .from('user', 'u')
                                         .select(['login_cnt'])
@@ -98,7 +105,7 @@ export class TodoService {
                                         .getRawOne();
 
       let achi_id = 0;
-
+      // 5. 로그인 일 수가 업적 달성 조건에 일치한지 확인
       switch(login_cnt.login_cnt){
         case Days.A_DAY:
           achi_id = AchiLogin.FOR_A_DAY
@@ -114,6 +121,7 @@ export class TodoService {
           break;
       }
 
+      // 5. 업적 달성시 insert (ID: 0은 존재하지 않는 업적 ID)
       if(achi_id != 0){
         await qr.manager.createQueryBuilder()
                         .insert()
