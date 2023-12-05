@@ -84,9 +84,11 @@ export class TodoService {
                       .update('user')
                       .set({
                         user_hp:
-                        () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
+                        () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) > 1
+                                    THEN "user_hp" - EXTRACT(DAY FROM AGE(now(), "last_login"))
+                                    WHEN "user_hp" = 10
                                     THEN "user_hp"
-                                    ELSE "user_hp" - EXTRACT(DAY FROM AGE(now(), "last_login"))
+                                    ELSE "user_hp" + 1
                                 END`,
                         login_seq:
                           () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) = 1
@@ -180,7 +182,13 @@ export class TodoService {
       }
 
       await qr.commitTransaction();
-      return { result };
+      return { 
+        result, 
+        user_achi: await qr.manager.createQueryBuilder()
+                                   .from('achievements', 'ac')
+                                   .where('achi_id = :achi_id', { achi_id })
+                                   .getRawOne()
+      };
     } catch (err) {
       await qr.rollbackTransaction();
       throw new Error(err);
