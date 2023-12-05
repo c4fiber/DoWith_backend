@@ -35,8 +35,13 @@ export class RoomService {
 
   async overlap(user_id: number, items: number[]): Promise<any> {
     
-    const result = this.dataSource.manager
-      .transaction(async (manager) => {
+    const qr  = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+    
+    var result = [];
+
+    try {
         // 기존의 room아이템 모두 삭제
         await this.roomRepo.delete({ user_id });
 
@@ -49,15 +54,16 @@ export class RoomService {
           }
 
           // 보유한 아이템 + 방에 없음 -> 방에 추가
-          await this.roomRepo.save({ user_id, item_id });
+          result.push(await this.roomRepo.save({ user_id, item_id }));
         }
-      })
-      .catch((err) => {
+      }
+      catch(err)  {
+        await qr.rollbackTransaction();
         throw new DoWithExceptions().FailedToUpdateMyRoom;
-      })
-      .finally(() => {
-        // this.dataSource.manager.release();
-      });
+      }
+      finally {
+        qr.release();
+      };
 
     return { result };
   }
