@@ -21,6 +21,7 @@ export class CommentController {
         private commentService: CommentService,
         private appGateWay: AppGateway,
         ) {}
+        
     @Get(':owner_id/comment')
     findAllByOwner(
         @Param('owner_id', ParseIntPipe) owner_id: number,

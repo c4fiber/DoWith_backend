@@ -61,17 +61,10 @@ export class NotificationService {
 
     // UPDATE
     async updateNotification(noti_id: number, updateNotificationDto: UpdateNotificationDto): Promise<Notification> {
-        // const comment = await this.commentRepository.findOne({ where: { com_id } });
-        // if (comment) {
-        //     comment.content = updateCommentDto.content;
-        //     comment.is_mod = true;
-        //     await this.commentRepository.save(comment);
-        //     return comment;
-        // }
         const notification = await this.notificationRepository.findOne({ where: { noti_id } });
         if (notification) {
             notification.req_type = updateNotificationDto.req_type;
-            await this.notificationRepository.save(notification);
+            await this.notificationRepository.save(notification);            
             return notification;
         }
     }
