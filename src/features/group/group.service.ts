@@ -6,13 +6,13 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/entities/user_group.entity';
 import { Todo } from 'src/entities/todo.entity';
 import { User } from 'src/entities/user.entities';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { Routine } from 'src/entities/routine.entity';
 import * as sharp from 'sharp'
 import * as fs from 'fs/promises'
 import * as path from 'path';
 
-import { applyPaging, getIdsFromItems } from 'src/utils/paging/PagingOptions';
+import { applyPaging, getIdsFromItems } from 'src/utils/PagingOptions';
 import { Room } from 'src/entities/room.entity';
 import { Reward } from 'src/enums/Reward.enum';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
@@ -540,7 +540,6 @@ export class GroupService {
 
     if (updatedTodo.affected === 0) {
       // 투두가 없음
-      Logger.log('Todo data does not exist');
       throw this.dwExcept.NoData;
     }
 
@@ -588,7 +587,6 @@ export class GroupService {
                                                   .execute();
 
     if (userUpdated.affected === 0) {
-      Logger.log('User data does not exist');
       throw this.dwExcept.NoData;
     }
 
@@ -623,7 +621,6 @@ export class GroupService {
                                                .execute();
 
     if (updateExp.affected === 0) {
-      Logger.log('Pet data does not exist');
       throw this.dwExcept.NoData;
     }
 
@@ -772,9 +769,9 @@ export class GroupService {
     return await queryRunner.manager
       .getRepository(Room)
       .createQueryBuilder('r')
-      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
-      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
-      .where('r.user_id = :user_id', { user_id: user_id })
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id AND ish.type_id = :PET_TYPE')
+      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
+      .where('r.user_id = :user_id', { user_id: user_id, PET_TYPE: 1 })
       .select([
         'ish.item_id as item_id',
         'ish.type_id as item_type',

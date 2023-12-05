@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   Req,
+  Request,
   Res,
   UseGuards,
   UsePipes,
@@ -22,17 +23,24 @@ import { User } from 'src/entities/user.entities';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('/login')
-  @UseGuards(AuthGuard())
-  async login(@Headers('Authorization') token: string) {
-    return await this.authService.login(token);
+//   @Get('/user')
+//   @UseGuards(AuthGuard())
+//   async getUserInfo(
+//     @Request() req,
+//     @Headers('Authorization') token: string
+//   ) {
+//     const user = req.user;
+//     return await this.authService.getUserInfo(user.user_id, token);
+//   }
+
+  @Post('/valid')
+  async isUserNameUnique(@Body('user_name') user_name: string) {
+    return await this.authService.isUserNameUnique(user_name);
   }
 
-  @Post('/singup')
+  @Post('/signup')
   @UsePipes(ValidationPipe)
-  async singup(
-    @Body() body: SignUpDto,
-  ): Promise<{ result: { user: User; token: string } }> {
+  async singup(@Body() body: SignUpDto) {
     return await this.authService.signup(body);
   }
 
@@ -45,20 +53,17 @@ export class AuthController {
     @Res() response: Response,
   ) {
     if (error) {
-      Logger.log(`Error while kakao auth. ${error}: ${state} ${desc} `);
       return desc;
     }
 
     const { token, kakao_id } = await this.authService.oauth(code);
     const redirectUri = `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${kakao_id}`;
-    Logger.log(`redirect to ${redirectUri}`);
     return response.redirect(redirectUri);
   }
 
   @Post('/test')
   @UseGuards(AuthGuard())
   async test(@Req() req) {
-    Logger.log(`@@ ${req}`);
     return 'Hello World!';
   }
 }

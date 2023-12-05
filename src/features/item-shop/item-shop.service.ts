@@ -4,7 +4,7 @@ import { ItemShop } from '../../entities/item-shop.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ItemType } from 'src/entities/item-type.entity';
 import { User } from 'src/entities/user.entities';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
 
 @Injectable()
@@ -53,8 +53,12 @@ export class ItemShopService {
                                          , 'ish.item_path AS item_path'
                                          ])
                                          .leftJoin('item_inventory', 'iv', 'iv.user_id = :user_id AND ish.item_id = iv.item_id', { user_id })
-                                         .leftJoin('item_type'     , 'it', 'ish.type_id = it.type_id')
-                                         .where('ish.item_id NOT IN (:...ownItems)', { ownItems })
+                                         .leftJoin('item_type'     , 'it', 'ish.type_id = it.type_id');
+    if(ownItems.length > 0){
+      query.where('ish.item_id NOT IN (:...ownItems)', { ownItems });
+    } else {
+      query.where('1 = 1');
+    }
     
     let result = {};                                
     // 아이템 클라이언트 요청에 맞춰서 가공           

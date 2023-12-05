@@ -5,6 +5,7 @@ import {
   FileTypeValidator,
   FileValidator,
   Get,
+  Headers,
   Logger,
   MaxFileSizeValidator,
   Param,
@@ -26,7 +27,7 @@ import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
+import { MulterConfig } from 'src/utils/MulterConfigService';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../../entities/user.entities';
 
@@ -35,17 +36,17 @@ export class UserController {
   constructor(
     private readonly usersService: UserService,
     private readonly multerConifg: MulterConfig,
-  ) {
-    this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
-  }
+  ) {}
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))
-  async getUser(@Request() req): Promise<{ result }> {
-    const user: User = req.user;
-    Logger.log(`User info from jwt: ${user.user_id}`);
-    const result = user;
-    return { result };
+  async getUser(
+    @Request() req,
+    @Headers('Authorization') token: string
+  ): Promise<{ result }> {
+    // const user: User = req.user;
+    const user = req.user;
+    return await this.usersService.getUserInfo(user.user_id, token);
   }
 
   //   @Get('/:user_id')
@@ -76,6 +77,7 @@ export class UserController {
     @UploadedFile() profile: Express.Multer.File,
   ): Promise<boolean> {
     // TODO: type, size, .. 검증 로직, 디스크 공간 체크
+    this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
     return true;
   }
 
@@ -99,13 +101,6 @@ export class UserController {
   @Delete('/:user_id')
   async deleteUser(@Param('user_id', ParseIntPipe) id: number): Promise<void> {
     return await this.usersService.deleteUser(id);
-  }
-
-  @Delete('/')
-  async deleteUserByKakaoId(
-    @Query('user_kakao_id') kakao_id: string,
-  ): Promise<void> {
-    return await this.usersService.deleteUserByKakaoId(kakao_id);
   }
 
   @Post('/contacts')

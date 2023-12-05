@@ -2,11 +2,11 @@
 
 import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { NotificationService } from '../notification/notification.service';
+import { NotificationService } from '../features/notification/notification.service';
 import { UserService } from 'src/features/user/user.service';
 import { TodoService } from 'src/features/todo/todo.service';
 import { GroupService } from 'src/features/group/group.service';
-import { CreateNotificationDto } from 'src/notification/dto/createNotification.dto';
+import { CreateNotificationDto } from 'src/features/notification/dto/createNotification.dto';
 import { Comment } from 'src/entities/comment.entity';
 import { Notification } from 'src/entities/notification.entity';
 
@@ -100,27 +100,19 @@ export class AppGateway {
   @SubscribeMessage('confirmRequest')
   async handleConfirmRequest(@MessageBody() data: { userId: number; todoId: number}, @ConnectedSocket() client: Socket) {
     const sender = await this.userService.getUser( data.userId );
-    console.log(sender);
     if (!sender) {
-      console.log('Invalid userId');
       return;
     }
 
     const todo = await this.todoService.findOne( data.todoId );
-    console.log(todo);
     if (!todo) {
-      console.log('Invalid todoId');
       return;
     }
 
     const groupMembers = await this.groupService.findUsersByGroupId( todo.grp_id );
-    console.log(groupMembers);
-    console.log(data.userId);
-    console.log(typeof(data.userId));
 
     for (const member of groupMembers) {
       if (member.user_id !== sender.user_id ) {
-        console.log(`${member.user_id}, ${typeof(member.user_id)}, ${data.userId}, ${typeof(data.userId)}`);
         const notificationData = new CreateNotificationDto();
         notificationData.sender_id = `${sender.user_id}`;
         notificationData.receiver_id = `${member.user_id}`;

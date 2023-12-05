@@ -3,8 +3,8 @@ import { GroupService } from './group.service';
 import { Group } from '../../entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MulterConfig } from 'src/utils/fileUpload/MulterConfigService';
-import { PagingOptions } from 'src/utils/paging/PagingOptions';
+import { MulterConfig } from 'src/utils/MulterConfigService';
+import { PagingOptions } from 'src/utils/PagingOptions';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('group')
@@ -12,9 +12,7 @@ export class GroupController {
   constructor(
     private readonly groupService: GroupService,
     private readonly multerConifg: MulterConfig
-  ){
-    this.multerConifg.changePath(process.env.IMAGE_PATH);
-  }
+  ){}
   
   // 모든 그룹 조회
   @Get('/')
@@ -93,6 +91,7 @@ export class GroupController {
     @Param('user_id') user_id: number,
     @UploadedFile() file: Express.Multer.File
   ): Promise<any>{
+    this.multerConifg.changePath(process.env.IMAGE_PATH);
     return this.groupService.updateImage(todo_id, user_id, file);
   }
 

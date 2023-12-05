@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ItemInventory } from '../../entities/item-inventory.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DoWithExceptions } from 'src/utils/do-with-exception/do-with-exception';
+import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { ItemShop } from 'src/entities/item-shop.entity';
 import { Room } from 'src/entities/room.entity';
 import { PetLevel } from 'src/enums/PetLevel.enum';

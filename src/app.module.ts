@@ -1,25 +1,23 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TodoModule } from './features/todo/todo.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { DoWithMiddlewareMiddleware } from 'src/utils/do-with-middleware/do-with-middleware.middleware';
+import { DoWithMiddlewareMiddleware } from 'src/utils/do-with-middleware.middleware';
 import { UserModule } from './features/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './features/group/group.module';
 import { RoutineModule } from './features/routine/routine.module';
 import { CommentModule } from './features/comment/comment.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { DoWithExceptionFilter } from './utils/do-with-exception-filter/do-with-exception.filter';
+import { DoWithExceptionFilter } from './utils/do-with-exception.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FriendModule } from './features/friend/friend.module';
 import { CategoryModule } from './features/category/category.module';
 import { UtilsModule } from './utils/utils.module';
-import { DoWithInterceptor } from './utils/do-with-interceptor/do-with-Interceptor';
+import { DoWithInterceptor } from './utils/do-with-Interceptor';
 import { HttpModule } from '@nestjs/axios';
-import { NotificationModule } from './notification/notification.module';
+import { NotificationModule } from './features/notification/notification.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { AchievementsModule } from './features/achievements/achievements.module';
 import { ItemInventoryModule } from './features/item-inventory/item-inventory.module';
@@ -73,9 +71,8 @@ import { AnnouncementModule } from './features/announcement/announcement.module'
     NotificationModule,
     AnnouncementModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     Logger,
     {
       provide: APP_FILTER,
