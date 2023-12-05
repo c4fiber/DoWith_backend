@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { User } from '../../entities/user.entities';
 import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,7 +24,10 @@ export class UserService {
   async getUserInfo(user: User) {
     // const tokenStr = token.substring(7);
     const {user_id} = user;
-    const user_pet = await this.getUserMainPet(this.dataSource, user_id);
+    const user_pet = await this.getUserMainPet(user_id);
+
+    Logger.debug(user);
+    Logger.debug(user_pet);
   
     const result = { user, user_pet };
     return { result };
@@ -157,8 +160,8 @@ export class UserService {
    * @param user_id
    * @returns
    */
-  private async getUserMainPet(dataSource: DataSource, user_id: number) {
-    return await dataSource
+  private async getUserMainPet(user_id: number) {
+    return await this.dataSource
       .getRepository(Room)
       .createQueryBuilder('r')
       .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id AND ish.type_id = :PET_TYPE')
