@@ -81,10 +81,10 @@ export class RoomService {
   async findAll(user_id: number) {
     const result = await this.roomRepo
       .createQueryBuilder('r')
-      .where('r.user_id = :user_id', { user_id })
-      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id')
+      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND r.user_id = iv.user_id')
       .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
       .select([
+        'r.user_id as user_id',
         'ish.item_id as item_id',
         'ish.type_id as item_type',
         'ish.item_name as item_name',
@@ -92,6 +92,7 @@ export class RoomService {
         'iv.pet_name as pet_name',
         'iv.pet_exp as pet_exp',
       ])
+      .where('r.user_id = :user_id', { user_id })
       .getRawMany();
     return { result };
   }
