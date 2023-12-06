@@ -24,9 +24,6 @@ export class UserService {
   async getUserInfo(user: User) {
     const {user_id} = user;
     const user_pet = await this.getUserMainPet(user_id);
-
-    Logger.debug(user);
-    Logger.debug(user_pet);
   
     const result = { user, user_pet };
     return { result };

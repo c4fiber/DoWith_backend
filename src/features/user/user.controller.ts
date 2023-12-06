@@ -43,6 +43,7 @@ export class UserController {
   async getUser(
     @Request() req,
   ): Promise<{ result }> {
+    
     return await this.usersService.getUserInfo(req.user);
   }
 
