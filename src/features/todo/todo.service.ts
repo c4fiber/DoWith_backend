@@ -83,9 +83,9 @@ export class TodoService {
       await qr.manager.createQueryBuilder()
                       .update('user')
                       .set({
-                        user_hp:
+                        user_hp:    // 3일전에 로그인 했었다면 hp는 -2
                         () => `CASE WHEN EXTRACT(DAY FROM AGE(now(), "last_login")) > 1
-                                    THEN "user_hp" - EXTRACT(DAY FROM AGE(now(), "last_login"))
+                                    THEN "user_hp" + 1 - EXTRACT(DAY FROM AGE(now(), "last_login"))
                                     WHEN "user_hp" = 10
                                     THEN "user_hp"
                                     ELSE "user_hp" + 1
