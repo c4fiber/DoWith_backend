@@ -24,7 +24,7 @@ async function bootstrap() {
           ),
         }),
         new winston.transports.File({
-          dirname: path.join('./src/logs/'),
+          dirname: path.join(process.env.LOG_PATH),
           filename: `${Date.now()}debug.log`,
           level: 'debug',
           format: winston.format.combine(
