@@ -33,6 +33,7 @@ export enum DoWithErrorCode {
   FailedToDeletedOriginal = '1002', // 이미지 압축 후 원본 파일 삭제 실패시
   FailedToResizeImage     = '1003', // 업로드한 이미지 압축에 실패시
   NoData                  = '1004', // 요청한 데이터가 없는 경우
+  NotManipulations        = '1005', // DB 조작이 없었던 경우
 
   // Room
   ItemAlreadyInMyRoom  = '409',  // 이미 펫이 존재하는 경우

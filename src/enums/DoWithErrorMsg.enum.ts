@@ -33,6 +33,7 @@ export enum DoWithErrorMsg {
   FailedToDeletedOriginal = '원본 파일을 삭제하는데 실패 했습니다.',
   FailedToResizeImage = '이미지 압축에 실패 했습니다.',
   NoData = '요청하신 데이터가 없습니다.',
+  NotManipulations = '데이터 조작을 하지 않았습니다.',
 
   // Room
   ItemAlreadyInMyRoom  = '아이템이 이미 방에 존재합니다.',
