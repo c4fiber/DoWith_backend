@@ -12,20 +12,11 @@ export class DoWithInterceptor implements NestInterceptor{
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     return next.handle().pipe(
       map(data => {
-        for(let i = 0; i < 100000; i++){
-          for(let j = 0; j < 1000000; j++){
-
-          }
-        }
-        Logger.debug("############### [ Interceptor In ] ###############");
-
         const http = context.switchToHttp(); 
         const req = http.getRequest();
         const res = http.getResponse();
         const method = req.method as HttpMethod;
         const mainKey = 'result';
-        Logger.debug(data);
-        Logger.debug(data[mainKey]['affected']);
         
         switch(method){
           // case HttpMethod.GET:
@@ -59,8 +50,11 @@ export class DoWithInterceptor implements NestInterceptor{
             break;
         }
 
-        Logger.debug(`data = ${data}`);
-        Logger.debug("############### [ Interceptor Out ] ###############");
+        var logs = `
+================== [ Response ] ==================\n`;
+        data['msg'] = 'success';
+        data['code'] = HttpStatus.OK;
+        
         return data;
       }), // map end
       // catchError((err) => {
