@@ -25,6 +25,7 @@ import { ItemShopModule } from './features/item-shop/item-shop.module';
 import { RoomModule } from './features/room/room.module';
 import { EntitiesModule } from './entities/entities.module';
 import { AnnouncementModule } from './features/announcement/announcement.module';
+import { FeatureModule } from './features/feature.module';
 
 @Module({
   imports: [
@@ -49,27 +50,11 @@ import { AnnouncementModule } from './features/announcement/announcement.module'
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    // Common Module
-    UtilsModule,
-    // Fixed Table
-    CategoryModule,
-    ItemShopModule,
-    AchievementsModule,
-    // API Module
-    UserModule,
-    TodoModule,
-    GroupModule,
-    RoutineModule,
-    AuthModule,
-    NotificationModule,
-    FriendModule,
-    CommentModule,
-    ItemInventoryModule,
-    RoomModule,
-    GatewayModule,
-    EntitiesModule,
-    NotificationModule,
-    AnnouncementModule,
+    AuthModule,      // login Auth 
+    EntitiesModule,  // Entities
+    FeatureModule,   // APIs
+    GatewayModule, 
+    UtilsModule,     // common
   ],
   controllers: [],
   providers: [
