@@ -21,7 +21,7 @@ export class NotificationService {
     // READ
     async findAllByUser(user_id: number): Promise<Notification[]> {
       const notifications = await this.notificationRepository.createQueryBuilder('notification')
-      .leftJoinAndSelect(User, 'sender', 'sender.user_id::text = notification.sender_id AND sender.del_at = null')
+      .innerJoinAndSelect(User, 'sender', 'sender.user_id::text = notification.sender_id AND sender.del_at IS NULL')
       .leftJoinAndSelect(User, 'receiver', 'receiver.user_id::text = notification.receiver_id')
       .leftJoinAndSelect(Todo, 'todo', `todo.todo_id::text = notification.sub_id AND (notification.noti_type = '2' OR notification.noti_type = '3')`)
       .select([
@@ -38,8 +38,6 @@ export class NotificationService {
       .where('notification.receiver_id = :user_id::text', { user_id })
       .orderBy('notification.noti_time', 'DESC')
       .getRawMany();
-      
-      console.log(notifications);
 
       return notifications.map(noti => ({
         ...noti,
