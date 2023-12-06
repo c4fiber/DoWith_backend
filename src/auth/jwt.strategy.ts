@@ -20,8 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload) {
     const { userId, user_id } = payload;
-    const id = userId == undefined ? user_id : userId;
-    if(id == undefined) {
+    
+    const id = userId || user_id;
+    if(!id) {
         throw new UnauthorizedException();
     }
 
