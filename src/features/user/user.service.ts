@@ -128,9 +128,9 @@ export class UserService {
     return await this.dataSource
       .getRepository(Room)
       .createQueryBuilder('r')
-      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id AND ish.type_id = :PET_TYPE')
-      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
-      .where('r.user_id = :user_id', { user_id: user_id, PET_TYPE: 1 })
+      .innerJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
+      .where('r.user_id = :user_id AND iv.item_type = :PET_TYPE', { user_id: user_id, PET_TYPE: 1 })
       .select([
         'ish.item_id as item_id',
         'ish.type_id as item_type',
