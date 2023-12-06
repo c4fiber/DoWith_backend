@@ -553,7 +553,14 @@ export class GroupService {
       throw this.dwExcept.NoData;
     }
 
-    const {todo_date, user_id} = todo;
+    const {todo_date, user_id, todo_done} = todo;
+
+    if(todo_done === true) {
+        const result = false;
+        // 이미 체크되어 있는 할일인 경우
+        await queryRunner.commitTransaction();
+        return { result };
+    }
 
     // 지난 날짜 투두는 제외
     if (this.isPastTodo(todo_date)) {
