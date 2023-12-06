@@ -78,4 +78,9 @@ export class UserController {
   ): Promise<UserResponseDto[]> {
     return await this.usersService.getUsersByContacts(body);
   }
+
+  @Get('/status/:user_id')
+  async getUserStatus(@Param('user_id', ParseIntPipe) id: number) {
+    return await this.usersService.getUserStatus(id);
+  }
 }
