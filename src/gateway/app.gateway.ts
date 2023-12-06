@@ -129,7 +129,7 @@ export class AppGateway {
                 senderId: sender.user_id,
                 senderName: sender.user_name,
                 todoId: todo.todo_id,
-                totoName: todo.todo_name,
+                todoName: todo.todo_name,
                 todoImg: todo.todo_img,
             });
         } catch (error) {
