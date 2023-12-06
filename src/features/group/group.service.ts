@@ -18,6 +18,7 @@ import { Reward } from 'src/enums/Reward.enum';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
 import { PetLevel } from 'src/enums/PetLevel.enum';
 import { ItemShop } from 'src/entities/item-shop.entity';
+import { PetLevelExp } from 'src/enums/PetLevelExp.enum';
 
 @Injectable()
 export class GroupService {
@@ -629,7 +630,7 @@ export class GroupService {
     // 3. 펫 진화가 필요한 경우 진화
     const parsed = item_name.split('_');
     const pet_type = parsed[0];
-    const pet_level = parsed[1];
+    const pet_level = parsed;
 
     if ((pet_level === PetLevel.lv1 && pet_exp >= PetLevelExp.lv1) ||
         (pet_level === PetLevel.lv2 && pet_exp >= PetLevelExp.lv2)) {
