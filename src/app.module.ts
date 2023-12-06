@@ -12,7 +12,16 @@ import { DoWithInterceptor } from './utils/do-with-Interceptor';
 import { HttpModule } from '@nestjs/axios';
 import { GatewayModule } from './gateway/gateway.module';
 import { EntitiesModule } from './entities/entities.module';
-import { FeatureModule } from './features/feature.module';
+import { FriendModule } from './features/friend/friend.module';
+import { AchievementsModule } from './features/achievements/achievements.module';
+import { CategoryModule } from './features/category/category.module';
+import { ItemShopModule } from './features/item-shop/item-shop.module';
+import { AnnouncementModule } from './features/announcement/announcement.module';
+import { CommentModule } from './features/comment/comment.module';
+import { ItemInventoryModule } from './features/item-inventory/item-inventory.module';
+import { NotificationModule } from './features/notification/notification.module';
+import { RoomModule } from './features/room/room.module';
+import { RoutineModule } from './features/routine/routine.module';
 
 @Module({
   imports: [
@@ -39,9 +48,21 @@ import { FeatureModule } from './features/feature.module';
     }),
     AuthModule,      // login Auth 
     EntitiesModule,  // Entities
-    FeatureModule,   // APIs
     GatewayModule, 
     UtilsModule,     // common
+    // Fixed Data Table
+    AchievementsModule,
+    CategoryModule,
+    ItemShopModule,
+
+    // APIs
+    AnnouncementModule,
+    CommentModule,
+    FriendModule,
+    ItemInventoryModule,
+    NotificationModule,
+    RoomModule,
+    RoutineModule,
   ],
   controllers: [],
   providers: [
