@@ -22,7 +22,7 @@ async function bootstrap() {
               prettyPrint: true,
             }),
           ),
-        }),
+        }),  // logger config end
         new winston.transports.File({
           dirname: path.join(process.env.LOG_PATH),
           filename: `${Date.now()}_debug.log`,
@@ -33,7 +33,7 @@ async function bootstrap() {
               return `${timestamp} [${level.toUpperCase()}]: ${message}`;
             })
           ),
-        }),
+        }),  // file config end
       ],
     }),
   });
