@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from '../../entities/group.entity';
 import { DataSource, QueryRunner, Raw, Repository } from 'typeorm';
@@ -479,10 +479,11 @@ export class GroupService {
       const filePath = file.path;
       const ext = path.extname(file.originalname);
       const name = path.basename(file.originalname, ext);
-      const newPath = `${process.env.IMAGE_PATH}${name}_${Date.now()}${ext}`;
+      const fileName = `${name}_${Date.now()}${ext}`;
+      const newPath = `${process.env.IMAGE_PATH}${fileName}`;
 
       // 1. 사진 압축(sharp 라이브러리 사용)
-      await sharp(filePath).resize({ width: 1000, height: 1000, fit: 'contain' })
+      await sharp(filePath).resize({ width: 700, height: 800, fit: 'contain' })
                            .toFile(newPath, async(err, info) => {
                               // 1. 원본 파일 삭제
                               await fs.unlink(filePath);
@@ -496,12 +497,12 @@ export class GroupService {
 
       // 2. 인증을 위해서 기존에 저장한 사진은 삭제
       if(oldFile && oldFile.todo_img){
-        await fs.unlink(oldFile.todo_img);
+        await fs.unlink(`${process.env.IMAGE_PATH}${oldFile.todo_img}`);
       }
 
       // 3. 새로운 사진 업데이트
       const result = await this.todoRepo.createQueryBuilder('t')
-                                        .update({ todo_img: newPath })
+                                        .update({ todo_img: fileName })
                                         .where({ todo_id })
                                         .andWhere({ user_id })
                                         .execute();
@@ -710,9 +711,8 @@ export class GroupService {
     }
   }
     
-
   /**
-   * 그룹 삭제 함수 (2023.12.03 사용중x)
+   * 그룹 삭제 함수
    * @param grp_id 
    * @returns 
    */

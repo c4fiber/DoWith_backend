@@ -52,7 +52,7 @@ export class User {
   @OneToMany(() => Todo, (todo) => todo.user)
   todos: Todo[];
 
-  @Column()
+  @Column({ default: () => 'CURRENT_DATE' })
   last_login: Date;
 
   @CreateDateColumn()
