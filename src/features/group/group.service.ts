@@ -557,7 +557,7 @@ export class GroupService {
     // 지난 날짜 투두는 제외
     if (this.isPastTodo(todo_date)) {
         
-        const result = false;
+        const result = true;
     //   const result = await queryRunner.manager.createQueryBuilder(Todo, 't')
     //                                           .leftJoin('user', 'u', 'u.user_id = t.user_id')
     //                                           .select([
