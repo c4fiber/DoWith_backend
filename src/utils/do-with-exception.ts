@@ -151,6 +151,12 @@ export class DoWithExceptions {
     HttpStatus.BAD_REQUEST,
   );
 
+  NotManipulations = new DoWithException(
+    DoWithErrorMsg.NotManipulations,
+    DoWithErrorCode.NotManipulations,
+    HttpStatus.BAD_REQUEST,
+  );
+
   // =============== [ Room ] ===============
   ItemAlreadyInMyRoom = new DoWithException(
     DoWithErrorMsg.ItemAlreadyInMyRoom,

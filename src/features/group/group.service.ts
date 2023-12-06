@@ -383,7 +383,7 @@ export class GroupService {
                                      ])
                                      .leftJoin('todo'   , 't', 't.grp_id = g.grp_id')
                                      .leftJoin('routine', 'r', 't.grp_id = r.grp_id AND t.rout_id = r.rout_id')
-                                     .leftJoin('user'   , 'u', 'u.user_id = t.user_id')
+                                     .innerJoin('user'   , 'u', 'u.user_id = t.user_id')
                                      .where('t.todo_img IS NOT NULL')
                                      .andWhere('g.grp_id = :grp_id', { grp_id })
                                      .andWhere('r.rout_id = :rout_id', { rout_id })
