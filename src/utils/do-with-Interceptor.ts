@@ -11,6 +11,8 @@ export class DoWithInterceptor implements NestInterceptor{
 
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     return next.handle().pipe(
+      timeout(3000),
+      retry(3),
       map(data => {
         const http = context.switchToHttp(); 
         const req = http.getRequest();
