@@ -79,6 +79,7 @@ export class AuthService {
                                 .execute();
 
       const user_id = createUser.identifiers[0].user_id;
+      Logger.debug(`new user id ${user_id}`);
 
       // 2. 첫 로그인 업적 달성
       const loginAchi = await queryRunner.manager.findOneBy(
