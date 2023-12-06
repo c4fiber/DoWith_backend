@@ -175,4 +175,53 @@ export class FriendService {
 
     return { result: res1.affected === 1 ? res1 : res2 };
   }
+
+  /**
+   * 마이룸 친구 상태 확인
+   * @discription 1. 친구 상태인 경우
+   *              2. 상대가 요청을 보낸 상태인 경우
+   *              3. 내가 요청을 보낸 상태인 경우
+   * @param body 
+   * @returns 
+   */
+  async getFriendStatus(user_id: number, friend_id: number){
+    // 1. 친구 상태인 경우
+    const isFriend = await this.userFriRepo.findOne({
+      select: ['status'],
+      where: [
+        { user_id, friend_id, status: FriendStatus.FRIEND },
+        { user_id: friend_id, friend_id: user_id, status: FriendStatus.FRIEND }
+      ]
+    });
+
+    if(isFriend){
+      return { msg: 'friend', result: isFriend };
+    }
+
+    // 2. 상대가 요청을 보낸 상태인 경우
+    const isRequested = await this.userFriRepo.findOne({
+      select: ['status'],
+      where: [
+          {user_id: friend_id, friend_id: user_id, status: FriendStatus.REQUESTED }
+      ]
+    });
+
+    if(isRequested){
+      return { msg: 'requested', result: isRequested };
+    }
+
+    // 3. 내가 요청을 보낸 상태인 경우
+    const request = await this.userFriRepo.findOne({
+      select: ['status'],
+      where: [
+          {user_id, friend_id, status: FriendStatus.REQUESTED }
+      ]
+    });
+
+    if(request){
+      return { msg: 'request', result: request };
+    }
+
+    return { msg: 'nothing' };
+  }
 }

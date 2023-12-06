@@ -24,7 +24,7 @@ export class MulterConfig implements MulterOptionsFactory{
           done(null, dir_path);
         },
         filename(req, file, done){
-          const allowed_exts = ['.jpg', '.jpeg', '.png', '.gif'];
+          const allowed_exts = ['.jpg', '.jpeg', '.png'];
           const ext = path.extname(file.originalname);
           const name = path.basename(file.originalname, ext);
 

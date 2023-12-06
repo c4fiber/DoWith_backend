@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as winston from 'winston';
+import * as path from 'path';
 import {
   utilities as nestWinstonModuleUtilities,
   WinstonModule,
@@ -21,7 +22,18 @@ async function bootstrap() {
               prettyPrint: true,
             }),
           ),
-        }),
+        }),  // logger config end
+        new winston.transports.File({
+          dirname: path.join(process.env.LOG_PATH),
+          filename: `${Date.now()}_debug.log`,
+          level: 'debug',
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.printf(({ level, message, timestamp }) => {
+              return `${timestamp} [${level.toUpperCase()}]: ${message}`;
+            })
+          ),
+        }),  // file config end
       ],
     }),
   });
