@@ -617,16 +617,16 @@ export class GroupService {
       'iv.pet_exp as pet_exp',
     */
     const { item_id, item_name, pet_name, pet_exp } = main_pet;
-    const petExp = this.calculatePetExp(true);
+    const newPetExp = pet_exp + this.calculatePetExp(true);
     let pet_item_id = item_id;
 
     const updateExp = await queryRunner.manager.createQueryBuilder()
                                                .update(ItemInventory)
                                                .set({
-                                                pet_exp: () => 'pet_exp + :exp',
+                                                pet_exp: newPetExp,
                                                })
                                                .where('user_id = :user_id', {
-                                                user_id: user_id, exp: petExp
+                                                user_id: user_id, exp: newPetExp
                                                })
                                                .andWhere({ item_id })
                                                .execute();
