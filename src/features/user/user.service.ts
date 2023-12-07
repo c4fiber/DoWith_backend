@@ -107,6 +107,13 @@ export class UserService {
                       .where('user_id = :user_id', { user_id })
                       .execute();
       
+      await qr.manager.createQueryBuilder()
+                      .delete()
+                      .from('user_friend')
+                      .where('user_id = :user_id', { user_id })
+                      .orWhere('friend_id = :user_id', { user_id })
+                      .execute();
+
       await qr.commitTransaction();
       return { result };
     } catch(err) {
