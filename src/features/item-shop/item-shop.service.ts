@@ -47,8 +47,9 @@ export class ItemShopService {
     // 상점 아이템 조회                    
     const query = this.itemShopRepo.createQueryBuilder('ish')
                                    .select([
-                                     'ish.item_id    AS item_id'
+                                     'ish.item_id   AS item_id'
                                    , 'ish.item_name AS item_name'
+                                   , 'ish.item_desc AS item_desc'
                                    , 'ish.item_cost AS item_cost'
                                    , 'ish.item_path AS item_path'
                                    ])
