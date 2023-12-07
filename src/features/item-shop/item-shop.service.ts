@@ -29,7 +29,7 @@ export class ItemShopService {
    * @param user_id 
    * @returns 
    */
-  async getAllItems(user_id: number){
+  async getAllItems(user_id: number, type_id: number){
     // 유저가 소유한 아이템 번호 목록
     const ItemsIds = await this.itemShopRepo.createQueryBuilder('ish')
                                             .select(['ish.item_id AS item_id'])
@@ -41,37 +41,27 @@ export class ItemShopService {
     const types = await this.itemTypeRepo.createQueryBuilder('t')
                                          .select([
                                            't.type_id   AS type_id'
-                                         , 't.type_name   AS type_name'
+                                         , 't.type_name AS type_name'
                                          ])
                                          .getRawMany();
     // 상점 아이템 조회                    
-    const query = await this.itemShopRepo.createQueryBuilder('ish')
-                                         .select([
-                                           'ish.item_id    AS item_id'
-                                         , 'ish.item_name AS item_name'
-                                         , 'ish.item_cost AS item_cost'
-                                         , 'ish.item_path AS item_path'
-                                         ])
-                                         .leftJoin('item_inventory', 'iv', 'iv.user_id = :user_id AND ish.item_id = iv.item_id', { user_id })
-                                         .leftJoin('item_type'     , 'it', 'ish.type_id = it.type_id');
+    const query = this.itemShopRepo.createQueryBuilder('ish')
+                                   .select([
+                                     'ish.item_id   AS item_id'
+                                   , 'ish.item_name AS item_name'
+                                   , 'ish.item_desc AS item_desc'
+                                   , 'ish.item_cost AS item_cost'
+                                   , 'ish.item_path AS item_path'
+                                   ])
+                                   .leftJoin('item_inventory', 'iv', 'iv.user_id = :user_id AND ish.item_id = iv.item_id', { user_id })
+                                   .leftJoin('item_type'     , 'it', 'ish.type_id = it.type_id')
+                                   .where('it.type_id = :type_id', { type_id });
+
     if(ownItems.length > 0){
-      query.where('ish.item_id NOT IN (:...ownItems)', { ownItems });
-    } else {
-      query.where('1 = 1');
-    }
-    
-    let result = {};                                
-    // 아이템 클라이언트 요청에 맞춰서 가공           
-    for(const type of types){
-      const type_id = type.type_id;
-      const type_name = type.type_name;
-      const temp = query.clone();
-
-      result[`${type_name}`] = await temp.andWhere('it.type_id = :type_id', { type_id })
-                                         .getRawMany();
+      query.andWhere('ish.item_id NOT IN (:...ownItems)', { ownItems });
     }
 
-    return { result, path: process.env.PUBLIC_IMAGE_PATH };
+    return { result: await query.getRawMany(), path: process.env.PUBLIC_IMAGE_PATH };
   }
 
   /**
