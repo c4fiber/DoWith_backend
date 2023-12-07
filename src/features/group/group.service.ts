@@ -640,8 +640,8 @@ export class GroupService {
     const pet_type = parsed[0];
     const pet_level = parsed[1];
 
-    if ((pet_level === PetLevel.lv1 && pet_exp >= PetLevelExp.lv1) ||
-        (pet_level === PetLevel.lv2 && pet_exp >= PetLevelExp.lv2)) {
+    if ((pet_level === PetLevel.lv1 && newPetExp >= PetLevelExp.lv1) ||
+        (pet_level === PetLevel.lv2 && newPetExp >= PetLevelExp.lv2)) {
 
         // 펫 진화
         const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;
