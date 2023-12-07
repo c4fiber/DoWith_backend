@@ -142,7 +142,7 @@ export class UserService {
   // hp및 상태 조회 (다른 사람이 봐도 문제없는 내용만 포함하도록)
   async getUserStatus(user_id: number) {
     const result = await this.userRepository.createQueryBuilder()
-    .select('user_hp', 'user_name').where('user_id = :user_id', { user_id }).getRawOne();
+    .select(['user_hp', 'user_name']).where('user_id = :user_id', { user_id }).getRawOne();
 
   if (!result) {
     throw this.doWithException.UserNotFound;
