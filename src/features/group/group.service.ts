@@ -18,6 +18,7 @@ import { Reward } from 'src/enums/Reward.enum';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
 import { PetLevel } from 'src/enums/PetLevel.enum';
 import { ItemShop } from 'src/entities/item-shop.entity';
+import { PetLevelExp } from 'src/enums/PetLevelExp.enum';
 
 @Injectable()
 export class GroupService {
@@ -552,20 +553,29 @@ export class GroupService {
       throw this.dwExcept.NoData;
     }
 
-    const {todo_date, user_id} = todo;
+    const {todo_date, user_id, todo_done} = todo;
+
+    if(todo_done === true) {
+        const result = false;
+        // 이미 체크되어 있는 할일인 경우
+        await queryRunner.commitTransaction();
+        return { result };
+    }
 
     // 지난 날짜 투두는 제외
     if (this.isPastTodo(todo_date)) {
-      const result = await queryRunner.manager.createQueryBuilder(Todo, 't')
-                                              .leftJoin('user', 'u', 'u.user_id = t.user_id')
-                                              .select([
-                                                'u.user_id as user_id',
-                                                'u.user_cash as user_cash',
-                                                't.todo_id as todo_id',
-                                                't.todo_done as todo_done',
-                                              ])
-                                              .where('t.todo_id = :todo_id', { todo_id })
-                                              .getRawOne();
+        
+        const result = true;
+    //   const result = await queryRunner.manager.createQueryBuilder(Todo, 't')
+    //                                           .leftJoin('user', 'u', 'u.user_id = t.user_id')
+    //                                           .select([
+    //                                             'u.user_id as user_id',
+    //                                             'u.user_cash as user_cash',
+    //                                             't.todo_id as todo_id',
+    //                                             't.todo_done as todo_done',
+    //                                           ])
+    //                                           .where('t.todo_id = :todo_id', { todo_id })
+    //                                           .getRawOne();
 
       await queryRunner.commitTransaction();
       return { result };
@@ -626,7 +636,9 @@ export class GroupService {
     }
 
     // 3. 펫 진화가 필요한 경우 진화
-    const [pet_type, pet_level] = item_name.split('_');
+    const parsed = item_name.split('_');
+    const pet_type = parsed[0];
+    const pet_level = parsed[1];
 
     if ((pet_level === PetLevel.lv1 && pet_exp >= PetLevelExp.lv1) ||
         (pet_level === PetLevel.lv2 && pet_exp >= PetLevelExp.lv2)) {
@@ -679,25 +691,26 @@ export class GroupService {
                              .execute();
       }
   
-      // 업데이트 결과 반환
-      const result = await queryRunner.manager.createQueryBuilder(User, 'u')
-                                              .leftJoin('todo', 't', 't.user_id = u.user_id')
-                                              .leftJoin(
-                                                'item_inventory',
-                                                'iv',
-                                                'iv.user_id = u.user_id AND iv.item_id = :pet_item_id',
-                                              )
-                                              .select([
-                                                'u.user_id as user_id',
-                                                'u.user_cash as user_cash',
-                                                't.todo_id as todo_id',
-                                                't.todo_done as todo_done',
-                                                'iv.item_id as item_id',
-                                                'iv.pet_exp as pet_exp',
-                                              ])
-                                              .where('u.user_id = :user_id', { user_id, pet_item_id })
-                                              .andWhere('t.todo_id = :todo_id', { todo_id })
-                                              .getRawOne();
+      // 투두를 작성한 유저의 업데이트 결과 반환
+      const result = true;
+    //   const result = await queryRunner.manager.createQueryBuilder(User, 'u')
+    //                                           .leftJoin('todo', 't', 't.user_id = u.user_id')
+    //                                           .leftJoin(
+    //                                             'item_inventory',
+    //                                             'iv',
+    //                                             'iv.user_id = u.user_id AND iv.item_id = :pet_item_id',
+    //                                           )
+    //                                           .select([
+    //                                             'u.user_id as user_id',      // 투두 작성자
+    //                                             'u.user_cash as user_cash',
+    //                                             't.todo_id as todo_id',
+    //                                             't.todo_done as todo_done',
+    //                                             'iv.item_id as item_id',
+    //                                             'iv.pet_exp as pet_exp',
+    //                                           ])
+    //                                           .where('u.user_id = :user_id', { user_id, pet_item_id })
+    //                                           .andWhere('t.todo_id = :todo_id', { todo_id })
+    //                                           .getRawOne();
 
       await queryRunner.commitTransaction();
       return { result };
@@ -766,12 +779,12 @@ export class GroupService {
    * @returns
    */
   private async getUserMainPet(queryRunner: QueryRunner, user_id: number) {
-    return await queryRunner.manager
+    return await this.dataSource
       .getRepository(Room)
       .createQueryBuilder('r')
-      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id AND ish.type_id = :PET_TYPE')
-      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
-      .where('r.user_id = :user_id', { user_id: user_id, PET_TYPE: 1 })
+      .innerJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
+      .where('r.user_id = :user_id AND ish.type_id = :PET_TYPE', { user_id: user_id, PET_TYPE: 1 })
       .select([
         'ish.item_id as item_id',
         'ish.type_id as item_type',

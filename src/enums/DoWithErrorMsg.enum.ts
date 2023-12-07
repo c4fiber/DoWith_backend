@@ -6,6 +6,7 @@ export enum DoWithErrorMsg {
   SelfFriendship    = '자신과 친구가 될 수 없습니다.',
   FailToSignUp      = '회원가입에 실패하였습니다.',
   Authorization     = '인증에 실패하였습니다.',
+  UserNameLimit     = '이름은 10자 이내로 입력해주세요',
 
   // Group
 

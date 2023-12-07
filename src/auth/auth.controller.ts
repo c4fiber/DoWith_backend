@@ -23,16 +23,6 @@ import { User } from 'src/entities/user.entities';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-//   @Get('/user')
-//   @UseGuards(AuthGuard())
-//   async getUserInfo(
-//     @Request() req,
-//     @Headers('Authorization') token: string
-//   ) {
-//     const user = req.user;
-//     return await this.authService.getUserInfo(user.user_id, token);
-//   }
-
   @Post('/valid')
   async isUserNameUnique(@Body('user_name') user_name: string) {
     return await this.authService.isUserNameUnique(user_name);
@@ -55,7 +45,6 @@ export class AuthController {
     if (error) {
       return desc;
     }
-
     const { token, kakao_id } = await this.authService.oauth(code);
     const redirectUri = `${process.env.APP_SCHEME}://oauth?token=${token}&kakao_id=${kakao_id}`;
     return response.redirect(redirectUri);

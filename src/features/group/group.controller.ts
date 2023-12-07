@@ -97,7 +97,6 @@ export class GroupController {
 
   // 그룹원 할 일 인증 승인
   @Patch('/user/:todo_id/approve')
-  @UseGuards(AuthGuard('jwt'))
   updateTodoDone(
     @Param('todo_id') todo_id: number
   ): Promise<any>{

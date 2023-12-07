@@ -8,6 +8,7 @@ import { TodoService } from 'src/features/todo/todo.service';
 import { GroupService } from 'src/features/group/group.service';
 import { CreateNotificationDto } from 'src/features/notification/dto/createNotification.dto';
 import { Comment } from 'src/entities/comment.entity';
+import { Notification } from 'src/entities/notification.entity';
 
 @WebSocketGateway()
 export class AppGateway {
@@ -69,10 +70,9 @@ export class AppGateway {
 		}				
   }
 
-  @SubscribeMessage('friendResponse')
-  async handleFriendResponse(@MessageBody() data: { senderId: number, receiverId: number}, @ConnectedSocket() client: Socket) {
-    const sender = await this.userService.getUser( data.senderId );
-    const receiver = await this.userService.getUser( data.receiverId );
+  async notifyFriendResponse(notification: Notification) {
+    const sender = await this.userService.getUser( parseInt(notification.sender_id) );
+    const receiver = await this.userService.getUser( parseInt(notification.receiver_id) );
     if (!sender || !receiver) {
         return;
     }
@@ -98,7 +98,7 @@ export class AppGateway {
   }
 
   @SubscribeMessage('confirmRequest')
-  async handleConfirmRequest(@MessageBody() data: { userId: number; todoId: number; photoUrl: string }, @ConnectedSocket() client: Socket) {
+  async handleConfirmRequest(@MessageBody() data: { userId: number; todoId: number}, @ConnectedSocket() client: Socket) {
     const sender = await this.userService.getUser( data.userId );
     if (!sender) {
       return;
@@ -117,7 +117,7 @@ export class AppGateway {
         notificationData.sender_id = `${sender.user_id}`;
         notificationData.receiver_id = `${member.user_id}`;
         notificationData.noti_type = '2';
-        notificationData.req_type = '0';
+        notificationData.req_type = `${todo.todo_img}`;
         notificationData.sub_id = `${todo.todo_id}`;
         
         await this.notificationService.createNotification(notificationData);
@@ -129,8 +129,8 @@ export class AppGateway {
                 senderId: sender.user_id,
                 senderName: sender.user_name,
                 todoId: todo.todo_id,
-                totoName: todo.todo_name,
-                photoUrl: data.photoUrl
+                todoName: todo.todo_name,
+                todoImg: todo.todo_img,
             });
         } catch (error) {
             console.error('Error sending notification to user ${member.user_id}:', error);

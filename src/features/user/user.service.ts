@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { User } from '../../entities/user.entities';
 import { UserRequestDto as UserRequestDto } from './dto/user-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,37 +20,19 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // 토큰 검사 & 유저 정보 반환
-  async getUserInfo(user_id: number, token: string) {
-    const tokenStr = token.substring(7);
-    // const verify =  this.jwtService.verify(tokenStr)
-    const { userId } = await this.jwtService.decode(tokenStr);
-
-    if(user_id != userId) {
-      throw this.doWithException.Authorization;
-    }
-    const queryRunner =this.dataSource.createQueryRunner();
-    const user = await this.userRepository.findOneBy({user_id});
-    const user_pet = await this.getUserMainPet(queryRunner, user_id);
-
-    const result = {user, user_pet};
+  // 유저 정보를 반환합니다.
+  async getUserInfo(user: User) {
+    const {user_id} = user;
+    const user_pet = await this.getUserMainPet(user_id);
+  
+    const result = { user, user_pet };
     return { result };
   }
 
-  // 아이디로 조회
+  // 아이디로 조회 (see app_gateway)
   async getUser(id: number): Promise<UserResponseDto> {
     const user = await this.userRepository.findOneBy({ user_id: id });
     return new UserResponseDto(user);
-  }
-
-  // 닉네임으로 조회
-  async getUserByName(name: string): Promise<User> {
-    return await this.userRepository.findOneBy({ user_name: name });
-  }
-
-  // 카카오 아이디로 조회
-  async getUserByKakaoId(kakao_id: string): Promise<User> {
-    return await this.userRepository.findOneBy({ user_kakao_id: kakao_id });
   }
 
   // 유저 수정
@@ -139,22 +121,6 @@ export class UserService {
     return true;
   }
 
-  // 유저 로그인 시각 업데이트
-  async updateLastLoginByKakaoId(kakao_id: string): Promise<boolean> {
-    const updateResult = await this.userRepository
-      .createQueryBuilder('user')
-      .update(User)
-      .set({ last_login: new Date() })
-      .where('user_kakao_id = :kakao_id', { kakao_id })
-      .execute();
-
-    if (updateResult.affected === 0) {
-      throw this.doWithException.UserNotFound;
-    }
-
-    return true;
-  }
-
   // 연락처 리스트로 조회
   async getUsersByContacts(
     body: GetUsersByContactsDto,
@@ -185,18 +151,14 @@ export class UserService {
   }
 
 
-  /**
-   * 유저의 Room에 있는 펫을 가져옵니다.
-   * @param user_id
-   * @returns
-   */
-  private async getUserMainPet(queryRunner: QueryRunner, user_id: number) {
-    return await queryRunner.manager
+  // 유저의 Room에 있는 펫을 가져옵니다.
+  private async getUserMainPet(user_id: number) {
+    return await this.dataSource
       .getRepository(Room)
       .createQueryBuilder('r')
-      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id AND ish.type_id = :PET_TYPE')
-      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
-      .where('r.user_id = :user_id', { user_id: user_id, PET_TYPE: 1 })
+      .innerJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
+      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
+      .where('r.user_id = :user_id AND ish.type_id = :PET_TYPE', { user_id: user_id, PET_TYPE: 1 })
       .select([
         'ish.item_id as item_id',
         'ish.type_id as item_type',
@@ -206,5 +168,17 @@ export class UserService {
         'iv.pet_exp as pet_exp',
       ])
       .getRawOne();
+  }
+
+  // hp및 상태 조회 (다른 사람이 봐도 문제없는 내용만 포함하도록)
+  async getUserStatus(user_id: number) {
+    const result = await this.userRepository.createQueryBuilder()
+    .select(['user_hp', 'user_name']).where('user_id = :user_id', { user_id }).getRawOne();
+
+  if (!result) {
+    throw this.doWithException.UserNotFound;
+  }
+
+    return { result }
   }
 }

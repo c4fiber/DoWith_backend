@@ -47,7 +47,12 @@ export class DoWithExceptions {
     DoWithErrorMsg.Authorization,
     DoWithErrorCode.Authorization,
     HttpStatus.BAD_REQUEST,
-  )
+  );
+  UserNameLimit = new DoWithException(
+    DoWithErrorMsg.UserNameLimit,
+    DoWithErrorCode.UserNameLimit,
+    HttpStatus.BAD_REQUEST,
+  );
 
   // =============== [ Group ] ===============
 

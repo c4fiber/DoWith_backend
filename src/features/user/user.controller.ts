@@ -42,33 +42,10 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   async getUser(
     @Request() req,
-    @Headers('Authorization') token: string
   ): Promise<{ result }> {
-    // const user: User = req.user;
-    const user = req.user;
-    return await this.usersService.getUserInfo(user.user_id, token);
+    
+    return await this.usersService.getUserInfo(req.user);
   }
-
-  //   @Get('/:user_id')
-  //   async getUserById(
-  //     @Param('user_id', ParseIntPipe) id: number,
-  //   ): Promise<UserResponseDto> {
-  //     return await this.usersService.getUser(id);
-  //   }
-
-  //   @Get('/')
-  //   async getUserByKakakoId(
-  //     @Query('user_kakao_id') kakaoId: string,
-  //   ): Promise<UserResponseDto> {
-  //     return await this.usersService.getUserByKakaoId(kakaoId);
-  //   }
-
-  //   @Get('/')
-  //   async getUserByName(
-  //     @Query('user_name') name: string,
-  //   ): Promise<UserResponseDto> {
-  //     return await this.usersService.getUserByName(name);
-  //   }
 
   @UseInterceptors(FileInterceptor('profile'))
   @Post('/:user_id/profile')
@@ -76,7 +53,6 @@ export class UserController {
     @Param('user_id', ParseIntPipe) id: number,
     @UploadedFile() profile: Express.Multer.File,
   ): Promise<boolean> {
-    // TODO: type, size, .. 검증 로직, 디스크 공간 체크
     this.multerConifg.changePath(process.env.PUBLIC_IMAGE_PATH);
     return true;
   }
@@ -90,14 +66,6 @@ export class UserController {
     return await this.usersService.updateUser(id, request);
   }
 
-  @Patch('/:user_id')
-  async updateUserHp(
-    @Param('user_id', ParseIntPipe) id: number,
-    @Query('hp', ParseIntPipe) hp: number,
-  ): Promise<boolean> {
-    return await this.usersService.updateHp(id, hp);
-  }
-
   @Delete('/:user_id')
   async deleteUser(@Param('user_id', ParseIntPipe) id: number){
     return await this.usersService.deleteUser(id);
@@ -109,5 +77,10 @@ export class UserController {
     @Body() body: GetUsersByContactsDto,
   ): Promise<UserResponseDto[]> {
     return await this.usersService.getUsersByContacts(body);
+  }
+
+  @Get('/status/:user_id')
+  async getUserStatus(@Param('user_id', ParseIntPipe) id: number) {
+    return await this.usersService.getUserStatus(id);
   }
 }
