@@ -25,6 +25,7 @@ import { ItemShopModule } from './features/item-shop/item-shop.module';
 import { RoomModule } from './features/room/room.module';
 import { EntitiesModule } from './entities/entities.module';
 import { AnnouncementModule } from './features/announcement/announcement.module';
+import { AttendanceModule } from './features/attendance/attendance.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { AnnouncementModule } from './features/announcement/announcement.module'
     EntitiesModule,
     NotificationModule,
     AnnouncementModule,
+    AttendanceModule,
   ],
   controllers: [],
   providers: [

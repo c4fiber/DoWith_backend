@@ -41,6 +41,7 @@ export class TodoService {
    *              4. Routine에서 만들어지는 To-Do 생성
    *              5. login_cnt에 따른 업적 달성
    *              6. login 안한 일 수 만큼 hp 마이너스
+   *              7. 사용자 오늘자 출석
    * @returns 
    */
   async createTodayTodo(user_id: number){
@@ -65,6 +66,7 @@ export class TodoService {
       throw this.dwExcept.AlreadyMadeTodos;
     }
 
+    // 오늘 첫 로그인인 경우 동작하는 로직
     try {
       await qr.connect();
       await qr.startTransaction();
@@ -97,6 +99,13 @@ export class TodoService {
                                   END`,
                       })
                       .where({ user_id })
+                      .execute();
+
+      // 7. 사용자 오늘자 출석
+      await qr.manager.createQueryBuilder()
+                      .insert()
+                      .into('attendance')
+                      .values({ user_id })
                       .execute();
                       
       // 5. 로그인 관련 업적 확인을 위해 로그인 일 수 조회
