@@ -18,8 +18,8 @@ export class AttendanceService {
                                       , `extract(dow from TO_DATE(atte_at, 'YYYYMMDD')) AS day_of_week`
                                       ])
                                       .where('user_id = :user_id', { user_id })
-                                      .andWhere(`TO_DATE(atte_at, 'YYYYMMDD') >= CURRENT_DATE - EXTRACT(DOW FROM CURRENT_DATE)::INTEGER`)
-                                      .andWhere(`TO_DATE(atte_at, 'YYYYMMDD') < CURRENT_DATE + (7 - EXTRACT(DOW FROM CURRENT_DATE)::INTEGER)`)
+                                      .andWhere(`TO_DATE(atte_at, 'YYYYMMDD') > CURRENT_DATE - EXTRACT(DOW FROM CURRENT_DATE)::INTEGER`)
+                                      .andWhere(`TO_DATE(atte_at, 'YYYYMMDD') <= CURRENT_DATE + (7 - EXTRACT(DOW FROM CURRENT_DATE)::INTEGER)`)
                                       .orderBy('atte_at', 'ASC')
                                       .getRawMany();
 
