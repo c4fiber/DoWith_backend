@@ -128,7 +128,7 @@ export class ItemInventoryService {
                                                      ])
                                                      .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
                                                      .where('iv.user_id = :user_id', { user_id })
-                                                     .andWhere('ish.type_id = :type_id', {  })
+                                                     .andWhere('ish.type_id = :type_id', { type_id })
                                                      .getRawMany();
     return { result };
   }
