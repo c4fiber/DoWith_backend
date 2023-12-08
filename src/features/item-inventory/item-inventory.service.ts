@@ -43,6 +43,7 @@ export class ItemInventoryService {
     return { result };
   }
 
+  // [ 수정 위치 ]
   async evolveMyPet(user_id: number, item_id: number): Promise<{ result }> {
     const { pet_name, pet_item_name } = await this.itemInventoryRepository
       .createQueryBuilder('iv')
