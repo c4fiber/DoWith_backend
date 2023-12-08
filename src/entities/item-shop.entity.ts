@@ -25,4 +25,7 @@ export class ItemShop {
   @ManyToMany(() => ItemType)
   @JoinColumn({ name: 'type_id', referencedColumnName: 'type_id' })
   type_id: number;
+
+  @Column({ nullable: true })
+  metadata: string;
 }
