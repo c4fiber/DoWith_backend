@@ -513,7 +513,15 @@ export class GroupService {
     }
   }
 
-  // [ 수정 위치 ]
+  /**
+   * To-Do 할일 done 체크
+   * @description 1. To-Do done 체크
+   *              2. 리워드 제공
+   *              3. 펫 진화
+   *              4. (if 진화) 룸과 인벤토리에 펫 제공
+   * @param todo_id 
+   * @returns 
+   */
   async updateTodoDone(todo_id: number): Promise<void>{
     const qr = this.dataSource.createQueryRunner();
     
@@ -522,6 +530,7 @@ export class GroupService {
 
     try{
       Logger.debug(todo_id);
+      // 1. To-Do done 체크
       const uptRes = await qr.manager.createQueryBuilder()
                                      .update(Todo)
                                      .set({ todo_done: true })
@@ -535,6 +544,7 @@ export class GroupService {
 
       Logger.debug("========== [ Test-1) Update Todo-Done ] ==========");
 
+      // 1. 체크한 To-Do가 오늘이 아닌 이미 지난 날짜인 경우 종료
       const isToday = await this.todoRepo.createQueryBuilder('t')
                                          .where(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
                                          .andWhere({ todo_id })
@@ -546,6 +556,7 @@ export class GroupService {
         return;
       }
 
+      // 앞으로 필요한 user_id를 todo_id를 통해서 조회
       const { user_id } = await this.todoRepo.createQueryBuilder()
                                              .select(['user_id AS user_id'])
                                              .where({ todo_id })
@@ -553,7 +564,7 @@ export class GroupService {
       Logger.debug(user_id);
       Logger.debug(todo_id);
 
-      // 유저의 To-Do 개수를 기반으로 리워드 계산
+      // 2. 리워드 제공 - 추가되야할 캐시 계산
       const reward = await this.todoRepo.createQueryBuilder()
                                         .select(`case when count(*) = 1
                                                       then ${Reward.FIRST_TODO_REWARD}
@@ -564,6 +575,7 @@ export class GroupService {
                                         .andWhere('todo_done = true')
                                         .getRawOne();
       Logger.debug(reward);
+      // 2. 리워드 제공 - 캐시(오늘 처음: 100, 그 외: 25)
       await qr.manager.createQueryBuilder()
                       .update('user')
                       .set({
@@ -572,8 +584,7 @@ export class GroupService {
                       .where('user_id = :user_id', { user_id })
                       .execute();
       Logger.debug("========== [ Test-3) User'scash ] ==========");
-      // 마이룸에 펫이 무조건 있다는 가정이 깔림 (시스템상 없는게 버그)
-      // item_id는 현재 room에 있는 펫 아이디
+      // 현재 유저가 키우는 펫 아이디 가져오기
       const { item_id } = await qr.manager.createQueryBuilder()
                                           .select(['r.item_id AS item_id'])
                                           .from('room', 'r')
@@ -584,6 +595,7 @@ export class GroupService {
       Logger.debug("========== [ Test-4) my room pet ] ==========");
       Logger.debug(item_id);
 
+      // 2. 리워드 - 경험치
       await qr.manager.createQueryBuilder()
                       .update('item_inventory')
                       .set({ pet_exp: () => `pet_exp + ${Reward.PET_EXP_REWARD}` })
@@ -592,6 +604,7 @@ export class GroupService {
      
       Logger.debug("========== [ Test-5) pet's exp increase ] ==========");
 
+      // 진화표
       const evol_map = await qr.manager.createQueryBuilder()
                                        .select([
                                          'ish1.item_id 	     AS cur_id'
@@ -605,14 +618,15 @@ export class GroupService {
                                        .where('ish1.type_id = 1')
                                        .getQuery();
 
+      // 3. 현재 펫이 진화가 가능한 상황인지 조회
       const next_id = await qr.manager.createQueryBuilder()
-                                          .select(['ish.next_id AS next_id'])
-                                          .from('item_inventory', 'iv')
-                                          .innerJoin(`(${ evol_map })`, 'ish', 'iv.item_id = ish.cur_id')
-                                          .where('iv.user_id = :user_id', { user_id })
-                                          .andWhere('ish.next_id IS NOT NULL')
-                                          .andWhere('iv.pet_exp >= ish.evol_exp')
-                                          .getRawOne();
+                                      .select(['ish.next_id AS next_id'])
+                                      .from('item_inventory', 'iv')
+                                      .innerJoin(`(${ evol_map })`, 'ish', 'iv.item_id = ish.cur_id')
+                                      .where('iv.user_id = :user_id', { user_id })
+                                      .andWhere('ish.next_id IS NOT NULL')
+                                      .andWhere('iv.pet_exp >= ish.evol_exp')
+                                      .getRawOne();
 
       Logger.debug("========== [ Test-6) Can pet evolate into next step ] ==========");
       Logger.debug(next_id);
@@ -623,8 +637,7 @@ export class GroupService {
         return;
       }
 
-      // insert 하면 기존 펫 경험치 그대로 갖고 있거나 새로 진화하게 되면 펫이 증식하는 버그가 생기게됨
-      // 임시 조치로 update로 변경했음
+      // 4. 인벤토리에 진화된 펫 제공 - 기존 진화 전 펫을 변경
       await qr.manager.createQueryBuilder()
                       .update('item_inventory')
                       .set({
@@ -634,6 +647,7 @@ export class GroupService {
                       .where({ user_id, item_id })
                       .execute();
 
+      // 4. 마이룸에 진화된 펫 제공 - 기존 진화 전 펫을 변경
       await qr.manager.createQueryBuilder()
                       .update('room')
                       .set({
