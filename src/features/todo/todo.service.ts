@@ -359,7 +359,6 @@ export class TodoService {
     }
   }
 
-
   /**
    * 날짜가 과거인지 확인
    * @param todo_date

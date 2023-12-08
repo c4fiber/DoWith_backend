@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { ItemShop } from 'src/entities/item-shop.entity';
 import { Room } from 'src/entities/room.entity';
-import { PetLevel } from 'src/enums/PetLevel.enum';
 
 @Injectable()
 export class ItemInventoryService {
@@ -43,47 +42,47 @@ export class ItemInventoryService {
     return { result };
   }
 
-  async evolveMyPet(user_id: number, item_id: number): Promise<{ result }> {
-    const { pet_name, pet_item_name } = await this.itemInventoryRepository
-      .createQueryBuilder('iv')
-      .where('iv.user_id = :user_id', { user_id })
-      .andWhere('iv.item_id = :item_id', { item_id })
-      .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
-      .select(['iv.pet_name as pet_name', 'ish.item_name as pet_item_name'])
-      .getRawOne();
+  // async evolveMyPet(user_id: number, item_id: number): Promise<{ result }> {
+  //   const { pet_name, pet_item_name } = await this.itemInventoryRepository
+  //     .createQueryBuilder('iv')
+  //     .where('iv.user_id = :user_id', { user_id })
+  //     .andWhere('iv.item_id = :item_id', { item_id })
+  //     .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
+  //     .select(['iv.pet_name as pet_name', 'ish.item_name as pet_item_name'])
+  //     .getRawOne();
 
-    const [pet_type, pet_level] = pet_item_name.split('_');
+  //   const [pet_type, pet_level] = pet_item_name.split('_');
 
-    if (pet_level == PetLevel.lv3) {
-      // 펫이 이미 진화를 완료함
-      throw this.dwExcept.PetEvolFinished;
-    }
+  //   if (pet_level == PetLevel.lv3) {
+  //     // 펫이 이미 진화를 완료함
+  //     throw this.dwExcept.PetEvolFinished;
+  //   }
 
-    const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;
-    const next_pet = await this.itemShopRespository.findOneBy({
-      item_name: next_pet_name,
-    });
+  //   const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;
+  //   const next_pet = await this.itemShopRespository.findOneBy({
+  //     item_name: next_pet_name,
+  //   });
 
-    if (next_pet == null) {
-      throw this.dwExcept.NoData;
-    }
+  //   if (next_pet == null) {
+  //     throw this.dwExcept.NoData;
+  //   }
 
-    const result = await this.itemInventoryRepository
-      .createQueryBuilder()
-      .insert()
-      .into(ItemInventory)
-      .values([
-        {
-          user_id: user_id,
-          item_id: next_pet.item_id,
-          pet_name: pet_name,
-          pet_exp: 0,
-        },
-      ])
-      .execute();
+  //   const result = await this.itemInventoryRepository
+  //     .createQueryBuilder()
+  //     .insert()
+  //     .into(ItemInventory)
+  //     .values([
+  //       {
+  //         user_id: user_id,
+  //         item_id: next_pet.item_id,
+  //         pet_name: pet_name,
+  //         pet_exp: 0,
+  //       },
+  //     ])
+  //     .execute();
 
-    return { result };
-  }
+  //   return { result };
+  // }
 
   async renameMyPet(user_id: number, item_id: number, pet_name: string) {
     const result = await this.itemInventoryRepository
@@ -100,22 +99,37 @@ export class ItemInventoryService {
     return { result };
   }
 
-  // 인벤토리 전체 조회
-  async findAll(user_id: number) {
-    const result = await this.itemInventoryRepository
-      .createQueryBuilder('iv')
-      .where('iv.user_id = :user_id', { user_id })
-      .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
-      .select([
-        'ish.item_id as item_id',
-        'ish.type_id as item_type',
-        'ish.item_name as item_name',
-        'ish.item_path as item_path',
-        'iv.pet_name as pet_name',
-        'iv.pet_exp as pet_exp',
-        'ish.metadata AS metadata',
-      ])
-      .getRawMany();
+  // async findAll1(user_id: number) {
+  //   const result = await this.itemInventoryRepository
+  //     .createQueryBuilder('iv')
+  //     .where('iv.user_id = :user_id', { user_id })
+  //     .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
+  //     .select([
+  //       'ish.item_id as item_id',
+  //       'ish.type_id as item_type',
+  //       'ish.item_name as item_name',
+  //       'ish.item_path as item_path',
+  //       'iv.pet_name as pet_name',
+  //       'iv.pet_exp as pet_exp',
+  //     ])
+  //     .getRawMany();
+  //   return { result };
+  // }
+
+  async findAll(user_id: number, type_id: number) {
+    const result = await this.itemInventoryRepository.createQueryBuilder('iv')
+                                                     .select([
+                                                       'ish.item_id as item_id'
+                                                     , 'ish.type_id as item_type'
+                                                     , 'ish.item_name as item_name'
+                                                     , 'ish.item_path as item_path'
+                                                     , 'iv.pet_name as pet_name'
+                                                     , 'iv.pet_exp as pet_exp'
+                                                     ])
+                                                     .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
+                                                     .where('iv.user_id = :user_id', { user_id })
+                                                     .andWhere('ish.type_id = :type_id', { type_id })
+                                                     .getRawMany();
     return { result };
   }
 }

@@ -99,7 +99,7 @@ export class GroupController {
   @Patch('/user/:todo_id/approve')
   updateTodoDone(
     @Param('todo_id') todo_id: number
-  ): Promise<any>{
+  ): Promise<void>{
     return this.groupService.updateTodoDone(todo_id);
   }
 

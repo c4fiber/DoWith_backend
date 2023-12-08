@@ -19,7 +19,7 @@ export class ItemShop {
   item_path: string;
 
   @Column({ nullable: true })
-  next_step: string;
+  next_step: number;
 
   @Column()
   @ManyToMany(() => ItemType)

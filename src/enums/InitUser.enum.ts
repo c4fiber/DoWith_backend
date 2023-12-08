@@ -5,6 +5,6 @@ export enum InitUser {
     login_cnt = 1,
     login_seq = 1,
     pet_exp = 0,
-    pet_id = 55,
+    pet_id = 0,
     achi_id = 5, // 첫 로그인
 }
