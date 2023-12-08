@@ -84,7 +84,7 @@ export class GroupService {
       await qr.startTransaction();
 
       createGroupDto.grp_owner =  createGroupDto.user_id;
-      createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
+      createGroupDto.cat_id = createGroupDto.cat_id;
 
       // 1. 그룹 생성
       const result = await qr.manager.save(Group, createGroupDto);

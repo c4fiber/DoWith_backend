@@ -5,6 +5,9 @@ export class Category {
   @PrimaryGeneratedColumn()
   cat_id: number;
 
+  @Column({ nullable: true })
+  cat_img: string;
+
   @Column()
   cat_name: string;
 }
