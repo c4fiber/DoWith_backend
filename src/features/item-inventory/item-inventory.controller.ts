@@ -42,8 +42,11 @@ export class ItemInventoryController {
     return this.itemInventoryService.renameMyPet(user_id, item_id, pet_name);
   }
 
-  @Get('/:user_id')
-  findAllItemsInInventory(@Param('user_id') user_id: number) {
-    return this.itemInventoryService.findAll(user_id);
+  @Get('/:user_id/:type_id')
+  findAllItemsInInventory(
+    @Param('user_id') user_id: number,
+    @Param('type_id') type_id: number
+  ) {
+    return this.itemInventoryService.findAll(user_id, type_id);
   }
 }
