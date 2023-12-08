@@ -13,12 +13,7 @@ import * as fs from 'fs/promises'
 import * as path from 'path';
 
 import { applyPaging, getIdsFromItems } from 'src/utils/PagingOptions';
-import { Room } from 'src/entities/room.entity';
 import { Reward } from 'src/enums/Reward.enum';
-import { ItemInventory } from 'src/entities/item-inventory.entity';
-import { PetLevel } from 'src/enums/PetLevel.enum';
-import { ItemShop } from 'src/entities/item-shop.entity';
-import { PetLevelExp } from 'src/enums/PetLevelExp.enum';
 
 @Injectable()
 export class GroupService {
