@@ -61,18 +61,49 @@ export class UserService {
   }
 
   // 아이디를 기준으로 유저 삭제
-  async deleteUser(user_id: number): Promise<void> {
+  async deleteUser(user_id: number) {
+    const user = await this.getUser(user_id);
+    if (user == null) {
+      throw this.doWithException.UserNotFound;
+    }
+    
+    const qr = this.dataSource.createQueryRunner();
     const uuid = uuidV4();
+    await qr.connect();
+    await qr.startTransaction(); 
 
-    await this.userRepository.createQueryBuilder()
-                             .update()
-                             .set({
-                               user_name: uuid
-                             , user_kakao_id: uuid
-                             , del_at: () => 'CURRENT_TIMESTAMP'
-                             })
-                             .where('user_id = :user_id', { user_id })
-                             .execute();
+    try {
+      const result = await this.userRepository.createQueryBuilder()
+                                              .update()
+                                              .set({
+                                                user_name: uuid
+                                              , user_kakao_id: uuid
+                                              , del_at: () => 'CURRENT_TIMESTAMP'
+                                              })
+                                              .where('user_id = :user_id', { user_id })
+                                              .execute();
+
+      await qr.manager.createQueryBuilder()
+                      .delete()
+                      .from('user_group')
+                      .where('user_id = :user_id', { user_id })
+                      .execute();
+      
+      await qr.manager.createQueryBuilder()
+                      .delete()
+                      .from('user_friend')
+                      .where('user_id = :user_id', { user_id })
+                      .orWhere('friend_id = :user_id', { user_id })
+                      .execute();
+
+      await qr.commitTransaction();
+      return { result };
+    } catch(err) {
+      await qr.rollbackTransaction();
+      throw new Error(err);
+    } finally {
+      qr.release();
+    }
   }
 
   // 유저 HP 업데이트
@@ -142,7 +173,7 @@ export class UserService {
   // hp및 상태 조회 (다른 사람이 봐도 문제없는 내용만 포함하도록)
   async getUserStatus(user_id: number) {
     const result = await this.userRepository.createQueryBuilder()
-    .select('user_hp', 'user_name').where('user_id = :user_id', { user_id }).getRawOne();
+    .select(['user_hp', 'user_name']).where('user_id = :user_id', { user_id }).getRawOne();
 
   if (!result) {
     throw this.doWithException.UserNotFound;

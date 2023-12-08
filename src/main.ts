@@ -23,17 +23,18 @@ async function bootstrap() {
             }),
           ),
         }),  // logger config end
-        new winston.transports.File({
-          dirname: path.join(process.env.LOG_PATH),
-          filename: `${Date.now()}_debug.log`,
-          level: 'debug',
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.printf(({ level, message, timestamp }) => {
-              return `${timestamp} [${level.toUpperCase()}]: ${message}`;
-            })
-          ),
-        }),  // file config end
+        // application log file (로그 파일)
+        // new winston.transports.File({
+        //   dirname: path.join(process.env.LOG_PATH),
+        //   filename: `${Date.now()}_debug.log`,
+        //   level: 'debug',
+        //   format: winston.format.combine(
+        //     winston.format.timestamp(),
+        //     winston.format.printf(({ level, message, timestamp }) => {
+        //       return `${timestamp} [${level.toUpperCase()}]: ${message}`;
+        //     })
+        //   ),
+        // }),  // file config end
       ],
     }),
   });

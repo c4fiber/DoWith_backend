@@ -617,16 +617,16 @@ export class GroupService {
       'iv.pet_exp as pet_exp',
     */
     const { item_id, item_name, pet_name, pet_exp } = main_pet;
-    const petExp = this.calculatePetExp(true);
+    const newPetExp = pet_exp + this.calculatePetExp(true);
     let pet_item_id = item_id;
 
     const updateExp = await queryRunner.manager.createQueryBuilder()
                                                .update(ItemInventory)
                                                .set({
-                                                pet_exp: () => 'pet_exp + :exp',
+                                                pet_exp: newPetExp,
                                                })
                                                .where('user_id = :user_id', {
-                                                user_id: user_id, exp: petExp
+                                                user_id: user_id, exp: newPetExp
                                                })
                                                .andWhere({ item_id })
                                                .execute();
@@ -640,8 +640,8 @@ export class GroupService {
     const pet_type = parsed[0];
     const pet_level = parsed[1];
 
-    if ((pet_level === PetLevel.lv1 && pet_exp >= PetLevelExp.lv1) ||
-        (pet_level === PetLevel.lv2 && pet_exp >= PetLevelExp.lv2)) {
+    if ((pet_level === PetLevel.lv1 && newPetExp >= PetLevelExp.lv1) ||
+        (pet_level === PetLevel.lv2 && newPetExp >= PetLevelExp.lv2)) {
 
         // 펫 진화
         const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;

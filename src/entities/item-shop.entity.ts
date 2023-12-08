@@ -9,6 +9,9 @@ export class ItemShop {
   @Column()
   item_name: string;
 
+  @Column({ nullable: true })
+  item_desc: string;
+
   @Column()
   item_cost: number;
 
