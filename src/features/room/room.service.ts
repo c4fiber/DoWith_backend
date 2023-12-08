@@ -93,6 +93,7 @@ export class RoomService {
         'r.user_id as user_id',
         'ish.item_id as item_id',
         'ish.type_id as item_type',
+        'ish.metadata as metadata',
         'ish.item_name as item_name',
         'ish.item_path as item_path',
         'iv.pet_name as pet_name',

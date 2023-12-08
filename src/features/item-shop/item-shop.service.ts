@@ -52,6 +52,7 @@ export class ItemShopService {
                                    , 'ish.item_desc AS item_desc'
                                    , 'ish.item_cost AS item_cost'
                                    , 'ish.item_path AS item_path'
+                                   , 'ish.metadata  AS metadata'
                                    ])
                                    .leftJoin('item_inventory', 'iv', 'iv.user_id = :user_id AND ish.item_id = iv.item_id', { user_id })
                                    .leftJoin('item_type'     , 'it', 'ish.type_id = it.type_id')
