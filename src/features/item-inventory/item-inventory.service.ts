@@ -100,6 +100,7 @@ export class ItemInventoryService {
     return { result };
   }
 
+  // 인벤토리 전체 조회
   async findAll(user_id: number) {
     const result = await this.itemInventoryRepository
       .createQueryBuilder('iv')
@@ -112,6 +113,7 @@ export class ItemInventoryService {
         'ish.item_path as item_path',
         'iv.pet_name as pet_name',
         'iv.pet_exp as pet_exp',
+        'ish.metadata AS metadata',
       ])
       .getRawMany();
     return { result };
