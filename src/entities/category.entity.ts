@@ -6,5 +6,8 @@ export class Category {
   cat_id: number;
 
   @Column()
+  cat_img: string;
+
+  @Column()
   cat_name: string;
 }

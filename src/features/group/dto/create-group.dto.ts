@@ -15,7 +15,4 @@ export class CreateGroupDto {
 
   @IsNotEmpty()
   cat_id: number;
-
-  @IsNotEmpty()
-  category: Category;
 }

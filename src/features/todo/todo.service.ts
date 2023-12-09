@@ -138,8 +138,8 @@ export class TodoService {
                         .insert()
                         .into('user_achi')
                         .values({ 
-                            user_id
-                          , achi_id
+                          user_id
+                        , achi_id
                         })
                         .execute();
       }

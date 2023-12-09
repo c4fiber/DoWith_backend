@@ -45,21 +45,22 @@ export class ItemShopService {
                                          ])
                                          .getRawMany();
     // 상점 아이템 조회                    
-    const query = this.itemShopRepo.createQueryBuilder('ish')
+    const query = this.itemShopRepo.createQueryBuilder('sh1')
                                    .select([
-                                     'ish.item_id   AS item_id'
-                                   , 'ish.item_name AS item_name'
-                                   , 'ish.item_desc AS item_desc'
-                                   , 'ish.item_cost AS item_cost'
-                                   , 'ish.item_path AS item_path'
-                                   , 'ish.metadata  AS metadata'
+                                     'sh1.item_id   AS item_id'
+                                   , 'sh1.item_name AS item_name'
+                                   , 'sh1.item_desc AS item_desc'
+                                   , 'sh1.item_cost AS item_cost'
+                                   , 'sh1.item_path AS item_path'
+                                   , 'sh1.metadata  AS metadata'
                                    ])
-                                   .leftJoin('item_inventory', 'iv', 'iv.user_id = :user_id AND ish.item_id = iv.item_id', { user_id })
-                                   .leftJoin('item_type'     , 'it', 'ish.type_id = it.type_id')
-                                   .where('it.type_id = :type_id', { type_id });
+                                   .innerJoin('item_shop', 'sh2', 'sh1.next_step = sh2.item_id AND sh2.next_step IS NOT NULL')
+                                   .where('sh1.type_id = :type_id', { type_id })
+                                   .andWhere('sh1.item_id != 0')  // 0: 기본으로 주어지는 펫은 상점에서 제외
+                                   .orderBy('sh1.item_id', 'ASC');
 
     if(ownItems.length > 0){
-      query.andWhere('ish.item_id NOT IN (:...ownItems)', { ownItems });
+      query.andWhere('sh1.item_id NOT IN (:...ownItems)', { ownItems });
     }
 
     return { result: await query.getRawMany(), path: process.env.PUBLIC_IMAGE_PATH };

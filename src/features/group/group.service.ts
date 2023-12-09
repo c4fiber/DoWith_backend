@@ -84,7 +84,7 @@ export class GroupService {
       await qr.startTransaction();
 
       createGroupDto.grp_owner =  createGroupDto.user_id;
-      createGroupDto['category'] = { cat_id: createGroupDto.cat_id, cat_name: 'Unreached code'};
+      createGroupDto.cat_id = createGroupDto.cat_id;
 
       // 1. 그룹 생성
       const result = await qr.manager.save(Group, createGroupDto);
@@ -158,11 +158,14 @@ export class GroupService {
 
     const rout_detail = await this.grpRepo.createQueryBuilder('g')
                                           .select([
-                                            'r.rout_id   AS rout_id'
-                                          , 'r.rout_name AS rout_name'
-                                          , 'r.rout_desc AS rout_desc'
+                                            'r.rout_id     AS rout_id'
+                                          , 'r.rout_name   AS rout_name'
+                                          , 'r.rout_desc   AS rout_desc'
+                                          , 'd.rout_repeat AS rout_repeat'
+                                          , 'd.days        AS days'
                                           ])
                                           .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
+                                          .leftJoin('days'   , 'd', 'r.rout_repeat = d.rout_repeat')
                                           .where('g.grp_id = :grp_id', { grp_id })
                                           .getRawMany();
     
@@ -479,7 +482,7 @@ export class GroupService {
       const newPath = `${process.env.IMAGE_PATH}${fileName}`;
 
       // 1. 사진 압축(sharp 라이브러리 사용)
-      await sharp(filePath).resize({ width: 700, height: 800, fit: 'contain' })
+      await sharp(filePath).resize({ width: 1300, height: 1000, fit: 'contain' })
                            .toFile(newPath, async(err, info) => {
                               // 1. 원본 파일 삭제
                               await fs.unlink(filePath);
