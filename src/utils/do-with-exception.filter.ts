@@ -45,26 +45,26 @@ export class DoWithExceptionFilter implements ExceptionFilter {
 
     res.status(err.http_code);
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    try {
-      err.method = req.method;
-      err.url = req.url;
-      err.agent = req.headers['user-agent'];
-      err.ip = req.ip;
-      err.parameters = req.body;
-      err.err_name = exception.name;
-      err.err_stack = exception.stack;
+    // const queryRunner = this.dataSource.createQueryRunner();
+    // try {
+    //   err.method = req.method;
+    //   err.url = req.url;
+    //   err.agent = req.headers['user-agent'];
+    //   err.ip = req.ip;
+    //   err.parameters = req.body;
+    //   err.err_name = exception.name;
+    //   err.err_stack = exception.stack;
 
-      await queryRunner.manager.save(doWithError, err);
-    } catch (err) {
-      // 조치 없음
-      this.logger.error('DB Insert Exception');
-    } finally {
-      if(!queryRunner.isReleased) {
-        await queryRunner.release(); // 이미 해제된 QueryRunner인 경우에만 호출
-      }
-      // queryRunner.release();
-    }
+    //   await queryRunner.manager.save(doWithError, err);
+    // } catch (err) {
+    //   // 조치 없음
+    //   this.logger.error('DB Insert Exception');
+    // } finally {
+    //   if(!queryRunner.isReleased) {
+    //     await queryRunner.release(); // 이미 해제된 QueryRunner인 경우에만 호출
+    //   }
+    //   // queryRunner.release();
+    // }
 
     res.json(comRes);
   }
