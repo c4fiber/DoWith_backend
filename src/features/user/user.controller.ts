@@ -83,4 +83,11 @@ export class UserController {
   async getUserStatus(@Param('user_id', ParseIntPipe) id: number) {
     return await this.usersService.getUserStatus(id);
   }
+
+  @Get('/:user_id/statistics')
+  async getUserstatistics(
+    @Param('user_id') user_id: number
+  ) {
+    return await this.usersService.getUserstatistics(user_id);
+  }
 }
