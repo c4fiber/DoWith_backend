@@ -465,7 +465,7 @@ export class GroupService {
    * @param file 
    * @returns 
    */
-  async updateImage(todo_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
+  async updateImageFromTodo(todo_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
     if(!file){
       throw this.dwExcept.ThereIsNoFile;
     }
@@ -474,6 +474,75 @@ export class GroupService {
     await qr.connect();
     await qr.startTransaction();
                                         
+    try {
+      // const filePath = file.path;
+      // const ext = path.extname(file.originalname);
+      // const name = path.basename(file.originalname, ext);
+      // const fileName = `${name}_${Date.now()}${ext}`;
+      // const newPath = `${process.env.IMAGE_PATH}${fileName}`;
+
+      // // 1. 사진 압축(sharp 라이브러리 사용)
+      // await sharp(filePath).resize({ width: 1300, height: 1000, fit: 'contain' })
+      //                      .toFile(newPath, async(err, info) => {
+      //                         // 1. 원본 파일 삭제
+      //                         await fs.unlink(filePath);
+      //                      });
+      
+      // const oldFile = await this.todoRepo.createQueryBuilder('t')
+      //                                    .select(['t.todo_img AS todo_img'])
+      //                                    .where({ todo_id })
+      //                                    .andWhere({ user_id })
+      //                                    .getRawOne();
+
+      // // 2. 인증을 위해서 기존에 저장한 사진은 삭제
+      // if(oldFile && oldFile.todo_img){
+      //   await fs.unlink(`${process.env.IMAGE_PATH}${oldFile.todo_img}`);
+      // }
+
+      const result = await this.compressFile(todo_id, user_id, file);
+
+      await qr.commitTransaction();
+      return { result };
+    } catch(err) {
+      await qr.rollbackTransaction();
+      throw new Error(err);
+    } finally {
+      await qr.release();
+    }
+  }
+
+  async updateImageFromGroup(rout_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
+    if(!file){
+      throw this.dwExcept.ThereIsNoFile;
+    }
+
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+                                        
+    try {
+      const todo_id = await this.todoRepo.createQueryBuilder('t')
+                                         .select(['todo_id AS todo_id'])
+                                         .where(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
+                                         .andWhere({ user_id, rout_id })
+                                         .getRawOne();
+      const result = await this.compressFile(todo_id.todo_id, user_id, file);
+
+      await qr.commitTransaction();
+      return { result };
+    } catch(err) {
+      await qr.rollbackTransaction();
+      throw new Error(err);
+    } finally {
+      await qr.release();
+    }
+  }
+
+  async compressFile(todo_id: number, user_id:number, file: Express.Multer.File){
+    if(!file){
+      throw this.dwExcept.ThereIsNoFile;
+    }
+
     try {
       const filePath = file.path;
       const ext = path.extname(file.originalname);
@@ -484,10 +553,10 @@ export class GroupService {
       // 1. 사진 압축(sharp 라이브러리 사용)
       await sharp(filePath).resize({ width: 1300, height: 1000, fit: 'contain' })
                            .toFile(newPath, async(err, info) => {
-                              // 1. 원본 파일 삭제
-                              await fs.unlink(filePath);
+                             // 1. 원본 파일 삭제
+                             await fs.unlink(filePath);
                            });
-      
+
       const oldFile = await this.todoRepo.createQueryBuilder('t')
                                          .select(['t.todo_img AS todo_img'])
                                          .where({ todo_id })
@@ -506,13 +575,9 @@ export class GroupService {
                                         .andWhere({ user_id })
                                         .execute();
 
-      await qr.commitTransaction();
-      return { result };
+      return result;
     } catch(err) {
-      await qr.rollbackTransaction();
       throw new Error(err);
-    } finally {
-      await qr.release();
     }
   }
 
