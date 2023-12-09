@@ -20,7 +20,7 @@ ENV TZ Asia/Seoul
 
 EXPOSE 3000
 # execute only one time (also ENTRYPOINT, too)
-CMD [ "npm", "run", "start:prod" ]
+CMD [ "npm", "run", "start:dev" ]
 
 WORKDIR /app
 COPY --from=builder /src/node_modules/ /app/node_modules/
