@@ -55,10 +55,10 @@ export class TodoService {
                                  )
                                  .getRawOne();
     // 1. 마지막 로그인 일자 갱신 쿼리 (실행 x)
-    const newLastLogin = qr.manager.createQueryBuilder()
-                                   .update('user')
-                                   .set({ last_login: () => 'now()' })
-                                   .where('user_id = :user_id', { user_id });
+    // const newLastLogin = qr.manager.createQueryBuilder()
+    //                                .update('user')
+    //                                .set({ last_login: () => 'now()' })
+    //                                .where('user_id = :user_id', { user_id });
 
     // 오늘 첫 로그인인 경우 동작하는 로직
     try {
@@ -68,7 +68,11 @@ export class TodoService {
       // 이미 todo 생성했을 경우
       if (user) {
         // 1. 마지막 로그인 날짜로 최신화
-        await newLastLogin.execute();
+        await qr.manager.createQueryBuilder()
+                        .update('user')
+                        .set({ last_login: () => 'now()' })
+                        .where('user_id = :user_id', { user_id })
+                        .execute();
         throw this.dwExcept.AlreadyMadeTodos;
       }
 
@@ -146,7 +150,11 @@ export class TodoService {
       }
 
       // 1. 오늘 로그인 날짜로 최신화
-      await newLastLogin.execute();
+      await qr.manager.createQueryBuilder()
+                      .update('user')
+                      .set({ last_login: () => 'now()' })
+                      .where('user_id = :user_id', { user_id })
+                      .execute();
       // 4. todo 생성기 - 유저가 가입한 그룹 리스트
       const subQuery = await qr.manager.createQueryBuilder()
                                        .select(['g.grp_id AS grp_id'])
@@ -203,6 +211,10 @@ export class TodoService {
       await qr.rollbackTransaction();
       throw new Error(err);
     } finally {
+      Logger.debug("################################################");
+      Logger.debug("################################################");
+      Logger.debug("################################################");
+      Logger.debug("################################################");
       await qr.release();
     }
   }
