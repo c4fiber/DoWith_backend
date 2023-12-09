@@ -256,7 +256,8 @@ export class GroupService {
       const routs = await this.grpRepo.createQueryBuilder('g')
                                       .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
                                       .select([
-                                        'r.rout_name AS todo_name'
+                                        'r.rout_id   AS rout_id'
+                                      , 'r.rout_name AS todo_name'
                                       , 'r.rout_desc AS todo_desc'
                                       , 'g.cat_id    AS todo_label'
                                       , 'r.rout_srt  AS todo_start'
@@ -268,6 +269,7 @@ export class GroupService {
       for(const rout of routs){
         const todo = new Todo();
 
+        todo.rout_id = rout.rout_id;
         todo.user_id = user_id;
         todo.grp_id = grp_id;
         todo.todo_name = rout.todo_name;
