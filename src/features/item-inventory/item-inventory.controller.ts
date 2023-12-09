@@ -22,17 +22,6 @@ export class ItemInventoryController {
     return this.itemInventoryService.getMyMainPet(user_id);
   }
 
-  // @Post('/:user_id/pet/:item_id')
-  // // @UseGuards(AuthGuard('jwt'))
-  // evolveMyPet(
-  //   @Param('user_id', ParseIntPipe) user_id: number,
-  //   @Param('item_id', ParseIntPipe) item_id: number,
-  //   @Request() req,
-  // ) {
-  //   // const user: User = req.user;
-  //   return this.itemInventoryService.evolveMyPet(user_id, item_id);
-  // }
-
   @Patch('/:user_id/pet-name/:item_id')
   renameMyPet(
     @Param('user_id') user_id: number,

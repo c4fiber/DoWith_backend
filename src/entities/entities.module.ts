@@ -19,6 +19,7 @@ import { Achievements } from './achievements.entity';
 import { Announcement } from './announcement.entity';
 import { Attendance } from './attendance.entity';
 import { Tier } from './tiers.entity';
+import { TierScore } from './tier_score.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
