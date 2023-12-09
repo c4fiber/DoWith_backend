@@ -11,8 +11,8 @@ export class CategoryService {
     private readonly logger: Logger
   ) {}
 
-  getAllCategories() {
-    const result = this.catRepo.find({});
+  async getAllCategories() {
+    const result = await this.catRepo.find({});
 
     return { result };
   }
