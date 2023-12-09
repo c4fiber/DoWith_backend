@@ -107,7 +107,7 @@ export class GroupService {
         rout.rout_srt = data.rout_srt;
         rout.rout_end = data.rout_end;
 
-        await qr.manager.save(Routine, rout);
+        const test = await qr.manager.save(Routine, rout);
 
         // 4. 할일 생성
         const todo = new Todo();
@@ -118,6 +118,7 @@ export class GroupService {
         todo.todo_desc = data.rout_desc;
         todo.todo_start = data.rout_srt;
         todo.todo_end = data.rout_end;
+        todo.rout_id = rout.rout_id;
 
         await qr.manager.save(Todo, todo);
       }
