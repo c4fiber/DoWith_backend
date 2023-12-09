@@ -200,7 +200,7 @@ export class UserService {
                                        .andWhere('t.todo_done = true')
                                        .getRawOne();
     const login_score = await this.userRepository.createQueryBuilder('u')
-                                                 .select(['(login_cnt * 10) + (user_hp * 10)'])
+                                                 .select(['(login_cnt * 10) + (user_hp * 10) as login_score'])
                                                  .where({ user_id })
                                                  .getRawOne();
     const achi_score = await qr.manager.createQueryBuilder()
@@ -213,6 +213,8 @@ export class UserService {
     Logger.debug(JSON.stringify(todo_score));
     Logger.debug(JSON.stringify(login_score));
     Logger.debug(JSON.stringify(achi_score));
+    const sum = +pet_exps.pet_exp + +todo_score.todo_score + +todo_score.rout_score + +login_score.login_score + +achi_score.achi_score;
+    Logger.debug(sum);
     return ;
   }
 }
