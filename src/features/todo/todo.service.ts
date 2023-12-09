@@ -59,17 +59,18 @@ export class TodoService {
                                    .update('user')
                                    .set({ last_login: () => 'now()' })
                                    .where('user_id = :user_id', { user_id });
-    // 이미 todo 생성했을 경우
-    if (user) {
-      // 1. 마지막 로그인 날짜로 최신화
-      await newLastLogin.execute();
-      throw this.dwExcept.AlreadyMadeTodos;
-    }
 
     // 오늘 첫 로그인인 경우 동작하는 로직
     try {
       await qr.connect();
       await qr.startTransaction();
+
+      // 이미 todo 생성했을 경우
+      if (user) {
+        // 1. 마지막 로그인 날짜로 최신화
+        await newLastLogin.execute();
+        throw this.dwExcept.AlreadyMadeTodos;
+      }
 
       // 3. 누적 로그인 증가
       const result = await qr.manager.createQueryBuilder()

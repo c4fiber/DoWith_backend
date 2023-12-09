@@ -43,7 +43,6 @@ import { TierScore } from './tier_score.entity';
     , Announcement
     , Attendance
     , Tier
-    , TierScore
   ])]
 })
 export class EntitiesModule {}
