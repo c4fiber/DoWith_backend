@@ -62,7 +62,7 @@ export class ItemShopService {
       query.andWhere('sh1.item_id NOT IN (:...ownItems)', { ownItems });
     }
 
-    if(type_id === 1){
+    if(type_id == 1){
       query.innerJoin('item_shop', 'sh2', 'sh1.next_step = sh2.item_id AND sh2.next_step IS NOT NULL');
     }
 
