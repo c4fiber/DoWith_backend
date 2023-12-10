@@ -97,7 +97,7 @@ API 정의 해둘 예정 시간 된다면? OR url 링크만 걸어두기
 |<img src ="https://img.shields.io/badge/jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/>|[타임라인기반 일정 관리](https://persimmon.atlassian.net/jira/software/projects/IWW/boards/1)|
 |<img src ="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/>|[스크럼, API Docs, 메타데이터, 피드백, 회의록 등](https://www.notion.so/7abb2ce040af491aad3f6e877268be5b?pvs=4)|
 |<img src ="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/>|[화면 설계](https://www.figma.com/file/TbIxjCTQzHCiIh9fgxObid/Do-With?type=design&node-id=0-1&mode=design&t=QNC0NqmfmA7WXusp-0)|
-|<img src ="https://img.shields.io/badge/dbdiagram-004088?style=for-the-badge&logo=diagramsdotnet&logoColor=white"/>|[DB ERD](https://dbdiagram.io/d/6564dc863be1495787d4b92e)|
+|<img src ="https://img.shields.io/badge/dbdiagram-004088?style=for-the-badge&logo=diagramsdotnet&logoColor=white"/>|[DB ERD](https://dbdiagram.io/d/last-657595bc56d8064ca0ba8143)|
 |<img src ="https://img.shields.io/badge/dropbox-0061FF?style=for-the-badge&logo=dropbox&logoColor=white"/>|파일 공유|
 |<img src ="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/>|의사소통|
 </br>
