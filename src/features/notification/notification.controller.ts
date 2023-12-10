@@ -29,13 +29,6 @@ export class NotificationController {
         return this.notificationService.findAllByUser(user_id);
     }
 
-    // @Post()
-    // create(
-    //     @Body() createNotificationDto: CreateNotificationDto
-    // ): Promise<Comment> {
-    //     return this.notificationService.createNotification(createNotificationDto);
-    // }
-
     @Put(':noti_id')
     async update(
         @Param('noti_id', ParseIntPipe) noti_id: number,

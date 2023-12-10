@@ -25,7 +25,9 @@ export class TodoService {
   async findAllByUser(user_id: number): Promise<Todo[]> {
     return await this.todoRepository.createQueryBuilder('t')
                                     .where('t.user_id = :user_id', { user_id })
-                                    .andWhere(`(to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR t.todo_done = false)`)
+                                    //.andWhere(`(to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR t.todo_done = false)`)
+                                    .andWhere(`(to_char(todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR (todo_done = false AND grp_id IS NULL))
+                                               OR (to_char(todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') AND (todo_done = false AND grp_id IS NOT NULL))`)
                                     .andWhere('t.todo_deleted = false')
                                     .orderBy('t.todo_done, t.todo_date', 'ASC')
                                     .getMany();
@@ -54,25 +56,22 @@ export class TodoService {
                                    `to_char(u.last_login, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`,
                                  )
                                  .getRawOne();
-    // 1. 마지막 로그인 일자 갱신 쿼리 (실행 x)
-    // const newLastLogin = qr.manager.createQueryBuilder()
-    //                                .update('user')
-    //                                .set({ last_login: () => 'now()' })
-    //                                .where('user_id = :user_id', { user_id });
 
     // 오늘 첫 로그인인 경우 동작하는 로직
     try {
       await qr.connect();
       await qr.startTransaction();
 
+      // 1. 마지막 로그인 일자 갱신 쿼리 (실행 x)
+      const newLastLogin = qr.manager.createQueryBuilder()
+                                     .update('user')
+                                     .set({ last_login: () => 'now()' })
+                                     .where('user_id = :user_id', { user_id });
+
       // 이미 todo 생성했을 경우
       if (user) {
         // 1. 마지막 로그인 날짜로 최신화
-        await qr.manager.createQueryBuilder()
-                        .update('user')
-                        .set({ last_login: () => 'now()' })
-                        .where('user_id = :user_id', { user_id })
-                        .execute();
+        await newLastLogin.execute();
         throw this.dwExcept.AlreadyMadeTodos;
       }
 
@@ -150,11 +149,7 @@ export class TodoService {
       }
 
       // 1. 오늘 로그인 날짜로 최신화
-      await qr.manager.createQueryBuilder()
-                      .update('user')
-                      .set({ last_login: () => 'now()' })
-                      .where('user_id = :user_id', { user_id })
-                      .execute();
+      await newLastLogin.execute();
       // 4. todo 생성기 - 유저가 가입한 그룹 리스트
       const subQuery = await qr.manager.createQueryBuilder()
                                        .select(['g.grp_id AS grp_id'])
@@ -211,10 +206,6 @@ export class TodoService {
       await qr.rollbackTransaction();
       throw new Error(err);
     } finally {
-      Logger.debug("################################################");
-      Logger.debug("################################################");
-      Logger.debug("################################################");
-      Logger.debug("################################################");
       await qr.release();
     }
   }
@@ -251,20 +242,6 @@ export class TodoService {
         todo[key] = createTodoDto[key];
       }
     });
-
-    // // todo_id, todo_deleted: default
-    // todo.user_id = createTodoDto.user_id;
-
-    // todo.todo_name = createTodoDto.todo_name;
-    // todo.todo_desc = createTodoDto.todo_desc;
-    // todo.todo_label = createTodoDto.todo_label;
-    // todo.todo_date = createTodoDto.todo_date;
-    // todo.todo_done = createTodoDto.todo_done;
-
-    // todo.todo_start = createTodoDto.todo_start;
-    // todo.todo_end = createTodoDto.todo_end;
-    // todo.grp_id = createTodoDto.grp_id;
-    // todo.todo_img = createTodoDto.todo_img;
 
     return await this.todoRepository.save(todo);
   }

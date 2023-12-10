@@ -4,7 +4,6 @@ import {
     Patch,
     Put,
     Controller,
-    Logger,
     Body,
     Param,
     ParseIntPipe,

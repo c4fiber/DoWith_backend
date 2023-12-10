@@ -1,15 +1,9 @@
-import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Room } from '../../entities/room.entity';
 import { DataSource } from 'typeorm';
 import { ItemInventory } from 'src/entities/item-inventory.entity';
-import { isIn } from 'class-validator';
 import { DoWithExceptions } from 'src/utils/do-with-exception';
 
 @Injectable()
@@ -68,22 +62,6 @@ export class RoomService {
     return { result };
   }
 
-  // // for controller
-  // async create(user_id: number, item_id: number): Promise<any> {
-  //   // 보유한 아이템이 아니다
-  //   if (!(await this.isInInventory(user_id, item_id))) {
-  //     throw this.doWithException.ItemNotInInventory;
-  //   }
-  //   // 이미 방에 있는 아이템이다.
-  //   if (await this.isInMyRoom(user_id, item_id)) {
-  //     throw this.doWithException.ItemAlreadyInMyRoom;
-  //   }
-
-  //   // TODO 펫이 여러마리 들어가면 안된다.
-
-  //   return { result: await this.roomRepo.save({ user_id, item_id }) };
-  // }
-
   async findAll(user_id: number) {
     const result = await this.roomRepo
       .createQueryBuilder('r')
@@ -103,14 +81,4 @@ export class RoomService {
       .getRawMany();
     return { result };
   }
-
-  // async remove(user_id: number, item_id: number) {
-  //   // 방에 아이템이 존재하지 않으면 에러
-  //   if (!(await this.isInMyRoom(user_id, item_id))) {
-  //     throw new NotFoundException();
-  //   }
-
-  //   const result = await this.roomRepo.delete({ user_id, item_id });
-  //   return { result };
-  // }
 }
