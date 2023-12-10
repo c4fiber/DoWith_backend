@@ -24,12 +24,40 @@ export class TodoService {
   // READ
   async findAllByUser(user_id: number){
     const todos = await this.todoRepo.createQueryBuilder('t')
+                                     .select([
+                                       't.todo_id    AS todo_id'
+                                     , 't.user_id    AS user_id'
+                                     , 't.todo_name  AS todo_name'
+                                     , 't.todo_desc  AS todo_desc'
+                                     , 't.todo_label AS todo_label'
+                                     , 't.todo_date  AS todo_date'
+                                     , 't.todo_done  AS todo_done'
+                                     , 't.todo_start AS todo_start'
+                                     , 't.todo_end   AS todo_end'
+                                     , 't.grp_id     AS grp_id'
+                                     , 't.todo_img   AS todo_img'
+                                     , 'todo_deleted AS todo_deleted'
+                                     ]) 
                                      .where({ user_id })
                                      .andWhere('t.grp_id IS NULL')
                                      .andWhere(`(to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR t.todo_done = false)`)
                                      .getRawMany();
 
     const routs = await this.todoRepo.createQueryBuilder('t')
+                                     .select([
+                                       't.todo_id    AS todo_id'
+                                     , 't.user_id    AS user_id'
+                                     , 't.todo_name  AS todo_name'
+                                     , 't.todo_desc  AS todo_desc'
+                                     , 't.todo_label AS todo_label'
+                                     , 't.todo_date  AS todo_date'
+                                     , 't.todo_done  AS todo_done'
+                                     , 't.todo_start AS todo_start'
+                                     , 't.todo_end   AS todo_end'
+                                     , 't.grp_id     AS grp_id'
+                                     , 't.todo_img   AS todo_img'
+                                     , 'todo_deleted AS todo_deleted'
+                                     ]) 
                                      .where({ user_id })
                                      .andWhere('t.grp_id IS NOT NULL')
                                      .andWhere('t.todo_done = false')
