@@ -147,9 +147,10 @@ export class GroupService {
                                            'g.grp_id    AS grp_id'
                                          , 'g.grp_name  AS grp_name'
                                          , 'g.grp_desc  AS grp_desc'
-                                         , `to_char(g.reg_at, 'yyyy-MM-dd HH:MI:SS') AS reg_at`
                                          , 'u.user_name AS user_name'
                                          , 'c.cat_name  AS cat_name'
+                                         , 'c.cat_img   As cat_img'
+                                         , `to_char(g.reg_at, 'yyyy-MM-dd HH:MI:SS') AS reg_at`
                                          ])
                                          .leftJoin('user_group', 'ug', 'g.grp_owner = ug.grp_id')
                                          .leftJoin('user'      , 'u' , 'ug.user_id = u.user_id')
@@ -221,6 +222,7 @@ export class GroupService {
                                        , 'u.user_name AS owner'
                                        , 'g.cat_id    AS cat_id'
                                        , 'c.cat_name  AS cat_name'
+                                       , 'c.cat_img   AS cat_img'
                                        , 'sub.mem_cnt AS mem_cnt'
                                        ])
                                        .leftJoin('user'        , 'u'  , 'g.grp_owner = u.user_id')
@@ -421,7 +423,7 @@ export class GroupService {
                                     .leftJoin('category'  , 'c' , 'g.cat_id = c.cat_id')
                                     .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                     .leftJoin('user'      , 'u1', 'ug.user_id = u1.user_id')
-                                    .leftJoin('user'      , 'u2', 'g.grp_owner = u2.user_id')
+                                    .innerJoin('user'     , 'u2', 'g.grp_owner = u2.user_id')
                                     .where('1 = 1')
                                     .groupBy('g.grp_id');
 
@@ -448,6 +450,7 @@ export class GroupService {
                               , 'g.grp_desc        AS grp_desc' 
                               , 'max(c.cat_id)     AS cat_id'
                               , 'max(c.cat_name)   AS cat_name'
+                              , 'max(c.cat_img)    AS cat_img'
                               , 'max(u2.user_name) AS owner'
                               , 'count(u1.user_id) AS mem_cnt'
                               ])
@@ -459,10 +462,8 @@ export class GroupService {
   }
 
   /**
-   * 그룹 인증 사진 업로드
-   * @description 1. 사진 압축
-   *              2. 원래 저장했었던 사진 삭제
-   *              3. 사진 저장
+   * 그룹 인증 사진 업로드 (할 일 페이지)
+   * @description 
    * @param todo_id 
    * @param user_id 
    * @param file 
@@ -490,6 +491,14 @@ export class GroupService {
     }
   }
 
+  /**
+   * 그룹 인증 사진 업로드 (그룹 세부정보 페이지)
+   * @description 
+   * @param rout_id 
+   * @param user_id 
+   * @param file 
+   * @returns 
+   */
   async updateImageFromGroup(rout_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
     if(!file){
       throw this.dwExcept.ThereIsNoFile;
@@ -517,6 +526,16 @@ export class GroupService {
     }
   }
 
+  /**
+   * 그룹 인증 사진 압축 및 업로드 함수
+   * @description 1. 사진 압축
+   *              2. 기존 파일 삭제
+   *              3. DB에 사진 데이터 삽입
+   * @param rout_id 
+   * @param user_id 
+   * @param file 
+   * @returns 
+   */
   async compressFile(todo_id: number, user_id:number, file: Express.Multer.File){
     if(!file){
       throw this.dwExcept.ThereIsNoFile;
