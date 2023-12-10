@@ -60,14 +60,16 @@ export class TodoService {
       await qr.connect();
       await qr.startTransaction();
 
+      // 1. 마지막 로그인 일자 갱신 쿼리 (실행 x)
+      const newLastLogin = qr.manager.createQueryBuilder()
+                                     .update('user')
+                                     .set({ last_login: () => 'now()' })
+                                     .where('user_id = :user_id', { user_id });
+
       // 이미 todo 생성했을 경우
       if (user) {
-        // 1. 마지막 로그인 날짜로 최신화 (밑에 코드랑 중복되는데 dead lock 문제로 중복 허용하도록 임시 조치함)
-        await qr.manager.createQueryBuilder()
-                        .update('user')
-                        .set({ last_login: () => 'now()' })
-                        .where('user_id = :user_id', { user_id })
-                        .execute();
+        // 1. 마지막 로그인 날짜로 최신화
+        await newLastLogin.execute();
         throw this.dwExcept.AlreadyMadeTodos;
       }
 
@@ -145,11 +147,7 @@ export class TodoService {
       }
 
       // 1. 오늘 로그인 날짜로 최신화
-      await qr.manager.createQueryBuilder()
-                      .update('user')
-                      .set({ last_login: () => 'now()' })
-                      .where('user_id = :user_id', { user_id })
-                      .execute();
+      await newLastLogin.execute();
       // 4. todo 생성기 - 유저가 가입한 그룹 리스트
       const subQuery = await qr.manager.createQueryBuilder()
                                        .select(['g.grp_id AS grp_id'])
