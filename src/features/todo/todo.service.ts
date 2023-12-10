@@ -25,7 +25,9 @@ export class TodoService {
   async findAllByUser(user_id: number): Promise<Todo[]> {
     return await this.todoRepository.createQueryBuilder('t')
                                     .where('t.user_id = :user_id', { user_id })
-                                    .andWhere(`(to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR t.todo_done = false)`)
+                                    //.andWhere(`(to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR t.todo_done = false)`)
+                                    .andWhere(`(to_char(todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR (todo_done = false AND grp_id IS NULL))
+                                               OR (to_char(todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') AND (todo_done = false AND grp_id IS NOT NULL))`)
                                     .andWhere('t.todo_deleted = false')
                                     .orderBy('t.todo_done, t.todo_date', 'ASC')
                                     .getMany();
