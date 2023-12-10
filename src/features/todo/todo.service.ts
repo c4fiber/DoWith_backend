@@ -16,21 +16,57 @@ import { AchiLogin } from 'src/enums/AchiLogin.enum';
 export class TodoService {
   constructor(
     @InjectRepository(Todo)
-    private readonly todoRepository: Repository<Todo>,
+    private readonly todoRepo: Repository<Todo>,
     private readonly dwExcept: DoWithExceptions,
     private readonly dataSource: DataSource,
   ) {}
 
   // READ
-  async findAllByUser(user_id: number): Promise<Todo[]> {
-    return await this.todoRepository.createQueryBuilder('t')
-                                    .where('t.user_id = :user_id', { user_id })
-                                    //.andWhere(`(to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR t.todo_done = false)`)
-                                    .andWhere(`(to_char(todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR (todo_done = false AND grp_id IS NULL))
-                                               OR (to_char(todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') AND (todo_done = false AND grp_id IS NOT NULL))`)
-                                    .andWhere('t.todo_deleted = false')
-                                    .orderBy('t.todo_done, t.todo_date', 'ASC')
-                                    .getMany();
+  async findAllByUser(user_id: number){
+    const todos = await this.todoRepo.createQueryBuilder('t')
+                                     .select([
+                                       't.todo_id    AS todo_id'
+                                     , 't.user_id    AS user_id'
+                                     , 't.todo_name  AS todo_name'
+                                     , 't.todo_desc  AS todo_desc'
+                                     , 't.todo_label AS todo_label'
+                                     , 't.todo_date  AS todo_date'
+                                     , 't.todo_done  AS todo_done'
+                                     , 't.todo_start AS todo_start'
+                                     , 't.todo_end   AS todo_end'
+                                     , 't.grp_id     AS grp_id'
+                                     , 't.todo_img   AS todo_img'
+                                     , 'todo_deleted AS todo_deleted'
+                                     ]) 
+                                     .where({ user_id })
+                                     .andWhere('t.grp_id IS NULL')
+                                     .andWhere(`(to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd') OR t.todo_done = false)`)
+                                     .getRawMany();
+
+    const routs = await this.todoRepo.createQueryBuilder('t')
+                                     .select([
+                                       't.todo_id    AS todo_id'
+                                     , 't.user_id    AS user_id'
+                                     , 't.todo_name  AS todo_name'
+                                     , 't.todo_desc  AS todo_desc'
+                                     , 't.todo_label AS todo_label'
+                                     , 't.todo_date  AS todo_date'
+                                     , 't.todo_done  AS todo_done'
+                                     , 't.todo_start AS todo_start'
+                                     , 't.todo_end   AS todo_end'
+                                     , 't.grp_id     AS grp_id'
+                                     , 't.todo_img   AS todo_img'
+                                     , 'todo_deleted AS todo_deleted'
+                                     ]) 
+                                     .where({ user_id })
+                                     .andWhere('t.grp_id IS NOT NULL')
+                                     .andWhere('t.todo_done = false')
+                                     .andWhere(`to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`)
+                                     .getRawMany();
+    Logger.debug(todos);
+    Logger.debug(routs);
+
+    return { result: { todos, routs } };
   }
 
   /**
@@ -211,7 +247,7 @@ export class TodoService {
   }
 
   async findOne(todo_id: number): Promise<Todo> {
-    return await this.todoRepository.findOneBy({
+    return await this.todoRepo.findOneBy({
       todo_id,
       todo_deleted: false,
     });
@@ -219,7 +255,7 @@ export class TodoService {
 
   async getTodayCount(user_id: number) {
     const now = new Date();
-    const query = this.todoRepository
+    const query = this.todoRepo
       .createQueryBuilder('todo')
       .where('user_id = :user_id', { user_id })
       .andWhere('DATE(todo.todo_date) = DATE(:today)', { today: now });
@@ -243,12 +279,12 @@ export class TodoService {
       }
     });
 
-    return await this.todoRepository.save(todo);
+    return await this.todoRepo.save(todo);
   }
 
   // UPDATE
   async update(todo_id: number, dto: UpdateTodoDto): Promise<Todo> {
-    const todo = await this.todoRepository.findOneBy({ todo_id });
+    const todo = await this.todoRepo.findOneBy({ todo_id });
 
     Object.keys(dto).forEach((key) => {
       if (dto[key] !== null && dto[key] !== undefined) {
@@ -256,14 +292,14 @@ export class TodoService {
       }
     });
 
-    return await this.todoRepository.save(todo);
+    return await this.todoRepo.save(todo);
   }
 
   // DELETE
   async delete(todo_id: number): Promise<void> {
-    const todo = await this.todoRepository.findOneBy({ todo_id });
+    const todo = await this.todoRepo.findOneBy({ todo_id });
     todo.todo_deleted = true;
-    await this.todoRepository.save(todo);
+    await this.todoRepo.save(todo);
   }
 
   // 투두 완료상태 변경
@@ -311,7 +347,7 @@ export class TodoService {
       }
 
       // 기존 오늘 완료된 투두 개수
-      const todayDoneCnt = await this.todoRepository
+      const todayDoneCnt = await this.todoRepo
         .createQueryBuilder('todo')
         .where('user_id = :user_id', { user_id })
         .andWhere('DATE(todo.todo_date) = DATE(:today)', { today })
