@@ -54,11 +54,6 @@ export class TodoService {
                                    `to_char(u.last_login, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`,
                                  )
                                  .getRawOne();
-    // 1. 마지막 로그인 일자 갱신 쿼리 (실행 x)
-    // const newLastLogin = qr.manager.createQueryBuilder()
-    //                                .update('user')
-    //                                .set({ last_login: () => 'now()' })
-    //                                .where('user_id = :user_id', { user_id });
 
     // 오늘 첫 로그인인 경우 동작하는 로직
     try {
@@ -67,7 +62,7 @@ export class TodoService {
 
       // 이미 todo 생성했을 경우
       if (user) {
-        // 1. 마지막 로그인 날짜로 최신화
+        // 1. 마지막 로그인 날짜로 최신화 (밑에 코드랑 중복되는데 dead lock 문제로 중복 허용하도록 임시 조치함)
         await qr.manager.createQueryBuilder()
                         .update('user')
                         .set({ last_login: () => 'now()' })
@@ -211,10 +206,6 @@ export class TodoService {
       await qr.rollbackTransaction();
       throw new Error(err);
     } finally {
-      Logger.debug("################################################");
-      Logger.debug("################################################");
-      Logger.debug("################################################");
-      Logger.debug("################################################");
       await qr.release();
     }
   }
@@ -251,20 +242,6 @@ export class TodoService {
         todo[key] = createTodoDto[key];
       }
     });
-
-    // // todo_id, todo_deleted: default
-    // todo.user_id = createTodoDto.user_id;
-
-    // todo.todo_name = createTodoDto.todo_name;
-    // todo.todo_desc = createTodoDto.todo_desc;
-    // todo.todo_label = createTodoDto.todo_label;
-    // todo.todo_date = createTodoDto.todo_date;
-    // todo.todo_done = createTodoDto.todo_done;
-
-    // todo.todo_start = createTodoDto.todo_start;
-    // todo.todo_end = createTodoDto.todo_end;
-    // todo.grp_id = createTodoDto.grp_id;
-    // todo.todo_img = createTodoDto.todo_img;
 
     return await this.todoRepository.save(todo);
   }

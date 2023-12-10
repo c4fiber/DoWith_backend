@@ -12,10 +12,6 @@ export class NotificationService {
     constructor(
         @InjectRepository(Notification)
         private notificationRepository: Repository<Notification>,
-        // @InjectRepository(User)
-        // private userRepository: Repository<User>,
-        // @InjectRepository(Todo)
-        // private todoRepository: Repository<Todo>, 
     ) {}
 
     // READ

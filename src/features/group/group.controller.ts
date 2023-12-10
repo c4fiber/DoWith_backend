@@ -1,11 +1,10 @@
-import { Body, Controller, Delete, Get, Logger, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { Group } from '../../entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/MulterConfigService';
 import { PagingOptions } from 'src/utils/PagingOptions';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('group')
 export class GroupController {

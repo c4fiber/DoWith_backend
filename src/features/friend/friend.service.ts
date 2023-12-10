@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DoWithExceptions } from 'src/utils/do-with-exception';
 import { User } from 'src/entities/user.entities';

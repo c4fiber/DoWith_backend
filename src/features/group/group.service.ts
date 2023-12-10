@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from '../../entities/group.entity';
-import { DataSource, QueryRunner, Raw, Repository } from 'typeorm';
+import { DataSource, Raw, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UserGroup } from 'src/entities/user_group.entity';
 import { Todo } from 'src/entities/todo.entity';
@@ -478,30 +478,6 @@ export class GroupService {
     await qr.startTransaction();
                                         
     try {
-      // const filePath = file.path;
-      // const ext = path.extname(file.originalname);
-      // const name = path.basename(file.originalname, ext);
-      // const fileName = `${name}_${Date.now()}${ext}`;
-      // const newPath = `${process.env.IMAGE_PATH}${fileName}`;
-
-      // // 1. 사진 압축(sharp 라이브러리 사용)
-      // await sharp(filePath).resize({ width: 1300, height: 1000, fit: 'contain' })
-      //                      .toFile(newPath, async(err, info) => {
-      //                         // 1. 원본 파일 삭제
-      //                         await fs.unlink(filePath);
-      //                      });
-      
-      // const oldFile = await this.todoRepo.createQueryBuilder('t')
-      //                                    .select(['t.todo_img AS todo_img'])
-      //                                    .where({ todo_id })
-      //                                    .andWhere({ user_id })
-      //                                    .getRawOne();
-
-      // // 2. 인증을 위해서 기존에 저장한 사진은 삭제
-      // if(oldFile && oldFile.todo_img){
-      //   await fs.unlink(`${process.env.IMAGE_PATH}${oldFile.todo_img}`);
-      // }
-
       const result = await this.compressFile(todo_id, user_id, file);
 
       await qr.commitTransaction();
@@ -600,7 +576,6 @@ export class GroupService {
     await qr.startTransaction();
 
     try{
-      Logger.debug(todo_id);
       // 1. To-Do done 체크
       const uptRes = await qr.manager.createQueryBuilder()
                                      .update(Todo)
@@ -613,16 +588,12 @@ export class GroupService {
         throw this.dwExcept.NoData;
       }
 
-      Logger.debug("========== [ Test-1) Update Todo-Done ] ==========");
-
       // 1. 체크한 To-Do가 오늘이 아닌 이미 지난 날짜인 경우 종료
       const isToday = await this.todoRepo.createQueryBuilder('t')
                                          .where(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
                                          .andWhere({ todo_id })
                                          .getRawOne();
-      Logger.debug("========== [ Test-2) Is today's todo ] ==========");
       if(!isToday){
-        Logger.debug("Not Today");
         await qr.commitTransaction();
         return;
       }
@@ -632,8 +603,6 @@ export class GroupService {
                                              .select(['user_id AS user_id'])
                                              .where({ todo_id })
                                              .getRawOne();
-      Logger.debug(user_id);
-      Logger.debug(todo_id);
 
       // 2. 리워드 제공 - 추가되야할 캐시 계산
       const reward = await this.todoRepo.createQueryBuilder()
@@ -645,7 +614,7 @@ export class GroupService {
                                         .andWhere(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
                                         .andWhere('todo_done = true')
                                         .getRawOne();
-      Logger.debug(reward);
+
       // 2. 리워드 제공 - 캐시(오늘 처음: 100, 그 외: 25)
       await qr.manager.createQueryBuilder()
                       .update('user')
@@ -654,7 +623,7 @@ export class GroupService {
                       })
                       .where('user_id = :user_id', { user_id })
                       .execute();
-      Logger.debug("========== [ Test-3) User'scash ] ==========");
+
       // 현재 유저가 키우는 펫 아이디 가져오기
       const { item_id } = await qr.manager.createQueryBuilder()
                                           .select(['r.item_id AS item_id'])
@@ -663,8 +632,6 @@ export class GroupService {
                                           .where('r.user_id = :user_id', { user_id })
                                           .andWhere('ish.type_id = 1')
                                           .getRawOne();
-      Logger.debug("========== [ Test-4) my room pet ] ==========");
-      Logger.debug(item_id);
 
       // 2. 리워드 - 경험치
       await qr.manager.createQueryBuilder()
@@ -672,8 +639,6 @@ export class GroupService {
                       .set({ pet_exp: () => `pet_exp + ${Reward.PET_EXP_REWARD}` })
                       .where({ user_id, item_id })
                       .execute(); 
-     
-      Logger.debug("========== [ Test-5) pet's exp increase ] ==========");
 
       // 진화표
       const evol_map = await qr.manager.createQueryBuilder()
@@ -699,11 +664,7 @@ export class GroupService {
                                       .andWhere('iv.pet_exp >= ish.evol_exp')
                                       .getRawOne();
 
-      Logger.debug("========== [ Test-6) Can pet evolate into next step ] ==========");
-      Logger.debug(next_id);
-
       if(!next_id){
-        Logger.debug("No next step");
         await qr.commitTransaction();
         return;
       }
