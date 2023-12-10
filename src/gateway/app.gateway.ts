@@ -9,6 +9,9 @@ import { GroupService } from 'src/features/group/group.service';
 import { CreateNotificationDto } from 'src/features/notification/dto/createNotification.dto';
 import { Comment } from 'src/entities/comment.entity';
 import { Notification } from 'src/entities/notification.entity';
+import { DataSource } from 'typeorm';
+import { Todo } from 'src/entities/todo.entity';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway()
 export class AppGateway {
@@ -20,6 +23,7 @@ export class AppGateway {
     private todoService: TodoService,
     private groupService: GroupService,
     private notificationService: NotificationService,
+    private readonly dataSource: DataSource,
     ) {}
 
 	async handleConnection(client: Socket) {
@@ -138,6 +142,55 @@ export class AppGateway {
       }
     }
   }
+
+  @SubscribeMessage('routineConfirmRequest')
+  async handleRoutineConfirmRequest(@MessageBody() data: { userId: number; routId: number}, @ConnectedSocket() client: Socket) {
+    const sender = await this.userService.getUser( data.userId );
+    if (!sender) {
+      return;
+    }
+
+    const today = new Date();
+    const todo = await this.dataSource.getRepository(Todo).findOne({
+                                        where: {
+                                            rout_id: data.routId, 
+                                            todo_date: today,
+                                            user_id: data.userId,
+                                        }});
+    if (!todo) {
+      return;
+    }
+
+    const groupMembers = await this.groupService.findUsersByGroupId( todo.grp_id );
+
+    for (const member of groupMembers) {
+      if (member.user_id !== sender.user_id ) {
+        const notificationData = new CreateNotificationDto();
+        notificationData.sender_id = `${sender.user_id}`;
+        notificationData.receiver_id = `${member.user_id}`;
+        notificationData.noti_type = '2';
+        notificationData.req_type = `${todo.todo_img}`;
+        notificationData.sub_id = `${todo.todo_id}`;
+        
+        await this.notificationService.createNotification(notificationData);
+
+        // 해당 to-do를 공유하는 사용자들에게 알림 전송
+        try {
+            this.server.to(member.socket_id).emit('confirmRequest', {
+                message: `${sender.user_name}님이 ${todo.todo_name}에 대한 인증을 요청했습니다.`,
+                senderId: sender.user_id,
+                senderName: sender.user_name,
+                todoId: todo.todo_id,
+                todoName: todo.todo_name,
+                todoImg: todo.todo_img,
+            });
+        } catch (error) {
+            console.error('Error sending notification to user ${member.user_id}:', error);
+        }
+      }
+    }
+  }
+
 
   @SubscribeMessage('confirmResponse')
   async handleConfirmResponse(@MessageBody() data: { userId: number, todoId: number }, @ConnectedSocket() client: Socket) {
