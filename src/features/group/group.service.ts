@@ -107,7 +107,7 @@ export class GroupService {
         rout.rout_srt = data.rout_srt;
         rout.rout_end = data.rout_end;
 
-        await qr.manager.save(Routine, rout);
+        const test = await qr.manager.save(Routine, rout);
 
         // 4. 할일 생성
         const todo = new Todo();
@@ -118,6 +118,7 @@ export class GroupService {
         todo.todo_desc = data.rout_desc;
         todo.todo_start = data.rout_srt;
         todo.todo_end = data.rout_end;
+        todo.rout_id = rout.rout_id;
 
         await qr.manager.save(Todo, todo);
       }
@@ -255,7 +256,8 @@ export class GroupService {
       const routs = await this.grpRepo.createQueryBuilder('g')
                                       .leftJoin('routine', 'r', 'g.grp_id = r.grp_id')
                                       .select([
-                                        'r.rout_name AS todo_name'
+                                        'r.rout_id   AS rout_id'
+                                      , 'r.rout_name AS todo_name'
                                       , 'r.rout_desc AS todo_desc'
                                       , 'g.cat_id    AS todo_label'
                                       , 'r.rout_srt  AS todo_start'
@@ -267,6 +269,7 @@ export class GroupService {
       for(const rout of routs){
         const todo = new Todo();
 
+        todo.rout_id = rout.rout_id;
         todo.user_id = user_id;
         todo.grp_id = grp_id;
         todo.todo_name = rout.todo_name;
@@ -465,7 +468,7 @@ export class GroupService {
    * @param file 
    * @returns 
    */
-  async updateImage(todo_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
+  async updateImageFromTodo(todo_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
     if(!file){
       throw this.dwExcept.ThereIsNoFile;
     }
@@ -474,6 +477,75 @@ export class GroupService {
     await qr.connect();
     await qr.startTransaction();
                                         
+    try {
+      // const filePath = file.path;
+      // const ext = path.extname(file.originalname);
+      // const name = path.basename(file.originalname, ext);
+      // const fileName = `${name}_${Date.now()}${ext}`;
+      // const newPath = `${process.env.IMAGE_PATH}${fileName}`;
+
+      // // 1. 사진 압축(sharp 라이브러리 사용)
+      // await sharp(filePath).resize({ width: 1300, height: 1000, fit: 'contain' })
+      //                      .toFile(newPath, async(err, info) => {
+      //                         // 1. 원본 파일 삭제
+      //                         await fs.unlink(filePath);
+      //                      });
+      
+      // const oldFile = await this.todoRepo.createQueryBuilder('t')
+      //                                    .select(['t.todo_img AS todo_img'])
+      //                                    .where({ todo_id })
+      //                                    .andWhere({ user_id })
+      //                                    .getRawOne();
+
+      // // 2. 인증을 위해서 기존에 저장한 사진은 삭제
+      // if(oldFile && oldFile.todo_img){
+      //   await fs.unlink(`${process.env.IMAGE_PATH}${oldFile.todo_img}`);
+      // }
+
+      const result = await this.compressFile(todo_id, user_id, file);
+
+      await qr.commitTransaction();
+      return { result };
+    } catch(err) {
+      await qr.rollbackTransaction();
+      throw new Error(err);
+    } finally {
+      await qr.release();
+    }
+  }
+
+  async updateImageFromGroup(rout_id: number, user_id: number, file: Express.Multer.File): Promise<any>{
+    if(!file){
+      throw this.dwExcept.ThereIsNoFile;
+    }
+
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+                                        
+    try {
+      const todo_id = await this.todoRepo.createQueryBuilder('t')
+                                         .select(['todo_id AS todo_id'])
+                                         .where(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
+                                         .andWhere({ user_id, rout_id })
+                                         .getRawOne();
+      const result = await this.compressFile(todo_id.todo_id, user_id, file);
+
+      await qr.commitTransaction();
+      return { result };
+    } catch(err) {
+      await qr.rollbackTransaction();
+      throw new Error(err);
+    } finally {
+      await qr.release();
+    }
+  }
+
+  async compressFile(todo_id: number, user_id:number, file: Express.Multer.File){
+    if(!file){
+      throw this.dwExcept.ThereIsNoFile;
+    }
+
     try {
       const filePath = file.path;
       const ext = path.extname(file.originalname);
@@ -484,10 +556,10 @@ export class GroupService {
       // 1. 사진 압축(sharp 라이브러리 사용)
       await sharp(filePath).resize({ width: 1300, height: 1000, fit: 'contain' })
                            .toFile(newPath, async(err, info) => {
-                              // 1. 원본 파일 삭제
-                              await fs.unlink(filePath);
+                             // 1. 원본 파일 삭제
+                             await fs.unlink(filePath);
                            });
-      
+
       const oldFile = await this.todoRepo.createQueryBuilder('t')
                                          .select(['t.todo_img AS todo_img'])
                                          .where({ todo_id })
@@ -506,13 +578,9 @@ export class GroupService {
                                         .andWhere({ user_id })
                                         .execute();
 
-      await qr.commitTransaction();
-      return { result };
+      return result;
     } catch(err) {
-      await qr.rollbackTransaction();
       throw new Error(err);
-    } finally {
-      await qr.release();
     }
   }
 
@@ -688,260 +756,4 @@ export class GroupService {
 
     return group ? group.users : [];
   }
-
-  /**
-   * 업로드한 인증 사진을 통해서 다른 그룹원의 루틴 인증 함수
-   * @param todo_id 
-   * @returns 
-   */
-  // async updateTodoDoneTemp(todo_id: number): Promise<any>{
-
-  //   const today: Date = new Date();
-
-  //   const queryRunner = this.dataSource.createQueryRunner();
-  //   await queryRunner.connect();
-  //   await queryRunner.startTransaction();
-  //   try {
-  //   // 1. 투두 업데이트
-  //   const updatedTodo = await queryRunner.manager.createQueryBuilder()
-  //                                                .update(Todo)
-  //                                                .set({
-  //                                                 todo_done: true,
-  //                                                })
-  //                                                .where({ todo_id })
-  //                                                .execute();
-
-  //   if (updatedTodo.affected === 0) {
-  //     // 투두가 없음
-  //     throw this.dwExcept.NoData;
-  //   }
-
-  //   // 2. 투두 관련 리워드 계산 & 유저 업데이트
-  //   // 투두 시간 가져오기
-  //   const todo = await this.getTodoDateAndUserId(queryRunner, todo_id);
-  //   Logger.debug(todo);
-  //   // LIB: 위에서 todo_id로 update하고 DML 조작 없는 경우 에러 발생시켜서 여기서 또 확인할 필요 없다고 생각함
-  //   if (todo === null) {
-  //     // 투두가 없음
-  //     throw this.dwExcept.NoData;
-  //   }
-
-  //   const {todo_date, user_id, todo_done} = todo;
-  //   // LIB: 위에서 true로 update하는데 여기서 무조건 true 아니야?
-  //   // 쿼리에서 해당 컬럼 안뽑아서 undefined라서 그냥 넘어가는 거였음
-  //   Logger.debug(todo_done);
-  //   Logger.debug(user_id);
-  //   Logger.debug(todo_date);
-  //   if(todo_done === true) {
-  //       const result = false;
-  //       // 이미 체크되어 있는 할일인 경우
-  //       await queryRunner.commitTransaction();
-  //       return { result };
-  //   }
-
-  //   // 지난 날짜 투두는 제외
-  //   // LIB: 이거는 getTodoDateAndUserId 해당 함수에서 날짜 조건 포함 시키면 될듯?
-  //   if (this.isPastTodo(todo_date)) {
-  //     await queryRunner.commitTransaction();
-  //     return { result: true };
-  //   }
-
-  //   // 기존 오늘 완료된 투두 개수
-  //   const todayDoneCnt = await this.todoRepo.createQueryBuilder('todo')
-  //                                           .where('user_id = :user_id', { user_id })
-  //                                           .andWhere('DATE(todo.todo_date) = DATE(:today)', { today })
-  //                                           .andWhere('todo_done = true')
-  //                                           .getCount();
-  //   Logger.debug(todayDoneCnt);
-  //   const cash = this.calculateCash(true,
-  //      todayDoneCnt);
-  //   Logger.debug(cash);
-  //   const userUpdated = await queryRunner.manager.createQueryBuilder()
-  //                                                 .update(User)
-  //                                                 .set({
-  //                                                   user_cash: () => 'user_cash + :cash',
-  //                                                 })
-  //                                                 .where('user_id = :id', { id: user_id, cash: cash })
-  //                                                 .execute();
-
-  //   if (userUpdated.affected === 0) {
-  //     throw this.dwExcept.NoData;
-  //   }
-
-  //   // 2. 그룹인 경우 메인으로 설정된 유저 펫 경험치 업데이트
-  //   const main_pet = await this.getUserMainPet(queryRunner, user_id);
-  //   if (main_pet == null) {
-  //     // 펫이 존재하지 않음
-  //     throw this.dwExcept.NoData;
-  //   }
-
-  //   const { item_id, item_name, pet_name, pet_exp } = main_pet;
-  //   const petExp = this.calculatePetExp(true);
-  //   let pet_item_id = item_id;
-
-  //   const updateExp = await queryRunner.manager.createQueryBuilder()
-  //                                              .update(ItemInventory)
-  //                                              .set({
-  //                                               pet_exp: () => 'pet_exp + :exp',
-  //                                              })
-  //                                              .where('user_id = :user_id', {
-  //                                               user_id: user_id, exp: petExp
-  //                                              })
-  //                                              .andWhere({ item_id })
-  //                                              .execute();
-
-  //   if (updateExp.affected === 0) {
-  //     throw this.dwExcept.NoData;
-  //   }
-
-  //   // 3. 펫 진화가 필요한 경우 진화
-  //   const parsed = item_name.split('_');
-  //   const pet_type = parsed[0];
-  //   const pet_level = parsed[1];
-
-  //   if ((pet_level === PetLevel.lv1 && pet_exp >= PetLevelExp.lv1) ||
-  //       (pet_level === PetLevel.lv2 && pet_exp >= PetLevelExp.lv2)) {
-
-  //       // 펫 진화
-  //       const next_pet_name = `${pet_type}_0${parseInt(pet_level) + 1}`;
-  //       const next_pet: ItemShop = await this.dataSource.createQueryBuilder(ItemShop, 'ish')
-  //                                                       .select()
-  //                                                       .where('item_name = :item_name', {
-  //                                                         item_name: next_pet_name
-  //                                                       })
-  //                                                       .getOne();
-
-  //       if (next_pet == null) {
-  //         throw this.dwExcept.NoData;
-  //       }
-
-  //       pet_item_id = next_pet.item_id; // 진화된 경우
-
-  //       // 인벤토리에 새 펫 배치
-  //       await this.dataSource.createQueryBuilder()
-  //                            .insert()
-  //                            .into(ItemInventory)
-  //                            .values([
-  //                              {
-  //                                user_id: user_id,
-  //                                item_id: next_pet.item_id,
-  //                                pet_name: pet_name,
-  //                                pet_exp: 0, // 경험치는 다시 0으로
-  //                              },
-  //                            ])
-  //                            .execute();
-
-  //       // 메인 룸에 배치 [삭제 후 삽입]
-  //       await this.dataSource.createQueryBuilder(Room, 'r')
-  //                            .delete()
-  //                            .where('user_id = :user_id', { user_id })
-  //                            .andWhere('item_id = :item_id', { item_id })
-  //                            .execute();
-
-  //       await this.dataSource.createQueryBuilder()
-  //                            .insert()
-  //                            .into(Room)
-  //                            .values([
-  //                              {
-  //                                user_id: user_id,
-  //                                item_id: next_pet.item_id,
-  //                              },
-  //                            ])
-  //                            .execute();
-  //     }
-  
-  //     // 투두를 작성한 유저의 업데이트 결과 반환
-  //     const result = true;
-
-  //     await queryRunner.commitTransaction();
-  //     return { result: true };
-      
-  //   } catch (error) {
-  //     await queryRunner.rollbackTransaction();
-  //     throw new Error(error);
-      
-  //   } finally {
-  //     await queryRunner.release();
-  //   }
-  // }
-  
-  // /**
-  //  * 날짜가 과거인지 확인
-  //  * @param todo_date
-  //  * @returns
-  //  */
-  // private isPastTodo(todo_date: Date): boolean {
-  //   const today = new Date();
-  //   today.setHours(0, 0, 0, 0);
-  //   todo_date.setHours(0, 0, 0, 0);
-  //   return todo_date < today;
-  // }
-
-  // /**
-  //  * 투두 날짜 및 유저 아이디를 반환합니다.
-  //  * @param queryRunner
-  //  * @param todo_id
-  //  * @returns
-  //  */
-  // private async getTodoDateAndUserId(queryRunner: QueryRunner, todo_id: number) {
-  //   const result = await queryRunner.manager
-  //     .getRepository(Todo)
-  //     .createQueryBuilder()
-  //     .select(['todo_date', 'user_id'])
-  //     .where({ todo_id })
-  //     .getRawOne();
-
-  //   return result;
-  // }
-
-  // /**
-  //  * 유저의 Room에 있는 펫을 가져옵니다.
-  //  * @param user_id
-  //  * @returns
-  //  */
-  // private async getUserMainPet(queryRunner: QueryRunner, user_id: number) {
-  //   return await this.dataSource
-  //     .getRepository(Room)
-  //     .createQueryBuilder('r')
-  //     .innerJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND iv.user_id = :user_id')
-  //     .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
-  //     .where('r.user_id = :user_id AND ish.type_id = :PET_TYPE', { user_id: user_id, PET_TYPE: 1 })
-  //     .select([
-  //       'ish.item_id as item_id',
-  //       'ish.type_id as item_type',
-  //       'ish.item_name as item_name',
-  //       'ish.item_path as item_path',
-  //       'iv.pet_name as pet_name',
-  //       'iv.pet_exp as pet_exp',
-  //     ])
-  //     .getRawOne();
-  // }
-
-  // /**
-  //  * 유저 캐시 보상 계산
-  //  * @param todo_done
-  //  * @param todo_date
-  //  * @param todayDoneCnt
-  //  * @returns
-  //  */
-  // private calculateCash(todo_done: boolean, todayDoneCnt: number) {
-  //   if (
-  //     (todo_done && todayDoneCnt === 0) ||
-  //     (!todo_done && todayDoneCnt === 1)
-  //   ) {
-  //     // 투두를 완료 체크한 경우 (첫 번째 투두 체크 또는 마지막 투두 체크해제)
-  //     return Reward.FIRST_TODO_REWARD * (todo_done ? 1 : -1);
-  //   }
-  //   // 기본 캐시 계산
-  //   return Reward.GROUP_TODO_REWARD * (todo_done ? 1 : -1);
-  // }
-
-  // /**
-  //  * 펫 경험치 계산
-  //  * @param todo_done
-  //  * @returns
-  //  */
-  // private calculatePetExp(todo_done: boolean) {
-  //   return Reward.PET_EXP_REWARD * (todo_done ? 1 : -1);
-  // }
 }

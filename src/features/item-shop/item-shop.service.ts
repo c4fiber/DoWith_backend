@@ -54,13 +54,16 @@ export class ItemShopService {
                                    , 'sh1.item_path AS item_path'
                                    , 'sh1.metadata  AS metadata'
                                    ])
-                                   .innerJoin('item_shop', 'sh2', 'sh1.next_step = sh2.item_id AND sh2.next_step IS NOT NULL')
                                    .where('sh1.type_id = :type_id', { type_id })
                                    .andWhere('sh1.item_id != 0')  // 0: 기본으로 주어지는 펫은 상점에서 제외
                                    .orderBy('sh1.item_id', 'ASC');
 
     if(ownItems.length > 0){
       query.andWhere('sh1.item_id NOT IN (:...ownItems)', { ownItems });
+    }
+
+    if(type_id == 1){
+      query.innerJoin('item_shop', 'sh2', 'sh1.next_step = sh2.item_id AND sh2.next_step IS NOT NULL');
     }
 
     return { result: await query.getRawMany(), path: process.env.PUBLIC_IMAGE_PATH };

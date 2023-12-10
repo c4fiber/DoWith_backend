@@ -86,13 +86,24 @@ export class GroupController {
   
   @UseInterceptors(FileInterceptor('file'))
   @Patch('/:todo_id/user/:user_id/image')
-  updateImage(
+  updateImageFromTodo(
     @Param('todo_id') todo_id: number,
     @Param('user_id') user_id: number,
     @UploadedFile() file: Express.Multer.File
   ): Promise<any>{
     this.multerConifg.changePath(process.env.IMAGE_PATH);
-    return this.groupService.updateImage(todo_id, user_id, file);
+    return this.groupService.updateImageFromTodo(todo_id, user_id, file);
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('/todo/:rout_id/user/:user_id/image')
+  updateImageFromGroup(
+    @Param('rout_id') rout_id: number,
+    @Param('user_id') user_id: number,
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<any>{
+    this.multerConifg.changePath(process.env.IMAGE_PATH);
+    return this.groupService.updateImageFromGroup(rout_id, user_id, file);
   }
 
   // 그룹원 할 일 인증 승인
