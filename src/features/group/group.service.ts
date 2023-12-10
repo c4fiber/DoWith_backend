@@ -325,15 +325,17 @@ export class GroupService {
 
       // 그룹에 남은 인원
       const leftCnt = await qr.manager.createQueryBuilder()
+                                      .select(['COUNT(*) AS cnt'])
                                       .from('group', 'g')
                                       .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
                                       .where('ug.grp_id = :grp_id', { grp_id })
-                                      .getCount();
+                                      .getRawOne();
+
       // 3. 그룹 인원이 0명이면 그룹 삭제
       const grpDel = await this.grpRepo.createQueryBuilder('g')
                                        .softDelete()
                                        .where('grp_id = :grp_id', { grp_id })
-                                       .andWhere(`0 = :leftCnt`, { leftCnt })
+                                       .andWhere(`0 = :cnt`, { cnt: leftCnt.cnt })
                                        .setParameter('grp_id', grp_id)
                                        .execute();
 
