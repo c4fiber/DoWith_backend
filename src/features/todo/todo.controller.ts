@@ -27,7 +27,7 @@ export class TodoController {
   @Get('/user/:user_id')
   findAllByUser(
     @Param('user_id', ParseIntPipe) user_id: number,
-  ): Promise<Todo[]> {
+  ){
     return this.todoService.findAllByUser(user_id);
   }
 
