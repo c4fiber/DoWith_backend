@@ -182,6 +182,13 @@ export class UserService {
     return { result }
   }
 
+  /**
+   * 유저 점수 통계
+   * @description todo와 업적은 통계 테이블에 작성하는게 나아 보이지만 
+   * 시간관계로 조인으로 해결했음
+   * @param user_id 
+   * @returns 
+   */
   async getUserstatistics(user_id: number){
     const qr = this.dataSource.createQueryRunner();
     const pet_exps = await qr.manager.createQueryBuilder()
@@ -209,12 +216,22 @@ export class UserService {
                                        .innerJoin('achievements', 'a', 'ua.achi_id = a.achi_id')
                                        .where({ user_id })
                                        .getRawOne();
-    Logger.debug(JSON.stringify(pet_exps));
-    Logger.debug(JSON.stringify(todo_score));
-    Logger.debug(JSON.stringify(login_score));
-    Logger.debug(JSON.stringify(achi_score));
-    const sum = +pet_exps.pet_exp + +todo_score.todo_score + +todo_score.rout_score + +login_score.login_score + +achi_score.achi_score;
-    Logger.debug(sum);
-    return ;
+
+    const isNumeric = (value) => !isNaN(value) && value != null;
+    const sum =   (isNumeric(pet_exps.pet_exp)        ? +pet_exps.pet_exp           : 0)
+                + (isNumeric(todo_score.todo_score)   ? +todo_score.todo_score * 10 : 0)
+                + (isNumeric(todo_score.rout_score)   ? +todo_score.rout_score * 20 : 0)
+                + (isNumeric(login_score.login_score) ? +login_score.login_score    : 0)
+                + (isNumeric(achi_score.achi_score)   ? +achi_score.achi_score      : 0);
+    
+    const result = await qr.manager.createQueryBuilder()
+                                   .select([
+                                     't.tier_name AS tier_name'
+                                   , 't.tier_img  AS tier_img'
+                                   ])
+                                   .from('tiers', 't')
+                                   .where(`${ sum } BETWEEN t.tier_min AND t.tier_max`)
+                                   .getRawOne();
+    return { result };
   }
 }
