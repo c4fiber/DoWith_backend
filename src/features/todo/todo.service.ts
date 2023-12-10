@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { Todo } from 'src/entities/todo.entity';
@@ -60,11 +60,8 @@ export class TodoService {
                                      ]) 
                                      .where({ user_id })
                                      .andWhere('t.grp_id IS NOT NULL')
-                                     .andWhere('t.todo_done = false')
                                      .andWhere(`to_char(t.todo_date, 'yyyyMMdd') = to_char(now(), 'yyyyMMdd')`)
                                      .getRawMany();
-    Logger.debug(todos);
-    Logger.debug(routs);
 
     return { result: { todos, routs } };
   }
