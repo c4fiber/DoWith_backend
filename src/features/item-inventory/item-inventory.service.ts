@@ -66,6 +66,7 @@ export class ItemInventoryService {
                                                      , 'ish.item_path as item_path'
                                                      , 'iv.pet_name as pet_name'
                                                      , 'iv.pet_exp as pet_exp'
+                                                     , 'ish.metadata as metadata'
                                                      ])
                                                      .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
                                                      .where('iv.user_id = :user_id', { user_id })
