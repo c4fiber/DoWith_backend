@@ -283,6 +283,8 @@ export class UserService {
                                    .select([
                                      't.tier_name AS tier_name'
                                    , 't.tier_img  AS tier_img'
+                                   , 't.tier_min  AS tier_min'
+                                   , 't.tier_max  AS tier_max'
                                    , `${ sum }    AS tier_score`
                                    ])
                                    .from('tiers', 't')
