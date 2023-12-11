@@ -44,6 +44,7 @@ import { AttendanceModule } from './features/attendance/attendance.module';
       synchronize: true, // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
       logging: true,
       extra: {
+        max: 30,
         timezone: 'Asia/Seoul',
       },
     }),
