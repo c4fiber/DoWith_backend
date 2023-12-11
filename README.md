@@ -22,7 +22,7 @@
 |포지션|<img src="https://img.shields.io/badge/Back End-498EAF?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Full Stack-E4DACE?style=for-the-badge&logo=&logoColor=white"/>|<img src="https://img.shields.io/badge/Front End-E5BB4B?style=for-the-badge&logo=&logoColor=white"/>|
 |gmail|bbock1214|qudcjf153|psjbrian|sojeong.lee017|vanessa.cheong1|
 |블로그|[<img src="https://img.shields.io/badge/tistory-000000?style=for-the-badge&logo=tistory&logoColor=white"/>](https://nashs789.tistory.com/)|[<img src="https://img.shields.io/badge/velog-20C997?style=for-the-badge&logo=velog&logoColor=white"/>](https://velog.io/@c4fiber)||[<img src="https://img.shields.io/badge/tistory-000000?style=for-the-badge&logo=tistory&logoColor=white"/>](https://cece-blog.tistory.com/)|[<img src="https://img.shields.io/badge/githubpages-222222?style=for-the-badge&logo=githubpages&logoColor=white"/>](https://tomoyo519.github.io/)|
-|담당업무|무엇 했는지|||||
+|업무|무엇 했는지|||||
 </br>
 멘토님도 넣을지??????
 </br>
