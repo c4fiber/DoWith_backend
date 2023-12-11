@@ -283,6 +283,7 @@ export class UserService {
                                    .select([
                                      't.tier_name AS tier_name'
                                    , 't.tier_img  AS tier_img'
+                                   , `${ sum }    AS tier_score`
                                    ])
                                    .from('tiers', 't')
                                    .where(`${ sum } BETWEEN t.tier_min AND t.tier_max`)
