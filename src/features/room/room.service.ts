@@ -63,22 +63,22 @@ export class RoomService {
   }
 
   async findAll(user_id: number) {
-    const result = await this.roomRepo
-      .createQueryBuilder('r')
-      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND r.user_id = iv.user_id')
-      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
-      .select([
-        'r.user_id as user_id',
-        'ish.item_id as item_id',
-        'ish.type_id as item_type',
-        'ish.metadata as metadata',
-        'ish.item_name as item_name',
-        'ish.item_path as item_path',
-        'iv.pet_name as pet_name',
-        'iv.pet_exp as pet_exp',
-      ])
-      .where('r.user_id = :user_id', { user_id })
-      .getRawMany();
+    const result = await this.roomRepo.createQueryBuilder('r')
+                                      .leftJoin('item_inventory', 'iv', 'r.item_id = iv.item_id AND r.user_id = iv.user_id')
+                                      .leftJoin('item_shop', 'ish', 'r.item_id = ish.item_id')
+                                      .select([
+                                        'r.user_id         AS user_id'
+                                      , 'ish.item_id       AS item_id'
+                                      , 'ish.type_id       AS item_type'
+                                      , 'ish.metadata      AS metadata'
+                                      , 'ish.item_name     AS item_name'
+                                      , 'ish.item_path     AS item_path'
+                                      , 'iv.pet_name       AS pet_name'
+                                      , 'iv.pet_exp        AS pet_exp'
+                                      , 'ish.item_cost / 3 AS total_pet_exp'
+                                      ])
+                                      .where('r.user_id = :user_id', { user_id })
+                                      .getRawMany();
     return { result };
   }
 }

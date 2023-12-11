@@ -9,6 +9,7 @@ import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { Room } from 'src/entities/room.entity';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidV4 } from 'uuid';
+import { getIdsFromItems } from 'src/utils/PagingOptions';
 
 @Injectable()
 export class UserService {
@@ -62,11 +63,6 @@ export class UserService {
 
   // 아이디를 기준으로 유저 삭제
   async deleteUser(user_id: number) {
-    const user = await this.getUser(user_id);
-    if (user == null) {
-      throw this.doWithException.UserNotFound;
-    }
-    
     const qr = this.dataSource.createQueryRunner();
     const uuid = uuidV4();
     await qr.connect();
@@ -81,6 +77,7 @@ export class UserService {
                                               , del_at: () => 'CURRENT_TIMESTAMP'
                                               })
                                               .where('user_id = :user_id', { user_id })
+                                              .andWhere('del_at IS NULL')
                                               .execute();
 
       await qr.manager.createQueryBuilder()
@@ -95,6 +92,64 @@ export class UserService {
                       .where('user_id = :user_id', { user_id })
                       .orWhere('friend_id = :user_id', { user_id })
                       .execute();
+
+      const GrpIdsAsOwner = await qr.manager.createQueryBuilder()
+                                            .select(['g.grp_id AS grp_id'])
+                                            .from('group', 'g')
+                                            .where('g.grp_owner = :user_id', { user_id })
+                                            .getRawMany();
+
+       /**
+        * [ 중복 코드 ]
+        * 여기 코드부터는 group 나가기에서 사용하는 로직과 동일한 로직을 수행합니다.
+        * 메소드로 작성했을 경우 메소드 종료시 자동으로 트랜잭션이 커밋되는 이슈가 있어서 중복 코드를 작성했습니다.
+        * 후에 트랜잭션을 제어할 방법이 생기면 다른 방법으로 시도하는게 좋을거라고 생각 됩니다.
+        */
+      if(GrpIdsAsOwner.length !== 0){
+        const grpIds = getIdsFromItems(GrpIdsAsOwner, 'grp_id');
+
+        for(const grp_id of grpIds){
+          // 그룹에 남은 인원
+          const leftCnt = await qr.manager.createQueryBuilder()
+                                          .select(['COUNT(*) AS cnt'])
+                                          .from('group', 'g')
+                                          .leftJoin('user_group', 'ug', 'g.grp_id = ug.grp_id')
+                                          .where('ug.grp_id = :grp_id', { grp_id })
+                                          .getRawOne();
+
+          // 그룹 인원이 0명이면 그룹 삭제
+          const grpDel = await qr.manager.createQueryBuilder()
+                                         .softDelete()
+                                         .from('group', 'g')
+                                         .where('grp_id = :grp_id', { grp_id })
+                                         .andWhere(`0 = :cnt`, { cnt: leftCnt.cnt })
+                                         .setParameter('grp_id', grp_id)
+                                         .execute();
+
+          if(grpDel.affected === 0){
+            // 가입 시기가 가장 오래된 1사람
+            const newOwner = await qr.manager.createQueryBuilder()
+                                             .from('user_group', 'ug')
+                                             .where('ug.grp_id = :grp_id', { grp_id })
+                                             .orderBy('ug.reg_at')
+                                             .limit(1)
+                                             .getRawOne();
+            // 그룹장 등록
+            await qr.manager.createQueryBuilder()
+                            .update('group')
+                            .set({ grp_owner: newOwner.user_id })
+                            .where({ grp_id })
+                            .execute();
+          } else {
+            // 그룹 삭제가 되었으니 그에 맞는 루틴도 삭제
+            await qr.manager.createQueryBuilder()
+                            .softDelete()
+                            .from('routine')
+                            .where('grp_id = :grp_id', { grp_id })
+                            .execute();
+          }
+        }
+      }
 
       await qr.commitTransaction();
       return { result };
