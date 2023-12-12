@@ -71,8 +71,6 @@ export class RoomService {
     let result = [];
 
     try {
-        // 기존의 room아이템 모두 삭제
-        //await this.roomRepo.delete({ user_id });
         await qr.manager.createQueryBuilder()
                         .delete()
                         .from('room', 'r')
@@ -92,20 +90,17 @@ export class RoomService {
                                       .into('room')
                                       .values({ user_id, item_id })
                                       .execute();
-          //result.push(await this.roomRepo.save({ user_id, item_id }));
           result.push(res);
         }
 
-        qr.commitTransaction();
+        await qr.commitTransaction();
 
         return { result };
       } catch(err)  {
         await qr.rollbackTransaction();
         throw this.dwExcept.FailedToUpdateMyRoom;
       } finally {
-        if (!qr.isReleased){
-          await qr.release();
-        }
+        await qr.release();
       };
   }
 
