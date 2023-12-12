@@ -328,8 +328,7 @@ export class TodoService {
                                     , 't.todo_id   AS todo_id'
                                     , 't.todo_done AS todo_done'
                                     ])
-                                    .where('u.user_id = :user_id', { user_id })
-                                    .andWhere('t.todo_id = :todo_id', { todo_id });
+                                    .where({ user_id, todo_id});
 
       // 체크한 To-Do가 오늘이 아닌 이미 지난 날짜인 경우 종료
       const isToday = await this.todoRepo.createQueryBuilder('t')
