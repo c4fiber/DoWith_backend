@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { Todo } from 'src/entities/todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -299,80 +299,162 @@ export class TodoService {
     await this.todoRepo.save(todo);
   }
 
+  // 투두 완료상태 변경
   async editDone(todo_id: number, todo_done: boolean, user_id: number) {
     const today: Date = new Date();
 
-    const qr = this.dataSource.createQueryRunner();
-    await qr.connect();
-    await qr.startTransaction();
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
       // 1. 투두 업데이트
-      const uptRes = await qr.manager.createQueryBuilder()
-                                     .update(Todo)
-                                     .set({ todo_done })
-                                     .where({ todo_id })
-                                     .execute();
+      const updatedTodo = await queryRunner.manager
+        .createQueryBuilder()
+        .update(Todo)
+        .set({
+          todo_done: todo_done,
+        })
+        .where('todo_id = :id', { id: todo_id })
+        .execute();
 
-      if (uptRes.affected === 0) {
+      if (updatedTodo.affected === 0) {
+        // 투두가 없음
         throw this.dwExcept.NoData;
       }
 
       // 2. 투두 관련 리워드 계산 & 유저 업데이트
-      const query = qr.manager.createQueryBuilder(User, 'u')
-                              .leftJoin('todo', 't', 't.user_id = u.user_id')
-                              .select([
-                                'u.user_id   AS user_id'
-                              , 'u.user_cash AS user_cash'
-                              , 't.todo_id   AS todo_id'
-                              , 't.todo_done AS todo_done'
-                              ])
-                              .where('u.user_id = :user_id', { user_id })
-                              .andWhere('t.todo_id = :todo_id', { todo_id });
-
-      // 체크한 To-Do가 오늘이 아닌 이미 지난 날짜인 경우 종료
-      const isToday = await this.todoRepo.createQueryBuilder('t')
-                                         .where(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
-                                         .andWhere({ todo_id })
-                                         .getRawOne();
-      if(!isToday){
-        await qr.commitTransaction();
-        return { result: await query.getRawOne() };
+      // 투두 시간 가져오기
+      const todo_date = await this.getTodoDate(queryRunner, todo_id);
+      if (todo_date == null) {
+        // 투두가 없음
+        throw this.dwExcept.NoData;
       }
 
-      const sign = todo_done ? 1 : -1;
-      // 2. 리워드 제공 - 추가되야할 캐시 계산(10개 초과시 0점)
-      const reward = await this.todoRepo.createQueryBuilder()
-                                        .select(`case when count(*) = 1
-                                                      then ${Reward.FIRST_TODO_REWARD}
-                                                      when count(*) = 0
-                                                      then ${sign} * ${Reward.FIRST_TODO_REWARD}
-                                                      when count(*) > 10
-                                                      then 0
-                                                      else ${sign} * ${Reward.NORAML_TODO_REWARD}
-                                                  end as reward`)
-                                        .where({ user_id })
-                                        .andWhere(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
-                                        .andWhere('grp_id IS NULL')
-                                        .andWhere('todo_done = true')
-                                        .getRawOne();
+      // 지난 날짜 투두는 제외
+      if (this.isPastTodo(todo_date)) {
+        const result = await this.getUserTodoResult(
+          queryRunner,
+          user_id,
+          todo_id,
+        );
 
-      // 2. 리워드 제공 - 캐시(오늘 처음: 100, 그 외: 10)
-      await qr.manager.createQueryBuilder()
-                      .update('user')
-                      .set({
-                        user_cash: () => `user_cash + ${reward.reward}`
-                      })
-                      .where('user_id = :user_id', { user_id })
-                      .execute();
+        await queryRunner.commitTransaction();
+        return { result };
+      }
 
-      await qr.commitTransaction();
-      return { result: await query.getRawOne() };
+      // 기존 오늘 완료된 투두 개수
+      const todayDoneCnt = await this.todoRepo
+        .createQueryBuilder('todo')
+        .where('user_id = :user_id', { user_id })
+        .andWhere('DATE(todo.todo_date) = DATE(:today)', { today })
+        .andWhere('todo_done = true')
+        .getCount();
+
+      const cash = this.calculateCash(todo_done, todayDoneCnt);
+      const userUpdated = await queryRunner.manager
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          user_cash: () => 'user_cash + :cash',
+        })
+        .where('user_id = :id', { id: user_id, cash: cash })
+        .execute();
+
+      if (userUpdated.affected === 0) {
+        throw this.dwExcept.NoData;
+      }
+
+      // 업데이트 결과 반환
+      const result = await this.getUserTodoResult(
+        queryRunner,
+        user_id,
+        todo_id,
+      );
+
+      await queryRunner.commitTransaction();
+      return { result };
     } catch (error) {
-      await qr.rollbackTransaction();
+      await queryRunner.rollbackTransaction();
       throw new Error(error);
     } finally {
-      await qr.release();
+      await queryRunner.release();
     }
+  }
+
+  /**
+   * 날짜가 과거인지 확인
+   * @param todo_date
+   * @returns
+   */
+  private isPastTodo(todo_date: Date): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    todo_date.setHours(0, 0, 0, 0);
+    return todo_date < today;
+  }
+
+  /**
+   * 투두 날짜 반환
+   * @param queryRunner
+   * @param todo_id
+   * @returns null if no todo exists
+   */
+  private async getTodoDate(queryRunner: QueryRunner, todo_id: number) {
+    const todo = await queryRunner.manager
+      .createQueryBuilder(Todo, 't')
+      .select(['todo_date'])
+      .where('t.todo_id = :todo_id', { todo_id })
+      .getRawOne();
+
+    return todo ? todo.todo_date : null;
+  }
+
+  /**
+   * 사용자 투두 완료체크 결과 반환
+   * @param queryRunner
+   * @param user_id
+   * @param todo_id
+   * @returns
+   */
+  private async getUserTodoResult(
+    queryRunner: QueryRunner,
+    user_id: number,
+    todo_id: number,
+  ) {
+    return await queryRunner.manager
+      .createQueryBuilder(User, 'u')
+      .leftJoin('todo', 't', 't.user_id = u.user_id')
+      .select([
+        'u.user_id as user_id',
+        'u.user_cash as user_cash',
+        't.todo_id as todo_id',
+        't.todo_done as todo_done',
+      ])
+      .where('u.user_id = :user_id', { user_id })
+      .andWhere('t.todo_id = :todo_id', { todo_id })
+      .getRawOne();
+  }
+
+  /**
+   * 유저 캐시 보상 계산
+   * @param todo_done
+   * @param todo_date
+   * @param todayDoneCnt
+   * @returns
+   */
+  private calculateCash(todo_done: boolean, todayDoneCnt: number) {
+    if (
+      (todo_done && todayDoneCnt === 0) ||
+      (!todo_done && todayDoneCnt === 1)
+    ) {
+      // 투두를 완료 체크한 경우 (첫 번째 투두 체크 또는 마지막 투두 체크해제)
+      return todo_done ? 100 : -100;
+    } else if (todo_done && todayDoneCnt >= 10) {
+      // 개인 투두 달성 보상은 10개까지 제한
+      return 0;
+    }
+    // 기본 캐시 계산
+    return Reward.NORAML_TODO_REWARD * (todo_done ? 1 : -1);
   }
 }
