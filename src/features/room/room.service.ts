@@ -64,7 +64,6 @@ export class RoomService {
   // }
 
   async overlap(user_id: number, items: number[]): Promise<any> {
-    Logger.debug(items);
     const qr  = this.dataSource.createQueryRunner();
     await qr.connect();
     await qr.startTransaction();
@@ -73,7 +72,13 @@ export class RoomService {
 
     try {
         // 기존의 room아이템 모두 삭제
-        await this.roomRepo.delete({ user_id });
+        //await this.roomRepo.delete({ user_id });
+        await qr.manager.createQueryBuilder()
+                        .delete()
+                        .from('room', 'r')
+                        .where({ user_id })
+                        .execute();
+
         const itemsInInv = await this.itemInventoryRepo.createQueryBuilder('iv')
                                                        .select(['iv.item_id AS item_id'])
                                                        .where({ user_id })
@@ -82,7 +87,13 @@ export class RoomService {
 
         for (const item of itemsInInv) {
           const item_id = item.item_id;
-          result.push(await this.roomRepo.save({ user_id, item_id }));
+          const res = await qr.manager.createQueryBuilder()
+                                      .insert()
+                                      .into('room')
+                                      .values({ user_id, item_id })
+                                      .execute();
+          //result.push(await this.roomRepo.save({ user_id, item_id }));
+          result.push(res);
         }
 
         qr.commitTransaction();
