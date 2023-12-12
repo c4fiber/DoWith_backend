@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from '../../entities/group.entity';
 import { DataSource, Raw, Repository } from 'typeorm';
@@ -596,7 +596,6 @@ export class GroupService {
     
     await qr.connect();
     await qr.startTransaction();
-    Logger.debug("!!!!!!!!!!!!!!!!!!!!!!");
 
     try{
       // 1. To-Do done 체크
@@ -606,7 +605,6 @@ export class GroupService {
                                      .where({ todo_id })
                                      .andWhere('todo_done = false')
                                      .execute();
-      Logger.debug("@@@@@@@@@@@@@@@@@@@@@@");
       if (uptRes.affected === 0) {
         throw this.dwExcept.NoData;
       }
@@ -620,13 +618,13 @@ export class GroupService {
         await qr.commitTransaction();
         return;
       }
-      Logger.debug("############################");
+
       // 앞으로 필요한 user_id를 todo_id를 통해서 조회
       const { user_id } = await this.todoRepo.createQueryBuilder()
                                              .select(['user_id AS user_id'])
                                              .where({ todo_id })
                                              .getRawOne();
-      Logger.debug("$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
       // 2. 리워드 제공 - 추가되야할 캐시 계산
       const reward = await this.todoRepo.createQueryBuilder()
                                         .select(`case when count(*) = 1
@@ -637,7 +635,7 @@ export class GroupService {
                                         .andWhere(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
                                         .andWhere('todo_done = true')
                                         .getRawOne();
-      Logger.debug("%%%%%%%%%%%%%%%%%%%%%%%%");
+
       // 2. 리워드 제공 - 캐시(오늘 처음: 100, 그 외: 25)
       await qr.manager.createQueryBuilder()
                       .update('user')
@@ -646,7 +644,7 @@ export class GroupService {
                       })
                       .where('user_id = :user_id', { user_id })
                       .execute();
-      Logger.debug("^^^^^^^^^^^^^^^^^^^^^^");
+
       // 현재 유저가 키우는 펫 아이디 가져오기
       const { item_id } = await qr.manager.createQueryBuilder()
                                           .select(['r.item_id AS item_id'])
@@ -655,14 +653,14 @@ export class GroupService {
                                           .where('r.user_id = :user_id', { user_id })
                                           .andWhere('ish.type_id = 1')
                                           .getRawOne();
-      Logger.debug("***********************");
+
       // 2. 리워드 - 경험치
       await qr.manager.createQueryBuilder()
                       .update('item_inventory')
                       .set({ pet_exp: () => `pet_exp + ${Reward.PET_EXP_REWARD}` })
                       .where({ user_id, item_id })
                       .execute(); 
-      Logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+
       // 진화표
       const evol_map = await qr.manager.createQueryBuilder()
                                        .select([
@@ -686,7 +684,7 @@ export class GroupService {
                                       .andWhere('ish.next_id IS NOT NULL')
                                       .andWhere('iv.pet_exp >= ish.evol_exp')
                                       .getRawOne();
-      Logger.debug("((((((((((((((((((((((((((((((");
+
       if(!next_id){
         await qr.commitTransaction();
         return;
@@ -701,7 +699,7 @@ export class GroupService {
                       })
                       .where({ user_id, item_id })
                       .execute();
-      Logger.debug("))))))))))))))))))))))))))))))");
+
       // 4. 마이룸에 진화된 펫 제공 - 기존 진화 전 펫을 변경
       await qr.manager.createQueryBuilder()
                       .update('room')
