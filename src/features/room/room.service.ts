@@ -76,7 +76,6 @@ export class RoomService {
         await this.roomRepo.delete({ user_id });
         const itemsInInv = await this.itemInventoryRepo.createQueryBuilder('iv')
                                                        .select(['iv.item_id AS item_id'])
-                                                       .innerJoin('room', 'r', 'iv.item_id = r.item_id AND iv.user_id = r.user_id')
                                                        .where({ user_id })
                                                        .andWhere('iv.item_id IN (:...items)', { items })
                                                        .getRawMany();
