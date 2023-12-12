@@ -67,6 +67,7 @@ export class ItemInventoryService {
                                                      , 'iv.pet_name as pet_name'
                                                      , 'iv.pet_exp as pet_exp'
                                                      , 'ish.metadata as metadata'
+                                                     , 'ish.item_cost / 3 AS total_pet_exp'
                                                      ])
                                                      .leftJoin('item_shop', 'ish', 'iv.item_id = ish.item_id')
                                                      .where('iv.user_id = :user_id', { user_id })

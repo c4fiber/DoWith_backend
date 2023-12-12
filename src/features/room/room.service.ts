@@ -103,9 +103,7 @@ export class RoomService {
         await qr.rollbackTransaction();
         throw this.dwExcept.FailedToUpdateMyRoom;
       } finally {
-        if(qr.isReleased){
-          qr.release();
-        }
+          await qr.release();
       };
   }
 
