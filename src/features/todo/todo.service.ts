@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Todo } from 'src/entities/todo.entity';
@@ -345,11 +345,15 @@ export class TodoService {
                                                       then 0
                                                       else ${sign} * ${Reward.NORAML_TODO_REWARD}
                                                   end as reward`)
-                                        .where({ user_id, todo_id })
+                                        .where({ user_id })
                                         .andWhere(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
                                         .andWhere('todo_done = true')
                                         .getRawOne();
 
+      Logger.debug("################");
+      Logger.debug(reward);
+      Logger.debug(sign);
+      Logger.debug("################");
       // 2. 리워드 제공 - 캐시(오늘 처음: 100, 그 외: 10)
       await qr.manager.createQueryBuilder()
                       .update('user')
