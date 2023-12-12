@@ -308,11 +308,15 @@ export class TodoService {
 
     try {
       // 1. 투두 업데이트
-      const updatedTodo = await qr.manager.createQueryBuilder()
-                                          .update(Todo)
-                                          .set({ todo_done })
-                                          .where('todo_id = :todo_id', { todo_id })
-                                          .execute();
+      const uptRes = await qr.manager.createQueryBuilder()
+                                     .update(Todo)
+                                     .set({ todo_done })
+                                     .where({ todo_id })
+                                     .execute();
+
+      if (uptRes.affected === 0) {
+        throw this.dwExcept.NoData;
+      }
 
       // 2. 투두 관련 리워드 계산 & 유저 업데이트
       const query = qr.manager.createQueryBuilder(User, 'u')
@@ -340,6 +344,8 @@ export class TodoService {
       // 2. 리워드 제공 - 추가되야할 캐시 계산(10개 초과시 0점)
       const reward = await this.todoRepo.createQueryBuilder()
                                         .select(`case when count(*) = 1
+                                                      then ${Reward.FIRST_TODO_REWARD}
+                                                      when count(*) = 0
                                                       then ${sign} * ${Reward.FIRST_TODO_REWARD}
                                                       when count(*) > 10
                                                       then 0
@@ -347,13 +353,10 @@ export class TodoService {
                                                   end as reward`)
                                         .where({ user_id })
                                         .andWhere(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
+                                        .andWhere('grp_id IS NULL')
                                         .andWhere('todo_done = true')
                                         .getRawOne();
 
-      Logger.debug("################");
-      Logger.debug(reward);
-      Logger.debug(sign);
-      Logger.debug("################");
       // 2. 리워드 제공 - 캐시(오늘 처음: 100, 그 외: 10)
       await qr.manager.createQueryBuilder()
                       .update('user')
