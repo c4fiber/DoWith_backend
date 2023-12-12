@@ -246,50 +246,57 @@ export class UserService {
    */
   async getUserstatistics(user_id: number){
     const qr = this.dataSource.createQueryRunner();
-    const pet_exps = await qr.manager.createQueryBuilder()
-                                     .select(['sum(iv.pet_exp)'])
-                                     .from('item_inventory', 'iv')
-                                     .where({ user_id })
-                                     .andWhere('iv.pet_exp IS NOT NULL')
-                                     .getRawOne();
-    const todo_score = await qr.manager.createQueryBuilder()
-                                       .select([
-                                         'COUNT(*) FILTER(where t.grp_id IS NULL) as todo_score'
-                                       , 'COUNT(*) FILTER(where t.grp_id IS NOT NULL) as rout_score'
-                                       ])
-                                       .from('todo', 't')
-                                       .where({ user_id })
-                                       .andWhere('t.todo_done = true')
-                                       .getRawOne();
-    const login_score = await this.userRepository.createQueryBuilder('u')
-                                                 .select(['(login_cnt * 10) + (user_hp * 10) as login_score'])
-                                                 .where({ user_id })
-                                                 .getRawOne();
-    const achi_score = await qr.manager.createQueryBuilder()
-                                       .select(['SUM(a.achi_score) AS achi_score'])
-                                       .from('user_achi', 'ua')
-                                       .innerJoin('achievements', 'a', 'ua.achi_id = a.achi_id')
-                                       .where({ user_id })
-                                       .getRawOne();
 
-    const isNumeric = (value) => !isNaN(value) && value != null;
-    const sum =   (isNumeric(pet_exps.pet_exp)        ? +pet_exps.pet_exp           : 0)
-                + (isNumeric(todo_score.todo_score)   ? +todo_score.todo_score * 10 : 0)
-                + (isNumeric(todo_score.rout_score)   ? +todo_score.rout_score * 20 : 0)
-                + (isNumeric(login_score.login_score) ? +login_score.login_score    : 0)
-                + (isNumeric(achi_score.achi_score)   ? +achi_score.achi_score      : 0);
-    
-    const result = await qr.manager.createQueryBuilder()
-                                   .select([
-                                     't.tier_name AS tier_name'
-                                   , 't.tier_img  AS tier_img'
-                                   , 't.tier_min  AS tier_min'
-                                   , 't.tier_max  AS tier_max'
-                                   , `${ sum }    AS tier_score`
-                                   ])
-                                   .from('tiers', 't')
-                                   .where(`${ sum } BETWEEN t.tier_min AND t.tier_max`)
-                                   .getRawOne();
-    return { result };
+    try {
+      const pet_exps = await qr.manager.createQueryBuilder()
+                                       .select(['sum(iv.pet_exp)'])
+                                       .from('item_inventory', 'iv')
+                                       .where({ user_id })
+                                       .andWhere('iv.pet_exp IS NOT NULL')
+                                       .getRawOne();
+      const todo_score = await qr.manager.createQueryBuilder()
+                                         .select([
+                                           'COUNT(*) FILTER(where t.grp_id IS NULL) as todo_score'
+                                         , 'COUNT(*) FILTER(where t.grp_id IS NOT NULL) as rout_score'
+                                         ])
+                                         .from('todo', 't')
+                                         .where({ user_id })
+                                         .andWhere('t.todo_done = true')
+                                         .getRawOne();
+      const login_score = await this.userRepository.createQueryBuilder('u')
+                                                   .select(['(login_cnt * 10) + (user_hp * 10) as login_score'])
+                                                   .where({ user_id })
+                                                   .getRawOne();
+      const achi_score = await qr.manager.createQueryBuilder()
+                                         .select(['SUM(a.achi_score) AS achi_score'])
+                                         .from('user_achi', 'ua')
+                                         .innerJoin('achievements', 'a', 'ua.achi_id = a.achi_id')
+                                         .where({ user_id })
+                                         .getRawOne();
+  
+      const isNumeric = (value) => !isNaN(value) && value != null;
+      const sum =   (isNumeric(pet_exps.pet_exp)        ? +pet_exps.pet_exp           : 0)
+                  + (isNumeric(todo_score.todo_score)   ? +todo_score.todo_score * 10 : 0)
+                  + (isNumeric(todo_score.rout_score)   ? +todo_score.rout_score * 20 : 0)
+                  + (isNumeric(login_score.login_score) ? +login_score.login_score    : 0)
+                  + (isNumeric(achi_score.achi_score)   ? +achi_score.achi_score      : 0);
+      
+      const result = await qr.manager.createQueryBuilder()
+                                     .select([
+                                       't.tier_name AS tier_name'
+                                     , 't.tier_img  AS tier_img'
+                                     , 't.tier_min  AS tier_min'
+                                     , 't.tier_max  AS tier_max'
+                                     , `${ sum }    AS tier_score`
+                                     ])
+                                     .from('tiers', 't')
+                                     .where(`${ sum } BETWEEN t.tier_min AND t.tier_max`)
+                                     .getRawOne();
+      return { result };
+    } catch(err) {
+      throw new Error()
+    } finally {
+      qr.release();
+    }
   }
 }
