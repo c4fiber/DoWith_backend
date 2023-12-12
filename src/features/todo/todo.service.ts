@@ -346,14 +346,14 @@ export class TodoService {
                                               .andWhere('DATE(todo.todo_date) = DATE(:today)', { today })
                                               .andWhere('todo_done = true')
                                               .getCount();
-
+      const sign = todo_done ? 1 : -1;
       // 2. 리워드 제공 - 추가되야할 캐시 계산(10개 초과시 0점)
       const reward = await this.todoRepo.createQueryBuilder()
                                         .select(`case when count(*) = 1
-                                                      then ${Reward.FIRST_TODO_REWARD}
+                                                      then ${sign} * ${Reward.FIRST_TODO_REWARD}
                                                       when count(*) > 10
                                                       then 0
-                                                      else ${Reward.NORAML_TODO_REWARD}
+                                                      else ${sign} * ${Reward.NORAML_TODO_REWARD}
                                                   end as reward`)
                                         .where({ user_id, todo_id })
                                         .andWhere(`to_char(now(), 'yyyyMMdd') = to_char(todo_date, 'yyyyMMdd')`)
