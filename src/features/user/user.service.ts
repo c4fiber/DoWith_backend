@@ -157,7 +157,7 @@ export class UserService {
       await qr.rollbackTransaction();
       throw new Error(err);
     } finally {
-      qr.release();
+      await qr.release();
     }
   }
 
@@ -296,7 +296,7 @@ export class UserService {
     } catch(err) {
       throw new Error()
     } finally {
-      qr.release();
+      await qr.release();
     }
   }
 }
