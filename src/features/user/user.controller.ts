@@ -2,19 +2,11 @@ import {
   Body,
   Controller,
   Delete,
-  FileTypeValidator,
-  FileValidator,
   Get,
-  Headers,
-  Logger,
-  MaxFileSizeValidator,
   Param,
-  ParseFilePipe,
   ParseIntPipe,
-  Patch,
   Post,
   Put,
-  Query,
   Request,
   UploadedFile,
   UseGuards,
@@ -29,7 +21,6 @@ import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/MulterConfigService';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from '../../entities/user.entities';
 
 @Controller('user')
 export class UserController {
@@ -43,7 +34,6 @@ export class UserController {
   async getUser(
     @Request() req,
   ): Promise<{ result }> {
-    
     return await this.usersService.getUserInfo(req.user);
   }
 
