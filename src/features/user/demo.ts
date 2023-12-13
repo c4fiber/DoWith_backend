@@ -116,6 +116,7 @@ export class Demo {
         const tree    = 100;
         const rug     = 104;
         const petExp  = 1995;
+        const itemTypeId =
 
         await inveRepo.update({
             user_id: userId,
@@ -132,15 +133,12 @@ export class Demo {
             item_id: midFox,
         });
 
-        // 7. 트리와 러그 룸에서 삭제
+        // 7. 모든 가구 룸에서 삭제
         await roomRepo.createQueryBuilder()
             .delete()
             .where(`
                 user_id = :userId AND     \
-                (
-                    item_id = :tree   OR  \
-                    item_id = :rug
-                )
+                item_id >= 100
             `, {userId, tree, rug})
             .execute();
 
