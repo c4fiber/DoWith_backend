@@ -23,14 +23,52 @@ export class Demo {
         const roomRepo: Repository<Room>          = this.dataSource.getRepository(Room);
 
         const achiId = 6;
+        const today: Date = new Date();
 
         // 1. 출결 모두 삭제, 로그인 업적 삭제
         await atteRepo.delete({user_id: userId});
         await achiRepo.delete({user_id: userId, achi_id: achiId});
 
         
-        // 2.1 새로 쌓을 투두들
-        const today: Date = new Date();
+        // 2. 오늘자 투두 모두 삭제
+        await todoRepo.createQueryBuilder('todo')
+            .delete()
+            .where(`
+                user_id  = :userId AND              \
+                DATE(todo.todo_date) = DATE(:today) \
+            `, {userId, today})
+            .execute();
+
+
+        // 3. 이전 6일의 출결 삽입
+        let date = new Date();
+        let dateString;
+        for(let i = 0; i < 6; i++) {
+            date.setDate(date.getDate() -1);
+            dateString = this.toFormattedDate(date);
+
+            await atteRepo.insert({
+                user_id: userId,
+                atte_at: dateString,
+            });
+        }
+        
+        // 4. 유저 로그인 카운트 세팅
+        await userRepo.createQueryBuilder()
+            .update()
+            .set({
+                user_cash: 400,
+                last_login: () => `CURRENT_TIMESTAMP - INTERVAL '1 day'`,
+                login_cnt : 6,
+                login_seq : 6,
+            })
+            .where(`
+                user_id = :userId
+            `, {userId})
+            .execute();
+        
+
+        // 5. 데모용 개인 투두 삽입
         const demoTodo = [
             {
                 "user_id": userId,
@@ -58,18 +96,6 @@ export class Demo {
             },
         ];
 
-        
-        // 2. 오늘자 투두 모두 삭제
-        await todoRepo.createQueryBuilder('todo')
-            .delete()
-            .where(`
-                user_id  = :userId AND              \
-                DATE(todo.todo_date) = DATE(:today) \
-            `, {userId, today})
-            .execute();
-        
-            
-        // 3. 개인 투두 더미데이터 삽입
         for(let newTodo of demoTodo) {
             const todo = new Todo();
             todo.user_id = newTodo['user_id'];
@@ -82,35 +108,8 @@ export class Demo {
             await todoRepo.save(todo);
         }
         
-        // 3. 이전 6일의 출결 삽입, 유저 로그인 정보 세팅
-        let date = new Date();
-        let dateString;
-        for(let i = 0; i < 6; i++) {
-            date.setDate(date.getDate() -1);
-            dateString = this.toFormattedDate(date);
 
-            await atteRepo.insert({
-                user_id: userId,
-                atte_at: dateString,
-            });
-        }
-
-        
-        await userRepo.createQueryBuilder()
-            .update()
-            .set({
-                user_cash: 400,
-                last_login: () => `CURRENT_TIMESTAMP - INTERVAL '1 day'`,
-                login_cnt : 6,
-                login_seq : 6,
-            })
-            .where(`
-                user_id = :userId
-            `, {userId})
-            .execute();
-        
-
-        // 4. 인벤토리와 룸의 구미호 펫을 중간여우로 변경
+        // 6. 인벤토리와 룸의 구미호 펫을 중간여우로 변경
         //    경험치를 진화 직전으로 세팅
         const kitsune = 3;
         const midFox  = 2;
@@ -133,7 +132,7 @@ export class Demo {
             item_id: midFox,
         });
 
-        // 5. 트리와 러그 룸에서 삭제
+        // 7. 트리와 러그 룸에서 삭제
         await roomRepo.createQueryBuilder()
             .delete()
             .where(`
@@ -146,7 +145,7 @@ export class Demo {
             .execute();
 
             
-        // 6. 트리는 인벤토리에서 삭제
+        // 트리는 인벤토리에서 삭제
         await inveRepo.delete({
             user_id: userId,
             item_id: tree,
