@@ -61,14 +61,15 @@ export class AppGateway {
     notificationData.req_type = '0';
     notificationData.sub_id = '';
 
-    await this.notificationService.createNotification(notificationData);
+    const noti = await this.notificationService.createNotification(notificationData);
 
 		try {
 			this.server.to(receiver.socket_id).emit('friendRequest', { 
 					message: `${sender.user_name}님이 친구 요청을 보냈습니다.`,
 					senderId: sender.user_id,
           senderName: sender.user_name,
-					receiverId: receiver.user_id }) ;
+					receiverId: receiver.user_id,
+          notiId: noti.noti_id}) ;
 		} catch (error) {
 			console.error(`Error sending notification to user ${receiver.user_id}:`, error);
 		}				
