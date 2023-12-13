@@ -76,8 +76,8 @@ export class AppGateway {
   }
 
   async notifyFriendResponse(notification: Notification) {
-    const sender = await this.userService.getUser( parseInt(notification.sender_id) );
-    const receiver = await this.userService.getUser( parseInt(notification.receiver_id) );
+    const sender = await this.userService.getUser( parseInt(notification.receiver_id) );
+    const receiver = await this.userService.getUser( parseInt(notification.sender_id) );
     if (!sender || !receiver) {
         return;
     }
