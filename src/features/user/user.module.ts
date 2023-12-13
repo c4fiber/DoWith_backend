@@ -9,7 +9,6 @@ import { MulterConfig } from 'src/utils/MulterConfigService';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { Demo } from './demo';
 
 @Module({
   imports: [
@@ -25,7 +24,7 @@ import { Demo } from './demo';
     , UtilsModule
   ],
   controllers: [UserController],
-  providers: [UserService, DoWithExceptions, MulterConfig, Demo],
+  providers: [UserService, DoWithExceptions, MulterConfig],
   exports: [UserService],
 })
 export class UserModule {}
