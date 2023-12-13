@@ -21,13 +21,20 @@ import { GetUsersByContactsDto } from './dto/get-users-by-contacts.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'src/utils/MulterConfigService';
 import { AuthGuard } from '@nestjs/passport';
+import { Demo } from './demo';
 
 @Controller('user')
 export class UserController {
   constructor(
     private readonly usersService: UserService,
     private readonly multerConifg: MulterConfig,
+    private readonly demo: Demo,
   ) {}
+
+  @Post('/:user_id/demo')
+  async doDemo(@Param('user_id', ParseIntPipe) userId: number) {
+    return this.demo.run(userId);
+  }
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))

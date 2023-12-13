@@ -6,6 +6,7 @@ import { Todo } from "src/entities/todo.entity";
 import { User } from "src/entities/user.entities";
 import { UserAchi } from "src/entities/user_achi.entity";
 import { DataSource, Repository } from "typeorm";
+import { CreateTodoDto } from "../todo/dto/create-todo.dto";
 
 @Injectable()
 export class Demo {
@@ -13,7 +14,7 @@ export class Demo {
         private readonly dataSource: DataSource,
     ){}
 
-    async demo(userId:number) {
+    async run(userId:number) {
         const userRepo: Repository<User>          = this.dataSource.getRepository(User);
         const todoRepo: Repository<Todo>          = this.dataSource.getRepository(Todo);
         const atteRepo: Repository<Attendance>    = this.dataSource.getRepository(Attendance);
@@ -28,24 +29,58 @@ export class Demo {
         await achiRepo.delete({user_id: userId, achi_id: achiId});
 
         
-        // 2. 오늘자 그룹 투두 삭제, 개인 투두 모두 false로 변경
-        await todoRepo.createQueryBuilder()
+        // 2.1 새로 쌓을 투두들
+        const today: Date = new Date();
+        const demoTodo = [
+            {
+                "user_id": userId,
+                "todo_name": "나만의 무기 만들기 최종발표",
+                "todo_desc": "유종의 미를 거두자",
+                "todo_date": today,
+                "todo_done": false,
+                "todo_start": "13:00:00",
+            },
+            {
+                "user_id": userId,
+                "todo_name": "저녁 약속",
+                "todo_desc": "",
+                "todo_date": today,
+                "todo_done": false,
+                "todo_start": "18:00:00",
+            },
+            {
+                "user_id": userId,
+                "todo_name": "자기전 알고리즘 1문제",
+                "todo_desc": "",
+                "todo_date": today,
+                "todo_done": false,
+                "todo_start": "22:00:00",
+            },
+        ];
+
+        
+        // 2. 오늘자 투두 모두 삭제
+        await todoRepo.createQueryBuilder('todo')
             .delete()
             .where(`
-                user_id  = :userId AND  \
-                grp_id IS NOT NULL AND  \
-                todo_date = DATE(now()) \
-            `, {userId})
+                user_id  = :userId AND              \
+                DATE(todo.todo_date) = DATE(:today) \
+            `, {userId, today})
             .execute();
-
-        await todoRepo.createQueryBuilder()
-            .update()
-            .where(`
-                user_id   = :userId AND  \
-                grp_id    IS NOT NULL    \
-                todo_date = DATE(now())  \
-            `, {userId})
-            .execute();
+        
+            
+        // 3. 개인 투두 더미데이터 삽입
+        for(let newTodo of demoTodo) {
+            const todo = new Todo();
+            todo.user_id = newTodo['user_id'];
+            todo.todo_name = newTodo['todo_name'];
+            todo.todo_desc = newTodo['todo_desc'];
+            todo.todo_date = newTodo['todo_date'];
+            todo.todo_done = newTodo['todo_done'];
+            todo.todo_start = newTodo['todo_start'];
+            
+            await todoRepo.save(todo);
+        }
         
         // 3. 이전 6일의 출결 삽입, 유저 로그인 정보 세팅
         let date = new Date();
@@ -62,14 +97,17 @@ export class Demo {
 
         
         await userRepo.createQueryBuilder()
-        .update()
-        .set({
-            user_cash: 400,
-            last_login: `to_char(now() - interval '1 day', 'yyyyMMdd')`,
-            login_cnt : 6,
-            login_seq : 6,
-        })
-        .execute();
+            .update()
+            .set({
+                user_cash: 400,
+                last_login: () => `CURRENT_TIMESTAMP - INTERVAL '1 day'`,
+                login_cnt : 6,
+                login_seq : 6,
+            })
+            .where(`
+                user_id = :userId
+            `, {userId})
+            .execute();
         
 
         // 4. 인벤토리와 룸의 구미호 펫을 중간여우로 변경
@@ -83,9 +121,9 @@ export class Demo {
         await inveRepo.update({
             user_id: userId,
             item_id: kitsune,
-            pet_exp: petExp,
         }, {
             item_id: midFox,
+            pet_exp: petExp,
         });
 
         await roomRepo.update({
@@ -99,7 +137,7 @@ export class Demo {
         await roomRepo.createQueryBuilder()
             .delete()
             .where(`
-                user_id = :userId AND \
+                user_id = :userId AND     \
                 (
                     item_id = :tree   OR  \
                     item_id = :rug
