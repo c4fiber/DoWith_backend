@@ -94,25 +94,23 @@ export class DemoService {
             await manager.delete(ItemInventory, { user_id: userId });
             await manager.delete(Room, { user_id: userId });
     
-            // 6. 인벤토리에 중간여우, 도마뱀, 기본펫
+            // 6. 인벤토리에 중간여우, 도마뱀, 중간새
             //    선물, 러그, 캔들 배치
             //    경험치를 진화 직전으로 세팅
-            const base      = 0;
             const midFox    = 2;
             const monitor   = 5;
+            const bird      = 8;
             const rug       = 104;
             const present   = 103;
             const fireplace = 105;
             const candle    = 106;
             const petExp    = 1995;
-            // const kitsune   = 3;   // 삭제
-            // const tree      = 100; // 삭제
-            
-            await manager.insert(ItemInventory, {   // 기본펫
+
+            await manager.insert(ItemInventory, {   // 중간여우
                 user_id: userId,
-                item_id: base,
-                pet_name: '애옹',
-                pet_exp: 1995,
+                item_id: bird,
+                pet_name: '뺙뺙',
+                pet_exp: 525,
             });
     
             await manager.insert(ItemInventory, {   // 중간여우
@@ -122,11 +120,11 @@ export class DemoService {
                 pet_exp: petExp,
             });
     
-            await manager.insert(ItemInventory, {   // 불사조
+            await manager.insert(ItemInventory, {   // 도마뱀
                 user_id: userId,
                 item_id: monitor,
-                pet_name: '뺙뺙',
-                pet_exp: 525,
+                pet_name: '구름이',
+                pet_exp: 400,
             });
             
             // 가구들
