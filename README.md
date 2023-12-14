@@ -23,15 +23,19 @@
 |gmail|bbock1214|qudcjf153|psjbrian|sojeong.lee017|vanessa.cheong1|
 |블로그|[<img src="https://img.shields.io/badge/tistory-FF6633?style=for-the-badge&logo=tistory&logoColor=white"/>](https://nashs789.tistory.com/)|[<img src="https://img.shields.io/badge/velog-20C997?style=for-the-badge&logo=velog&logoColor=white"/>](https://velog.io/@c4fiber)||[<img src="https://img.shields.io/badge/tistory-FF6633?style=for-the-badge&logo=tistory&logoColor=white"/>](https://cece-blog.tistory.com/)|[<img src="https://img.shields.io/badge/githubpages-222222?style=for-the-badge&logo=githubpages&logoColor=white"/>](https://tomoyo519.github.io/)|
 |업무|무엇 했는지|||||
-</br>
-멘토님도 넣을지??????
-</br>
+
+</br></br>
 
 ## :calendar: 기간
-- 설계 - 2023.11.07 ~ 2023.11.14 (1주)
+
+- 설계: 2023.11.07 ~ 2023.11.14 (1주)
     - PPT: [바로가기](https://docs.google.com/presentation/d/1aGyAQPrHDuRw4QX_VfzhHuHh4uk_epPGAr8O62015zU/edit#slide=id.p)
-- 개발 - 2023.11.14 ~ 2023.12.07 (약 3주)
-- 테스트 - 2023.12.07 ~ 2023.12.16 (약 1주)
+- 개발: 2023.11.14 ~ 2023.12.07 (약 3주)
+- 테스트: 2023.12.07 ~ 2023.12.16 (약 1주)
+- 시연: 2023.12.16(토)
+    - 포스터:  
+<img width="452" alt="스크린샷 2023-12-14 오전 9 36 15" src="https://github.com/c4fiber/DoWith_backend/assets/59809278/0a4af7fd-8fb0-4def-9fc6-94a01dad7b66">
+
 </br>
 
 ## :pushpin: 디렉토리 구조
@@ -76,7 +80,6 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 </br></br>
 
 ## :round_pushpin: 기능
-API 정의 해둘 예정 시간 된다면? OR url 링크만 걸어두기
 </br></br>
 
 ## :wrench: 기술 스택
