@@ -115,3 +115,29 @@ SW사관학교 정글 7기 나만의 무기 만들기 DoWith 프로젝트(백엔
 - 세준
 - 소정
 - 다희
+
+## :gear: 환경 설정
+```
+# Postgres
+DB_HOST=
+DB_PORT=
+DB_USERNAME=
+DB_PASSWORD=
+DB_DATABASE=
+
+# NestJS
+PORT=
+LOG_LEVEL=
+LOG_PATH=
+IMAGE_PATH=
+PUBLIC_IMAGE_PATH=
+
+# Kakao Oauth
+SERVER=
+KAKAO_REST_API_KEY=
+APP_SCHEME=
+KAKAO_URL=
+
+# JWT
+JWT_SECRET=
+```
