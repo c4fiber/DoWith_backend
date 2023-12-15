@@ -133,8 +133,11 @@ export class DemoService {
             await manager.insert(ItemInventory, { user_id: userId, item_id: present });
             await manager.insert(ItemInventory, { user_id: userId, item_id: fireplace });
             
-            // 룸에 도마뱀 배치
+            // 룸에 도마뱀, 벽난로, 선물, 캔들 배치
             await manager.insert(Room, { user_id: userId, item_id: monitor });
+            await manager.insert(Room, { user_id: userId, item_id: candle });
+            await manager.insert(Room, { user_id: userId, item_id: present });
+            await manager.insert(Room, { user_id: userId, item_id: fireplace });
     
     
             // 7. 가입한 그룹에 있는 더미 유저들의 투두 일자를 오늘로 조정
