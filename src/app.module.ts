@@ -27,6 +27,7 @@ import { EntitiesModule } from './entities/entities.module';
 import { AnnouncementModule } from './features/announcement/announcement.module';
 import { AttendanceModule } from './features/attendance/attendance.module';
 import { DemoModule } from './demo/demo.module';
+import * as fs from 'fs';
 
 @Module({
   imports: [
@@ -44,6 +45,9 @@ import { DemoModule } from './demo/demo.module';
       autoLoadEntities: true,
       synchronize: true, // 배포할 때는 false 안하면 변경시 데이터 날아갈 수 있음
       logging: true,
+      ssl: {
+        ca: fs.readFileSync('global-bundle.pem')
+      },
       extra: {
         max: 30,
         timezone: 'Asia/Seoul',
