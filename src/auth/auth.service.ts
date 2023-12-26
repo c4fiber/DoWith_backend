@@ -95,7 +95,6 @@ export class AuthService {
         const createUser: User = await manager.save(user);
         const userId = createUser.user_id;
 
-        Logger.debug(createUser);
 
         // 2. 첫 로그인 업적 달성
         const loginAchi: Achievements = await manager.findOneBy(
@@ -146,21 +145,20 @@ export class AuthService {
             token: token
         };
 
-        Logger.debug(result);
 
         return { result };
     })
   }
 
   /**
-   * 닉네임/비밀번호 기반 로그인
+   * 닉네임/비밀번호 기반으로 로그인합니다
+   * 로그인 카운드와 업적은 투두 생성에서 처리됩니다
    * @param dto 
+   * @returns token
    */
   async login(dto: LoginDto) {
     // 1. 닉네임으로 사용자 검색
     const user = await this.userRepository.findOneBy({user_name: dto.user_name});
-    Logger.debug(dto)
-    Logger.debug(user)
     if(user && await bcrypt.compare(dto.user_pwd, user.user_pwd)) {
         // 2. 유효한 사용자인 경우 토큰 발급하여 반환
         const userId = user.user_id;
@@ -311,7 +309,6 @@ export class AuthService {
 
   
   // === Helpers === //
-
   // 닉네임 중복검사. (미사용)
   async isUserNameUnique(user_name: string) {
     const user = await this.userRepository.createQueryBuilder()
