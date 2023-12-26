@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   OneToMany,
@@ -19,10 +20,13 @@ export class User {
   @Column({ unique: true })
   user_name: string;
 
-  @Column()
+  @Column({ nullable: true })
   user_tel: string;
 
-  @Column({ unique: true })
+  @Column({ nullable: true })
+  user_pwd: string;
+
+  @Column({ unique: true, nullable: true })
   user_kakao_id: string;
 
   @Column({ default: 10 })
@@ -40,13 +44,18 @@ export class User {
   @Column({ default: 1 })
   login_seq: number;
 
-  // @OneToOne(() => Room)
-  // @JoinColumn()
-  // room_id: number;
-
   @ManyToMany(() => User)
-  @JoinTable()
-  // TODO: @JoinColumn({ name: '', referencedColumnName: '' })
+  @JoinTable({
+    name: 'user_friends',
+    joinColumn: {
+        name: 'user_id',
+        referencedColumnName: 'user_id',
+    },
+    inverseJoinColumn: {
+        name: 'friend_id',
+        referencedColumnName: 'user_id',
+    }
+  })
   friends: User[];
 
   @OneToMany(() => Todo, (todo) => todo.user)
@@ -54,6 +63,9 @@ export class User {
 
   @Column({ default: () => 'CURRENT_DATE' })
   last_login: Date;
+  
+  @Column({nullable: true})
+  socket_id: string;
 
   @CreateDateColumn()
   reg_at: Date;
@@ -63,7 +75,4 @@ export class User {
 
   @DeleteDateColumn()
   del_at: Date;
-
-  @Column({nullable: true})
-  socket_id: string;
 }
