@@ -68,7 +68,7 @@ export class TodoController {
     @Request() req,
   ) {
     const user = req.user;
-    return this.todoService.editDone(todo_id, todo_done, user.user_id);
+    return this.todoService.check(todo_id, todo_done, user);
   }
 
   @Get('/today/count')

@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { DataSource, EntityManager, QueryRunner, Repository } from 'typeorm';
 import { Todo } from 'src/entities/todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -299,7 +299,101 @@ export class TodoService {
     await this.todoRepo.save(todo);
   }
 
+  // CHECK TODO
+  async check(todo_id: number, todo_done: boolean, user: User) {
+    return this.dataSource.transaction(async (manager: EntityManager) => {
+        // 1. 투두 업데이트
+        const todo = await manager.findOneBy(Todo, {todo_id: todo_id});
+        Logger.debug(todo);
+        Logger.debug(todo_done);
+        if(todo_done === undefined || todo === null) {
+            // 1-1. 투두가 없음
+            throw this.dwExcept.NoData;
+        }
+
+        if(todo.user_id !== user.user_id) {
+            // 1-2. 사용자의 투두가 아님
+            throw this.dwExcept.Authorization;
+        }
+
+        if(todo.todo_done === todo_done) {
+            // 1-3. 이미 체크된 경우, 응답 구성 및 반환
+            const result = {
+                user_id: user.user_id,
+                user_cash: user.user_cash,
+                todo_id: todo.todo_id,
+                todo_done: todo.todo_done,
+            }
+            return { result };
+        }
+
+        todo.todo_done = todo_done;
+        const savedTodo = await manager.save(todo);
+
+        // 2. 투두 리워드 계산
+        // 2-1. 지난 날짜 투두는 제외
+        const now: Date = new Date();
+        const year  = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const date  = now.getDate().toString().padStart(2, '0');
+
+        const today = `${year}-${month}-${date}`;
+        const todoDate = savedTodo.todo_date.toString();
+        Logger.debug(`today: ${today}, tododate: ${todoDate}`)
+
+        if(todoDate < today) {
+            // 응답 구성, 반환
+            const result = {
+                user_id: user.user_id,
+                user_cash: user.user_cash,
+                todo_id: savedTodo.todo_id,
+                todo_done: savedTodo.todo_done,
+            }
+            return { result };
+        }
+
+        // 2-2. 오늘 완료된 투두 개수 계산
+        const user_id = user.user_id;
+        const todayDone = await manager
+            .createQueryBuilder()
+            .from(Todo, 'todo')
+            .where('todo.user_id = :user_id', {user_id})
+            .andWhere('todo.todo_date = :today', {today})
+            .andWhere('todo.todo_done = true')
+            .getCount();
+
+
+        // 2-3. 유저 캐시 업데이트
+        if(todo_done) {
+            if(todayDone === 1) {
+                user.user_cash += Reward.FIRST_TODO_REWARD;
+            } else {
+                user.user_cash += Reward.NORAML_TODO_REWARD;
+            }
+        } else {
+            if(todayDone === 0) {
+                user.user_cash -= Reward.FIRST_TODO_REWARD;
+            } else {
+                user.user_cash -= Reward.NORAML_TODO_REWARD;
+            }
+        }
+
+        const savedUser = await manager.save(user);
+
+        // 3. 응답 구성, 반환
+        const result = {
+            user_id: savedUser.user_id,
+            user_cash: savedUser.user_cash,
+            todo_id: savedTodo.todo_id,
+            todo_done: savedTodo.todo_done,
+        };
+
+        return { result }; 
+    });
+  }
+
   // 투두 완료상태 변경
+  // [위 함수 테스트 완료되는대로 삭제 예정]
   async editDone(todo_id: number, todo_done: boolean, user_id: number) {
     const today: Date = new Date();
 
