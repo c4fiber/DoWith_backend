@@ -304,8 +304,6 @@ export class TodoService {
     return this.dataSource.transaction(async (manager: EntityManager) => {
         // 1. 투두 업데이트
         const todo = await manager.findOneBy(Todo, {todo_id: todo_id});
-        Logger.debug(todo);
-        Logger.debug(todo_done);
         if(todo_done === undefined || todo === null) {
             // 1-1. 투두가 없음
             throw this.dwExcept.NoData;
@@ -339,7 +337,6 @@ export class TodoService {
 
         const today = `${year}-${month}-${date}`;
         const todoDate = savedTodo.todo_date.toString();
-        Logger.debug(`today: ${today}, tododate: ${todoDate}`)
 
         if(todoDate < today) {
             // 응답 구성, 반환
@@ -393,7 +390,7 @@ export class TodoService {
   }
 
   // 투두 완료상태 변경
-  // [위 함수 테스트 완료되는대로 삭제 예정]
+  // [위 check 함수 테스트 완료되는대로 삭제 예정]
   async editDone(todo_id: number, todo_done: boolean, user_id: number) {
     const today: Date = new Date();
 
