@@ -16,8 +16,9 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
-import { SignUpDto } from './dto/singup.dto';
+import { SignUpDto } from './dto/signup.dto';
 import { User } from 'src/entities/user.entities';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -29,9 +30,13 @@ export class AuthController {
   }
 
   @Post('/signup')
-  @UsePipes(ValidationPipe)
   async singup(@Body() body: SignUpDto) {
-    return await this.authService.signup(body);
+    return await this.authService.register(body);
+  }
+
+  @Post('/login')
+  async login(@Body() body: LoginDto) {
+    return await this.authService.login(body);
   }
 
   @Get('/')

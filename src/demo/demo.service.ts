@@ -104,7 +104,7 @@ export class DemoService {
             const present   = 103;
             const fireplace = 105;
             const candle    = 106;
-            const petExp    = 1995;
+            const petExp    = 1990;
 
             await manager.insert(ItemInventory, {   // 중간여우
                 user_id: userId,
