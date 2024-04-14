@@ -39,7 +39,7 @@ export class UserService {
   // 유저 수정
   async updateUser(id: number, request: UserRequestDto): Promise<boolean> {
     // 만약 중복된 이름일 경우 예외 반환
-    const { user_name, user_tel } = request;
+    const { user_name } = request;
     const user = await this.userRepository.findOneBy({ user_name: user_name });
     if (user !== null) {
       throw this.doWithException.UserNameNotUnique;
@@ -50,7 +50,6 @@ export class UserService {
       .update(User)
       .set({
         user_name: user_name,
-        user_tel: user_tel,
       })
       .where('user_id = :id', { id })
       .execute();
